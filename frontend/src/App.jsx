@@ -20,7 +20,7 @@ import DashboardPage from "./pages/DashboardPage";
 import DevToolsPage from "./pages/DevToolsPage";
 import ProjectsPage from "./pages/ProjectsPage";
 import SnippetsPage from "./pages/SnippetsPage";
-import DocsPage from "./pages/PlaceholderPage";
+import DocsPage from "./pages/DocsPage";
 import NotesPage from "./pages/PlaceholderPage";
 import EnvVaultPage from "./pages/PlaceholderPage";
 import BookmarksPage from "./pages/PlaceholderPage";
@@ -54,7 +54,7 @@ function App() {
                 <Route path="/dev-tools" element={<DevToolsPage />} />
                 <Route path="/projects" element={<ProjectsPage />} />
                 <Route path="/snippets" element={<SnippetsPage />} />
-                <Route path="/docs" element={<DocsPage title="Docs" icon="📖" />} />
+                <Route path="/docs" element={<DocsPage />} />
                 <Route path="/notes" element={<NotesPage title="Notes" icon="📝" />} />
                 <Route path="/env-vault" element={<EnvVaultPage title="Env Vault" icon="🔐" />} />
                 <Route path="/bookmarks" element={<BookmarksPage title="Bookmarks" icon="🔖" />} />
