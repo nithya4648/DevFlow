@@ -16,11 +16,14 @@ const cookieParser = require("cookie-parser");
 const app = express();
 const server = http.createServer(app);
 
-// Socket.io setup (used later for real-time notifications/activity feed)
+const { configureSocket } = require("./utils/socketService");
+
+// Socket.io setup (real-time notifications/activity feed)
 const io = new Server(server, {
   cors: { origin: process.env.CLIENT_URL, credentials: true },
 });
 app.set("io", io);
+configureSocket(io);
 
 // Core middleware
 app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
@@ -33,6 +36,8 @@ const snippetRoutes = require("./routes/snippet.routes");
 const docRoutes = require("./routes/doc.routes");
 const noteRoutes = require("./routes/note.routes");
 const envRoutes = require("./routes/env.routes");
+const bookmarkRoutes = require("./routes/bookmark.routes");
+const notificationRoutes = require("./routes/notification.routes");
 
 // Routes
 app.use("/api/health", healthRoutes);
@@ -42,6 +47,8 @@ app.use("/api/snippets", snippetRoutes);
 app.use("/api/docs", docRoutes);
 app.use("/api/notes", noteRoutes);
 app.use("/api/env-vars", envRoutes);
+app.use("/api/bookmarks", bookmarkRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 // Error handling (always last)
 app.use(notFound);

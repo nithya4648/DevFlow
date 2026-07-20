@@ -3,6 +3,7 @@ import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-do
 import useAuth from "../hooks/useAuth";
 import useDarkMode from "../hooks/useDarkMode";
 import { useToast } from "../context/ToastContext";
+import { useNotifications } from "../context/NotificationContext";
 import {
   FaBars,
   FaTimes,
@@ -21,6 +22,7 @@ import {
   FaLock,
   FaBookmark,
   FaCog,
+  FaBell,
 } from "react-icons/fa";
 
 export const DashboardLayout = () => {
@@ -35,6 +37,10 @@ export const DashboardLayout = () => {
   });
   const [mobileOpen, setMobileOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const [notifDropdownOpen, setNotifDropdownOpen] = useState(false);
+
+  // From context
+  const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
 
   useEffect(() => {
     localStorage.setItem("devflow_sidebar_collapsed", collapsed);
@@ -168,11 +174,90 @@ export const DashboardLayout = () => {
               {theme === "dark" ? <FaSun className="h-4.5 w-4.5" /> : <FaMoon className="h-4.5 w-4.5" />}
             </button>
 
+            {/* Notifications Dropdown */}
+            {user && (
+              <div className="relative">
+                <button
+                  onClick={() => {
+                    setNotifDropdownOpen(!notifDropdownOpen);
+                    setProfileDropdownOpen(false);
+                  }}
+                  className="relative rounded-xl border border-gray-150 bg-gray-50 dark:border-gray-850 dark:bg-gray-950/40 p-2.5 text-gray-500 hover:text-indigo-500 dark:text-gray-400 dark:hover:text-indigo-400 transition"
+                >
+                  <FaBell className="h-4.5 w-4.5" />
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white shadow-sm ring-2 ring-white dark:ring-gray-900">
+                      {unreadCount > 99 ? '99+' : unreadCount}
+                    </span>
+                  )}
+                </button>
+
+                {notifDropdownOpen && (
+                  <>
+                    <div
+                      onClick={() => setNotifDropdownOpen(false)}
+                      className="fixed inset-0 z-40"
+                    />
+                    <div className="absolute right-0 mt-2.5 w-80 origin-top-right rounded-xl border border-gray-150 bg-white shadow-xl dark:border-gray-800 dark:bg-gray-900 z-50 flex flex-col max-h-[400px]">
+                      {/* Header */}
+                      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-gray-800">
+                        <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Notifications</h3>
+                        {unreadCount > 0 && (
+                          <button
+                            onClick={markAllAsRead}
+                            className="text-xs text-indigo-500 hover:text-indigo-600 dark:text-indigo-400 font-medium"
+                          >
+                            Mark all read
+                          </button>
+                        )}
+                      </div>
+
+                      {/* List */}
+                      <div className="flex-1 overflow-y-auto p-2 space-y-1">
+                        {notifications.length === 0 ? (
+                          <div className="py-6 text-center text-sm text-gray-500">
+                            No notifications yet.
+                          </div>
+                        ) : (
+                          notifications.map((n) => (
+                            <div
+                              key={n._id}
+                              onClick={() => {
+                                if (!n.isRead) markAsRead(n._id);
+                              }}
+                              className={`p-3 rounded-lg flex flex-col gap-1 cursor-pointer transition ${
+                                n.isRead
+                                  ? "bg-transparent hover:bg-gray-50 dark:hover:bg-gray-800/50 opacity-70"
+                                  : "bg-indigo-50 dark:bg-indigo-900/10 hover:bg-indigo-100 dark:hover:bg-indigo-900/20"
+                              }`}
+                            >
+                              <div className="flex items-start justify-between gap-2">
+                                <p className={`text-xs ${n.isRead ? "text-gray-600 dark:text-gray-400" : "text-gray-900 dark:text-gray-100 font-medium"}`}>
+                                  {n.message}
+                                </p>
+                                {!n.isRead && <span className="w-2 h-2 rounded-full bg-indigo-500 shrink-0 mt-1" />}
+                              </div>
+                              <span className="text-[10px] text-gray-400">
+                                {new Date(n.createdAt).toLocaleString()}
+                              </span>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
+
             {/* Profile Dropdown */}
             {user && (
               <div className="relative">
                 <button
-                  onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+                  onClick={() => {
+                    setProfileDropdownOpen(!profileDropdownOpen);
+                    setNotifDropdownOpen(false);
+                  }}
                   className="flex items-center gap-2 outline-none group"
                 >
                   {user.avatar ? (

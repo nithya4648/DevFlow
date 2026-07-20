@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { ToastProvider } from "./context/ToastContext";
+import { NotificationProvider } from "./context/NotificationContext";
 
 // Public pages
 import LoginPage from "./pages/LoginPage";
@@ -23,7 +24,7 @@ import SnippetsPage from "./pages/SnippetsPage";
 import DocsPage from "./pages/DocsPage";
 import NotesPage from "./pages/NotesPage";
 import EnvVaultPage from "./pages/EnvVaultPage";
-import BookmarksPage from "./pages/PlaceholderPage";
+import BookmarksPage from "./pages/BookmarksPage";
 import SettingsPage from "./pages/PlaceholderPage";
 
 // Dev Tools
@@ -45,7 +46,8 @@ function App() {
   return (
     <ToastProvider>
       <AuthProvider>
-        <BrowserRouter>
+        <NotificationProvider>
+          <BrowserRouter>
           <Routes>
             {/* Protected Dashboard Shell */}
             <Route element={<ProtectedRoute />}>
@@ -57,7 +59,7 @@ function App() {
                 <Route path="/docs" element={<DocsPage />} />
                 <Route path="/notes" element={<NotesPage />} />
                 <Route path="/env-vault" element={<EnvVaultPage />} />
-                <Route path="/bookmarks" element={<BookmarksPage title="Bookmarks" icon="🔖" />} />
+                <Route path="/bookmarks" element={<BookmarksPage />} />
                 <Route path="/settings" element={<SettingsPage title="Settings" icon="⚙️" />} />
 
                 {/* Dev Tools sub-routes */}
@@ -85,7 +87,8 @@ function App() {
             <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
             <Route path="/verify-email/:token" element={<VerifyEmailPage />} />
           </Routes>
-        </BrowserRouter>
+          </BrowserRouter>
+        </NotificationProvider>
       </AuthProvider>
     </ToastProvider>
   );

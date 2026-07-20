@@ -51,6 +51,20 @@ const register = async (req, res, next) => {
       verificationTokenExpiry,
     });
 
+    // --- CREATE AND EMIT WELCOME NOTIFICATION ---
+    const Notification = require("../models/Notification.model");
+    const { emitNotificationToUser } = require("../utils/socketService");
+    
+    const welcomeNote = await Notification.create({
+      recipient: user._id,
+      type: "success",
+      message: `Welcome to DevFlow, ${user.name}! 🚀 Explore your new developer dashboard.`,
+    });
+    
+    // Emit real-time socket event if they connect immediately, though usually they connect after this response
+    emitNotificationToUser(req, user._id, welcomeNote);
+    // ---------------------------------------------
+
     // 5. Send verification email (async)
     sendVerificationEmail(user.email, verificationToken).catch((err) =>
       console.error(`Error sending email to ${user.email}:`, err.message)
