@@ -31,6 +31,7 @@ app.use(express.urlencoded({ extended: true }));
 const projectRoutes = require("./routes/project.routes");
 const snippetRoutes = require("./routes/snippet.routes");
 const docRoutes = require("./routes/doc.routes");
+const noteRoutes = require("./routes/note.routes");
 
 // Routes
 app.use("/api/health", healthRoutes);
@@ -38,6 +39,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api/snippets", snippetRoutes);
 app.use("/api/docs", docRoutes);
+app.use("/api/notes", noteRoutes);
 
 // Error handling (always last)
 app.use(notFound);
