@@ -28,9 +28,12 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+const projectRoutes = require("./routes/project.routes");
+
 // Routes
 app.use("/api/health", healthRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/projects", projectRoutes);
 
 // Error handling (always last)
 app.use(notFound);
