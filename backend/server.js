@@ -32,6 +32,7 @@ const projectRoutes = require("./routes/project.routes");
 const snippetRoutes = require("./routes/snippet.routes");
 const docRoutes = require("./routes/doc.routes");
 const noteRoutes = require("./routes/note.routes");
+const envRoutes = require("./routes/env.routes");
 
 // Routes
 app.use("/api/health", healthRoutes);
@@ -40,6 +41,7 @@ app.use("/api/projects", projectRoutes);
 app.use("/api/snippets", snippetRoutes);
 app.use("/api/docs", docRoutes);
 app.use("/api/notes", noteRoutes);
+app.use("/api/env-vars", envRoutes);
 
 // Error handling (always last)
 app.use(notFound);

@@ -22,7 +22,7 @@ import ProjectsPage from "./pages/ProjectsPage";
 import SnippetsPage from "./pages/SnippetsPage";
 import DocsPage from "./pages/DocsPage";
 import NotesPage from "./pages/NotesPage";
-import EnvVaultPage from "./pages/PlaceholderPage";
+import EnvVaultPage from "./pages/EnvVaultPage";
 import BookmarksPage from "./pages/PlaceholderPage";
 import SettingsPage from "./pages/PlaceholderPage";
 
@@ -56,7 +56,7 @@ function App() {
                 <Route path="/snippets" element={<SnippetsPage />} />
                 <Route path="/docs" element={<DocsPage />} />
                 <Route path="/notes" element={<NotesPage />} />
-                <Route path="/env-vault" element={<EnvVaultPage title="Env Vault" icon="🔐" />} />
+                <Route path="/env-vault" element={<EnvVaultPage />} />
                 <Route path="/bookmarks" element={<BookmarksPage title="Bookmarks" icon="🔖" />} />
                 <Route path="/settings" element={<SettingsPage title="Settings" icon="⚙️" />} />
 
