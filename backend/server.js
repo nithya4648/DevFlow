@@ -29,11 +29,13 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const projectRoutes = require("./routes/project.routes");
+const snippetRoutes = require("./routes/snippet.routes");
 
 // Routes
 app.use("/api/health", healthRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/projects", projectRoutes);
+app.use("/api/snippets", snippetRoutes);
 
 // Error handling (always last)
 app.use(notFound);

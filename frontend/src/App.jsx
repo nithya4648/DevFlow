@@ -19,7 +19,7 @@ import DashboardPage from "./pages/DashboardPage";
 // Placeholder pages
 import DevToolsPage from "./pages/DevToolsPage";
 import ProjectsPage from "./pages/ProjectsPage";
-import SnippetsPage from "./pages/PlaceholderPage";
+import SnippetsPage from "./pages/SnippetsPage";
 import DocsPage from "./pages/PlaceholderPage";
 import NotesPage from "./pages/PlaceholderPage";
 import EnvVaultPage from "./pages/PlaceholderPage";
@@ -53,7 +53,7 @@ function App() {
                 <Route path="/" element={<DashboardPage />} />
                 <Route path="/dev-tools" element={<DevToolsPage />} />
                 <Route path="/projects" element={<ProjectsPage />} />
-                <Route path="/snippets" element={<SnippetsPage title="Snippets" icon="🧩" />} />
+                <Route path="/snippets" element={<SnippetsPage />} />
                 <Route path="/docs" element={<DocsPage title="Docs" icon="📖" />} />
                 <Route path="/notes" element={<NotesPage title="Notes" icon="📝" />} />
                 <Route path="/env-vault" element={<EnvVaultPage title="Env Vault" icon="🔐" />} />
