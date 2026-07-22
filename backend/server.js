@@ -38,6 +38,9 @@ const noteRoutes = require("./routes/note.routes");
 const envRoutes = require("./routes/env.routes");
 const bookmarkRoutes = require("./routes/bookmark.routes");
 const notificationRoutes = require("./routes/notification.routes");
+const teamRoutes = require("./routes/team.routes");
+const commentRoutes = require("./routes/comment.routes");
+const searchRoutes = require("./routes/search.routes");
 
 // Routes
 app.use("/api/health", healthRoutes);
@@ -49,6 +52,9 @@ app.use("/api/notes", noteRoutes);
 app.use("/api/env-vars", envRoutes);
 app.use("/api/bookmarks", bookmarkRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use("/api/teams", teamRoutes);
+app.use("/api/comments", commentRoutes);
+app.use("/api/search", searchRoutes);
 
 // Error handling (always last)
 app.use(notFound);

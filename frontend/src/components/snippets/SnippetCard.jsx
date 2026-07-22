@@ -36,7 +36,7 @@ function exportSnippet(snippet) {
   URL.revokeObjectURL(url);
 }
 
-export default function SnippetCard({ snippet, onEdit, onDelete, onToggleFavorite }) {
+export default function SnippetCard({ snippet, onEdit, onDelete, onToggleFavorite, canEdit = true, canDelete = true }) {
   const [copied, copy] = useCopyToClipboard();
   const langColor = LANG_COLOR[snippet.language] || "text-gray-400 bg-gray-400/10";
   const codePreview = snippet.code.split("\n").slice(0, 5).join("\n");
@@ -60,6 +60,11 @@ export default function SnippetCard({ snippet, onEdit, onDelete, onToggleFavorit
           <h3 className="text-sm font-semibold text-gray-100 truncate">{snippet.title}</h3>
           {snippet.description && (
             <p className="text-xs text-gray-500 line-clamp-1 mt-0.5">{snippet.description}</p>
+          )}
+          {snippet.teamId && (
+            <span className="inline-flex items-center mt-1 text-[9px] font-bold text-cyan-400 bg-cyan-500/10 px-1.5 py-0.5 rounded border border-cyan-500/20">
+              👥 {snippet.teamId.name || "Team"}
+            </span>
           )}
         </div>
 
@@ -138,26 +143,30 @@ export default function SnippetCard({ snippet, onEdit, onDelete, onToggleFavorit
           </button>
 
           {/* Edit */}
-          <button
-            onClick={() => onEdit(snippet)}
-            title="Edit snippet"
-            className="p-1.5 rounded-lg text-gray-400 hover:text-indigo-400 hover:bg-indigo-400/10 transition-all"
-          >
-            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-            </svg>
-          </button>
+          {canEdit && (
+            <button
+              onClick={() => onEdit(snippet)}
+              title="Edit snippet"
+              className="p-1.5 rounded-lg text-gray-400 hover:text-indigo-400 hover:bg-indigo-400/10 transition-all"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+            </button>
+          )}
 
           {/* Delete */}
-          <button
-            onClick={() => onDelete(snippet._id)}
-            title="Delete snippet"
-            className="p-1.5 rounded-lg text-gray-400 hover:text-red-400 hover:bg-red-400/10 transition-all"
-          >
-            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-            </svg>
-          </button>
+          {canDelete && (
+            <button
+              onClick={() => onDelete(snippet._id)}
+              title="Delete snippet"
+              className="p-1.5 rounded-lg text-gray-400 hover:text-red-400 hover:bg-red-400/10 transition-all"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </button>
+          )}
         </div>
       </div>
     </div>

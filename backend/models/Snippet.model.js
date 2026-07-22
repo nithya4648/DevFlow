@@ -45,14 +45,19 @@ const snippetSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    teamId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Team",
+      default: null,
+    },
   },
   {
     timestamps: true,
   }
 );
 
-// Efficient queries: owner + favorite + language
-snippetSchema.index({ owner: 1, language: 1, isFavorite: 1, createdAt: -1 });
+// Efficient queries
+snippetSchema.index({ owner: 1, teamId: 1, language: 1, isFavorite: 1, createdAt: -1 });
 // Text search on title
 snippetSchema.index({ title: "text", description: "text" });
 

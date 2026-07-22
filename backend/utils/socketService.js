@@ -45,10 +45,21 @@ const configureSocket = (io) => {
     }
   });
 
-  io.on("connection", (socket) => {
+  io.on("connection", async (socket) => {
     // Join a room named user_<userId> for targeted notifications
     const roomName = `user_${socket.user._id}`;
     socket.join(roomName);
+
+    // Join team rooms
+    try {
+      const Team = require("../models/Team.model");
+      const userTeams = await Team.find({ "members.user": socket.user._id }).select("_id").lean();
+      userTeams.forEach((t) => {
+        socket.join(`team_${t._id}`);
+      });
+    } catch (err) {
+      console.error("Socket team rooms join error:", err);
+    }
     
     // console.log(`Socket ${socket.id} connected for user ${socket.user.name}`);
 

@@ -2,6 +2,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import Editor from "@monaco-editor/react";
+import { useTeams } from "../../hooks/useTeams";
+import CommentSection from "../collaboration/CommentSection";
 
 export const LANGUAGES = [
   { value: "javascript", label: "JavaScript" },
@@ -36,6 +38,9 @@ export default function SnippetModal({ isOpen, onClose, onSubmit, initialData, i
   const [code, setCode] = useState("");
   const overlayRef = useRef(null);
 
+  const { data: teamsRes } = useTeams();
+  const teams = teamsRes?.data || [];
+
   const {
     register,
     handleSubmit,
@@ -51,6 +56,7 @@ export default function SnippetModal({ isOpen, onClose, onSubmit, initialData, i
       folder: "",
       tags: [],
       isFavorite: false,
+      teamId: "",
     },
   });
 
@@ -66,10 +72,11 @@ export default function SnippetModal({ isOpen, onClose, onSubmit, initialData, i
         folder: initialData.folder || "",
         tags: initialData.tags || [],
         isFavorite: initialData.isFavorite || false,
+        teamId: initialData.teamId ? (initialData.teamId._id || initialData.teamId) : "",
       });
       setCode(initialData.code || "");
     } else {
-      reset({ title: "", language: "javascript", description: "", folder: "", tags: [], isFavorite: false });
+      reset({ title: "", language: "javascript", description: "", folder: "", tags: [], isFavorite: false, teamId: "" });
       setCode("");
     }
     setTagInput("");
@@ -174,80 +181,106 @@ export default function SnippetModal({ isOpen, onClose, onSubmit, initialData, i
                 </div>
               </div>
 
-              {/* Tags */}
-              <div>
-                <label className="block text-xs font-medium text-gray-400 mb-1">Tags</label>
-                <div className="flex gap-2">
-                  <input
-                    value={tagInput}
-                    onChange={(e) => setTagInput(e.target.value)}
-                    onKeyDown={(e) => { if (e.key === "Enter") addTag(e); }}
-                    placeholder="Add tag…"
-                    className="flex-1 bg-gray-800 border border-white/10 rounded-xl px-3 py-2 text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition"
-                  />
-                  <button type="button" onClick={addTag} className="px-3 py-2 bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-300 rounded-xl text-sm transition">
-                    Add
-                  </button>
-                </div>
-                {tags.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5 mt-2">
-                    {tags.map((tag) => (
-                      <span key={tag} className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-400 border border-indigo-500/20">
-                        #{tag}
-                        <button type="button" onClick={() => removeTag(tag)} className="hover:text-red-400 transition-colors">×</button>
-                      </span>
-                    ))}
+              {/* Tags + Team Scope */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-gray-400 mb-1">Tags</label>
+                  <div className="flex gap-2">
+                    <input
+                      value={tagInput}
+                      onChange={(e) => setTagInput(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === "Enter") addTag(e); }}
+                      placeholder="Add tag…"
+                      className="flex-1 bg-gray-800 border border-white/10 rounded-xl px-3 py-2 text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition"
+                    />
+                    <button type="button" onClick={addTag} className="px-3 py-2 bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-300 rounded-xl text-sm transition">
+                      Add
+                    </button>
                   </div>
-                )}
+                  {tags.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mt-2">
+                      {tags.map((tag) => (
+                        <span key={tag} className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-400 border border-indigo-500/20">
+                          #{tag}
+                          <button type="button" onClick={() => removeTag(tag)} className="hover:text-red-400 transition-colors">×</button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                
+                <div>
+                  <label className="block text-xs font-medium text-gray-400 mb-1">Workspace Scoping (Team)</label>
+                  <select
+                    {...register("teamId")}
+                    className="w-full bg-gray-800 border border-white/10 rounded-xl px-3 py-2 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition"
+                  >
+                    <option value="">Private (Personal)</option>
+                    {teams.map((t) => (
+                      <option key={t._id} value={t._id}>{t.name}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
 
-              {/* Favorite toggle */}
-              <label className="flex items-center gap-2 cursor-pointer select-none">
-                <input type="checkbox" {...register("isFavorite")} className="w-4 h-4 accent-indigo-500" />
-                <span className="text-sm text-gray-400">Mark as favorite ⭐</span>
-              </label>
-            </div>
+            {/* Favorite toggle */}
+            <label className="flex items-center gap-2 cursor-pointer select-none">
+              <input type="checkbox" {...register("isFavorite")} className="w-4 h-4 accent-indigo-500" />
+              <span className="text-sm text-gray-400">Mark as favorite ⭐</span>
+            </label>
+          </div>
 
-            {/* Monaco Editor */}
-            <div className="mx-6 mt-4 mb-1">
-              <label className="block text-xs font-medium text-gray-400 mb-1">
-                Code * {!code.trim() && <span className="text-red-400">(required)</span>}
-              </label>
-            </div>
-            <div className="mx-6 mb-4 rounded-xl overflow-hidden border border-white/10">
-              <Editor
-                height="240px"
-                language={selectedLang}
-                value={code}
-                onChange={(val) => setCode(val || "")}
-                theme="vs-dark"
-                options={{
-                  fontSize: 13,
-                  minimap: { enabled: false },
-                  scrollBeyondLastLine: false,
-                  lineNumbers: "on",
-                  wordWrap: "on",
-                  padding: { top: 12, bottom: 12 },
-                  renderLineHighlight: "line",
-                  scrollbar: { vertical: "auto", horizontal: "auto" },
-                }}
+          {/* Comments section if snippet exists */}
+          {initialData?._id && (
+            <div className="px-6 border-t border-white/5">
+              <CommentSection
+                targetType="snippet"
+                targetId={initialData._id}
+                teamId={initialData.teamId?._id || initialData.teamId}
               />
             </div>
-          </div>
+          )}
 
-          {/* Footer actions */}
-          <div className="flex justify-end gap-3 px-6 py-4 border-t border-white/10 shrink-0">
-            <button type="button" onClick={onClose} className="px-4 py-2 text-sm text-gray-400 hover:text-gray-200 transition">
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={isLoading || !code.trim()}
-              className="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-sm font-medium rounded-xl transition-colors"
-            >
-              {isLoading ? "Saving…" : initialData ? "Save Changes" : "Create Snippet"}
-            </button>
+          {/* Monaco Editor */}
+          <div className="mx-6 mt-4 mb-1">
+            <label className="block text-xs font-medium text-gray-400 mb-1">
+              Code * {!code.trim() && <span className="text-red-400">(required)</span>}
+            </label>
           </div>
+          <div className="mx-6 mb-4 rounded-xl overflow-hidden border border-white/10">
+            <Editor
+              height="200px"
+              language={selectedLang}
+              value={code}
+              onChange={(val) => setCode(val || "")}
+              theme="vs-dark"
+              options={{
+                fontSize: 13,
+                minimap: { enabled: false },
+                scrollBeyondLastLine: false,
+                lineNumbers: "on",
+                wordWrap: "on",
+                padding: { top: 12, bottom: 12 },
+                renderLineHighlight: "line",
+                scrollbar: { vertical: "auto", horizontal: "auto" },
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Footer actions */}
+        <div className="flex justify-end gap-3 px-6 py-4 border-t border-white/10 shrink-0">
+          <button type="button" onClick={onClose} className="px-4 py-2 text-sm text-gray-400 hover:text-gray-200 transition">
+            Cancel
+          </button>
+          <button
+            type="submit"
+            disabled={isLoading || !code.trim()}
+            className="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-sm font-medium rounded-xl transition-colors"
+          >
+            {isLoading ? "Saving…" : initialData ? "Save Changes" : "Create Snippet"}
+          </button>
+        </div>
         </form>
       </div>
     </div>

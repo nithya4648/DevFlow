@@ -1,6 +1,8 @@
 // frontend/src/components/projects/ProjectModal.jsx
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
+import { useTeams } from "../../hooks/useTeams";
+import CommentSection from "../collaboration/CommentSection";
 
 const STATUS_OPTIONS = [
   { value: "todo", label: "To Do" },
@@ -18,6 +20,9 @@ export default function ProjectModal({ isOpen, onClose, onSubmit, initialData, i
   const [labelInput, setLabelInput] = useState("");
   const overlayRef = useRef(null);
 
+  const { data: teamsRes } = useTeams();
+  const teams = teamsRes?.data || [];
+
   const {
     register,
     handleSubmit,
@@ -34,6 +39,7 @@ export default function ProjectModal({ isOpen, onClose, onSubmit, initialData, i
       labels: [],
       deadline: "",
       category: "",
+      teamId: "",
     },
   });
 
@@ -52,6 +58,7 @@ export default function ProjectModal({ isOpen, onClose, onSubmit, initialData, i
           ? new Date(initialData.deadline).toISOString().split("T")[0]
           : "",
         category: initialData.category || "",
+        teamId: initialData.teamId ? (initialData.teamId._id || initialData.teamId) : "",
       });
     } else {
       reset({
@@ -62,6 +69,7 @@ export default function ProjectModal({ isOpen, onClose, onSubmit, initialData, i
         labels: [],
         deadline: "",
         category: "",
+        teamId: "",
       });
     }
     setLabelInput("");
@@ -234,6 +242,29 @@ export default function ProjectModal({ isOpen, onClose, onSubmit, initialData, i
               </div>
             )}
           </div>
+
+          {/* Team Scope */}
+          <div>
+            <label className="block text-xs font-medium text-gray-400 mb-1">Workspace Scoping (Team)</label>
+            <select
+              {...register("teamId")}
+              className="w-full bg-gray-800 border border-white/10 rounded-xl px-3 py-2 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition"
+            >
+              <option value="">Private (Personal)</option>
+              {teams.map((t) => (
+                <option key={t._id} value={t._id}>{t.name}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Comments section if project exists */}
+          {initialData?._id && (
+            <CommentSection
+              targetType="project"
+              targetId={initialData._id}
+              teamId={initialData.teamId?._id || initialData.teamId}
+            />
+          )}
 
           {/* Actions */}
           <div className="flex justify-end gap-3 pt-2">

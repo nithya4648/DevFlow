@@ -1,12 +1,19 @@
 // frontend/src/pages/DocsPage.jsx
-import { useState, useEffect } from "react";
+import { useContext, useState, useEffect } from "react";
 import { useDocs, useDoc, useCreateDoc, useUpdateDoc, useDeleteDoc } from "../hooks/useDocs";
 import DocSidebar from "../components/docs/DocSidebar";
 import MarkdownEditor from "../components/docs/MarkdownEditor";
 import DocVersionHistory from "../components/docs/DocVersionHistory";
+import CommentSection from "../components/collaboration/CommentSection";
 import { Skeleton } from "../components/ui/Skeleton";
+import { AuthContext } from "../context/AuthContext";
+import { useTeams } from "../hooks/useTeams";
 
 export default function DocsPage() {
+  const { user } = useContext(AuthContext);
+  const { data: teamsData } = useTeams();
+  const teams = teamsData?.data || [];
+
   const [search, setSearch] = useState("");
   const [selectedDocId, setSelectedDocId] = useState(null);
   const [showHistory, setShowHistory] = useState(false);
@@ -19,6 +26,19 @@ export default function DocsPage() {
   // Fetch full detail of selected doc
   const { data: docDetailData, isLoading: loadingDetail } = useDoc(selectedDocId);
   const selectedDoc = docDetailData?.data;
+
+  // Compute role for selected doc
+  const selectedDocRole = (() => {
+    if (!selectedDoc) return null;
+    const teamId = selectedDoc.teamId?._id || selectedDoc.teamId;
+    if (!teamId) return null; // private → full access
+    const team = teams.find((t) => t._id === teamId);
+    const member = team?.members?.find((m) => (m.user?._id || m.user) === user?._id);
+    return member?.role || "viewer";
+  })();
+
+  const canEdit = !selectedDocRole || selectedDocRole === "admin" || selectedDocRole === "editor";
+  const canDelete = !selectedDocRole || selectedDocRole === "admin";
 
   const createMutation = useCreateDoc();
   const updateMutation = useUpdateDoc();
@@ -76,7 +96,7 @@ export default function DocsPage() {
           setShowHistory(false);
         }}
         onNewDoc={handleNewDoc}
-        onDeleteDoc={handleDeleteDoc}
+        onDeleteDoc={canDelete ? handleDeleteDoc : undefined}
         searchValue={search}
         onSearch={setSearch}
       />
@@ -132,13 +152,33 @@ export default function DocsPage() {
                  History
                </button>
              </div>
+
+             {/* Viewer read-only banner */}
+             {!canEdit && selectedDoc.teamId && (
+               <div className="mb-3 px-3 py-2 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs flex items-center gap-2">
+                 <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                 </svg>
+                 You have <strong>viewer</strong> access — this document is read-only.
+               </div>
+             )}
              
              <MarkdownEditor
                title={selectedDoc.title}
                content={selectedDoc.content}
                category={selectedDoc.category}
-               onSave={handleSaveDoc}
+               teamId={selectedDoc.teamId}
+               onSave={canEdit ? handleSaveDoc : undefined}
                isSaving={updateMutation.isPending}
+               readOnly={!canEdit}
+             />
+
+             {/* Comments Thread */}
+             <CommentSection
+               targetType="doc"
+               targetId={selectedDoc._id}
+               teamId={selectedDoc.teamId?._id || selectedDoc.teamId}
              />
           </div>
         ) : null}

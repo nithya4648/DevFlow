@@ -1,11 +1,13 @@
 // frontend/src/pages/ProjectsPage.jsx
-import { useState } from "react";
+import { useContext, useState, useCallback } from "react";
 import { useProjects, useCreateProject, useUpdateProject, useDeleteProject } from "../hooks/useProjects";
 import KanbanBoard from "../components/projects/KanbanBoard";
 import CalendarView from "../components/projects/CalendarView";
 import ProjectModal from "../components/projects/ProjectModal";
 import ProjectFilters from "../components/projects/ProjectFilters";
 import { Skeleton } from "../components/ui/Skeleton";
+import { AuthContext } from "../context/AuthContext";
+import { useTeams } from "../hooks/useTeams";
 
 const VIEW_KANBAN = "kanban";
 const VIEW_CALENDAR = "calendar";
@@ -48,11 +50,28 @@ function ProjectsSkeleton() {
 }
 
 export default function ProjectsPage() {
+  const { user } = useContext(AuthContext);
+  const { data: teamsData } = useTeams();
+  const teams = teamsData?.data || [];
+
   const [view, setView] = useState(VIEW_KANBAN);
   const [filters, setFilters] = useState({ search: "", status: "", priority: "" });
   const [modalOpen, setModalOpen] = useState(false);
   const [editProject, setEditProject] = useState(null);
   const [defaultStatus, setDefaultStatus] = useState("todo");
+
+  // Helper: given a project return the current user's edit/delete capability
+  const getPerms = useCallback((project) => {
+    const teamId = project.teamId?._id || project.teamId;
+    if (!teamId) return { canEdit: true, canDelete: true }; // private
+    const team = teams.find((t) => t._id === teamId);
+    const member = team?.members?.find((m) => (m.user?._id || m.user) === user?._id);
+    const role = member?.role || "viewer";
+    return {
+      canEdit: role === "admin" || role === "editor",
+      canDelete: role === "admin",
+    };
+  }, [teams, user]);
 
   // Strip empty filter keys before sending to API
   const activeFilters = Object.fromEntries(
@@ -183,6 +202,7 @@ export default function ProjectsPage() {
             onEdit={openEditModal}
             onDelete={handleDelete}
             onAddNew={openCreateModal}
+            getPerms={getPerms}
           />
         ) : (
           <CalendarView projects={projects} onEdit={openEditModal} />

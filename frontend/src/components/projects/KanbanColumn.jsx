@@ -9,7 +9,7 @@ const COLUMN_CONFIG = {
   "done":        { label: "Done",        accent: "border-emerald-500/50",badge: "bg-emerald-500/20 text-emerald-300", dot: "bg-emerald-400" },
 };
 
-export default function KanbanColumn({ status, projects, onEdit, onDelete, onAddNew }) {
+export default function KanbanColumn({ status, projects, onEdit, onDelete, onAddNew, getPerms }) {
   const { setNodeRef, isOver } = useDroppable({ id: status });
   const config = COLUMN_CONFIG[status];
 
@@ -45,14 +45,19 @@ export default function KanbanColumn({ status, projects, onEdit, onDelete, onAdd
         }`}
       >
         <SortableContext items={projects.map((p) => p._id)} strategy={verticalListSortingStrategy}>
-          {projects.map((project) => (
-            <KanbanCard
-              key={project._id}
-              project={project}
-              onEdit={onEdit}
-              onDelete={onDelete}
-            />
-          ))}
+          {projects.map((project) => {
+            const { canEdit, canDelete } = getPerms ? getPerms(project) : { canEdit: true, canDelete: true };
+            return (
+              <KanbanCard
+                key={project._id}
+                project={project}
+                onEdit={onEdit}
+                onDelete={onDelete}
+                canEdit={canEdit}
+                canDelete={canDelete}
+              />
+            );
+          })}
         </SortableContext>
 
         {/* Empty state drop hint */}

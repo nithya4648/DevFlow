@@ -1,7 +1,16 @@
 // backend/controllers/doc.controller.js
 const Doc = require("../models/Doc.model");
 const DocVersion = require("../models/DocVersion.model");
+const Team = require("../models/Team.model");
 const { createDocSchema, updateDocSchema } = require("../validators/doc.validators");
+const { hasTeamPermission } = require("../utils/rbac");
+const { logActivity } = require("./team.controller");
+
+// Helper to get teams a user belongs to
+const getUserTeams = async (userId) => {
+  const teams = await Team.find({ "members.user": userId }).select("_id").lean();
+  return teams.map((t) => t._id);
+};
 
 // @desc    Get all docs for logged-in user
 // @route   GET /api/docs
@@ -9,7 +18,15 @@ const { createDocSchema, updateDocSchema } = require("../validators/doc.validato
 const getDocs = async (req, res, next) => {
   try {
     const { category, search } = req.query;
-    const filter = { owner: req.user._id };
+
+    const teamIds = await getUserTeams(req.user._id);
+
+    const filter = {
+      $or: [
+        { owner: req.user._id },
+        { teamId: { $in: teamIds } },
+      ],
+    };
 
     if (category) filter.category = category;
     if (search) {
@@ -18,10 +35,16 @@ const getDocs = async (req, res, next) => {
 
     const [docs, categories] = await Promise.all([
       Doc.find(filter)
-        .select("title category updatedAt createdAt") // exclude content for list view
+        .select("title category teamId updatedAt createdAt") // exclude content for list view
+        .populate("teamId", "name")
         .sort({ updatedAt: -1 })
         .lean(),
-      Doc.distinct("category", { owner: req.user._id }),
+      Doc.distinct("category", {
+        $or: [
+          { owner: req.user._id },
+          { teamId: { $in: teamIds } }
+        ]
+      }),
     ]);
 
     res.status(200).json({
@@ -40,7 +63,28 @@ const getDocs = async (req, res, next) => {
 const createDoc = async (req, res, next) => {
   try {
     const validatedData = createDocSchema.parse(req.body);
-    const doc = await Doc.create({ ...validatedData, owner: req.user._id });
+    const teamId = req.body.teamId || null;
+
+    if (teamId) {
+      const isAllowed = await hasTeamPermission(req.user._id, teamId, "editor");
+      if (!isAllowed) {
+        return res.status(403).json({ success: false, message: "Unauthorized to create doc in this team" });
+      }
+    }
+
+    const doc = await Doc.create({
+      ...validatedData,
+      teamId,
+      owner: req.user._id,
+    });
+
+    if (teamId) {
+      await logActivity(teamId, req.user._id, "created document", "doc", doc._id, doc.title);
+      // Emit socket event
+      const io = req.app.get("io");
+      if (io) io.to(`team_${teamId}`).emit("doc:created", doc);
+    }
+
     res.status(201).json({ success: true, data: doc });
   } catch (error) {
     next(error);
@@ -52,12 +96,25 @@ const createDoc = async (req, res, next) => {
 // @access  Private
 const getDocById = async (req, res, next) => {
   try {
-    const doc = await Doc.findOne({ _id: req.params.id, owner: req.user._id }).lean();
+    const doc = await Doc.findById(req.params.id)
+      .populate("teamId", "name members")
+      .lean();
+
     if (!doc) {
-      const error = new Error("Document not found");
-      error.statusCode = 404;
-      return next(error);
+      return res.status(404).json({ success: false, message: "Document not found" });
     }
+
+    const isOwner = doc.owner.toString() === req.user._id.toString();
+    let hasAccess = isOwner;
+
+    if (doc.teamId) {
+      hasAccess = await hasTeamPermission(req.user._id, doc.teamId._id, "viewer");
+    }
+
+    if (!hasAccess) {
+      return res.status(403).json({ success: false, message: "Unauthorized to view this document" });
+    }
+
     res.status(200).json({ success: true, data: doc });
   } catch (error) {
     next(error);
@@ -71,15 +128,23 @@ const updateDoc = async (req, res, next) => {
   try {
     const validatedData = updateDocSchema.parse(req.body);
 
-    // Fetch current before update to snapshot it
-    const existing = await Doc.findOne({ _id: req.params.id, owner: req.user._id });
+    const existing = await Doc.findById(req.params.id);
     if (!existing) {
-      const error = new Error("Document not found");
-      error.statusCode = 404;
-      return next(error);
+      return res.status(404).json({ success: false, message: "Document not found" });
     }
 
-    // Save version snapshot of the PREVIOUS state (before overwrite)
+    const isOwner = existing.owner.toString() === req.user._id.toString();
+    let isAllowed = isOwner;
+
+    if (existing.teamId) {
+      isAllowed = await hasTeamPermission(req.user._id, existing.teamId, "editor");
+    }
+
+    if (!isAllowed) {
+      return res.status(403).json({ success: false, message: "Unauthorized to edit this document" });
+    }
+
+    // Save version snapshot of the PREVIOUS state
     await DocVersion.create({
       docId: existing._id,
       title: existing.title,
@@ -87,14 +152,18 @@ const updateDoc = async (req, res, next) => {
       editedAt: existing.updatedAt,
     });
 
-    // Now update
-    const updated = await Doc.findByIdAndUpdate(
-      existing._id,
-      { $set: validatedData },
-      { new: true, runValidators: true }
-    ).lean();
+    // Update
+    Object.assign(existing, validatedData);
+    await existing.save();
 
-    res.status(200).json({ success: true, data: updated });
+    if (existing.teamId) {
+      await logActivity(existing.teamId, req.user._id, "updated document", "doc", existing._id, existing.title);
+      // Emit socket event
+      const io = req.app.get("io");
+      if (io) io.to(`team_${existing.teamId}`).emit("doc:updated", existing);
+    }
+
+    res.status(200).json({ success: true, data: existing });
   } catch (error) {
     next(error);
   }
@@ -105,14 +174,35 @@ const updateDoc = async (req, res, next) => {
 // @access  Private
 const deleteDoc = async (req, res, next) => {
   try {
-    const doc = await Doc.findOneAndDelete({ _id: req.params.id, owner: req.user._id });
+    const doc = await Doc.findById(req.params.id);
     if (!doc) {
-      const error = new Error("Document not found");
-      error.statusCode = 404;
-      return next(error);
+      return res.status(404).json({ success: false, message: "Document not found" });
     }
-    // Cascade-delete versions
+
+    const isOwner = doc.owner.toString() === req.user._id.toString();
+    let isAllowed = isOwner;
+
+    if (doc.teamId) {
+      isAllowed = await hasTeamPermission(req.user._id, doc.teamId, "admin");
+    }
+
+    if (!isAllowed) {
+      return res.status(403).json({ success: false, message: "Unauthorized to delete this document (Admin only)" });
+    }
+
+    const teamId = doc.teamId;
+    const title = doc.title;
+
+    await Doc.findByIdAndDelete(req.params.id);
     await DocVersion.deleteMany({ docId: doc._id });
+
+    if (teamId) {
+      await logActivity(teamId, req.user._id, "deleted document", "doc", null, title);
+      // Emit socket event
+      const io = req.app.get("io");
+      if (io) io.to(`team_${teamId}`).emit("doc:deleted", { id: req.params.id });
+    }
+
     res.status(200).json({ success: true, message: "Document deleted successfully" });
   } catch (error) {
     next(error);
@@ -124,16 +214,24 @@ const deleteDoc = async (req, res, next) => {
 // @access  Private
 const getDocVersions = async (req, res, next) => {
   try {
-    // Verify ownership via doc
-    const doc = await Doc.findOne({ _id: req.params.id, owner: req.user._id }).lean();
+    const doc = await Doc.findById(req.params.id).lean();
     if (!doc) {
-      const error = new Error("Document not found");
-      error.statusCode = 404;
-      return next(error);
+      return res.status(404).json({ success: false, message: "Document not found" });
+    }
+
+    const isOwner = doc.owner.toString() === req.user._id.toString();
+    let hasAccess = isOwner;
+
+    if (doc.teamId) {
+      hasAccess = await hasTeamPermission(req.user._id, doc.teamId, "viewer");
+    }
+
+    if (!hasAccess) {
+      return res.status(403).json({ success: false, message: "Unauthorized" });
     }
 
     const versions = await DocVersion.find({ docId: req.params.id })
-      .select("title editedAt _id") // omit content for list — fetch on demand
+      .select("title editedAt _id")
       .sort({ editedAt: -1 })
       .lean();
 
@@ -148,12 +246,20 @@ const getDocVersions = async (req, res, next) => {
 // @access  Private
 const getDocVersionById = async (req, res, next) => {
   try {
-    // Verify ownership via doc
-    const doc = await Doc.findOne({ _id: req.params.id, owner: req.user._id }).lean();
+    const doc = await Doc.findById(req.params.id).lean();
     if (!doc) {
-      const error = new Error("Document not found");
-      error.statusCode = 404;
-      return next(error);
+      return res.status(404).json({ success: false, message: "Document not found" });
+    }
+
+    const isOwner = doc.owner.toString() === req.user._id.toString();
+    let hasAccess = isOwner;
+
+    if (doc.teamId) {
+      hasAccess = await hasTeamPermission(req.user._id, doc.teamId, "viewer");
+    }
+
+    if (!hasAccess) {
+      return res.status(403).json({ success: false, message: "Unauthorized" });
     }
 
     const version = await DocVersion.findOne({
@@ -162,9 +268,7 @@ const getDocVersionById = async (req, res, next) => {
     }).lean();
 
     if (!version) {
-      const error = new Error("Version not found");
-      error.statusCode = 404;
-      return next(error);
+      return res.status(404).json({ success: false, message: "Version not found" });
     }
 
     res.status(200).json({ success: true, data: version });
@@ -182,3 +286,4 @@ module.exports = {
   getDocVersions,
   getDocVersionById,
 };
+

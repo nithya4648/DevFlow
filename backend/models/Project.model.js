@@ -20,6 +20,11 @@ const projectSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    teamId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Team",
+      default: null,
+    },
     status: {
       type: String,
       enum: ["todo", "in-progress", "done"],
@@ -50,7 +55,9 @@ const projectSchema = new mongoose.Schema(
   }
 );
 
-// Index for efficient owner-scoped queries with filters
-projectSchema.index({ owner: 1, status: 1, priority: 1, createdAt: -1 });
+// Indexes for efficient queries with filters
+projectSchema.index({ owner: 1, teamId: 1, status: 1, priority: 1, createdAt: -1 });
+// Text search
+projectSchema.index({ title: "text", description: "text" });
 
 module.exports = mongoose.model("Project", projectSchema);

@@ -26,6 +26,8 @@ import NotesPage from "./pages/NotesPage";
 import EnvVaultPage from "./pages/EnvVaultPage";
 import BookmarksPage from "./pages/BookmarksPage";
 import SettingsPage from "./pages/PlaceholderPage";
+import TeamSettingsPage from "./pages/TeamSettingsPage";
+import ActivityFeedPage from "./pages/ActivityFeedPage";
 
 // Dev Tools
 import ToolsIndex from "./pages/tools/ToolsIndex";
@@ -60,6 +62,8 @@ function App() {
                 <Route path="/notes" element={<NotesPage />} />
                 <Route path="/env-vault" element={<EnvVaultPage />} />
                 <Route path="/bookmarks" element={<BookmarksPage />} />
+                <Route path="/teams" element={<TeamSettingsPage />} />
+                <Route path="/activity" element={<ActivityFeedPage />} />
                 <Route path="/settings" element={<SettingsPage title="Settings" icon="⚙️" />} />
 
                 {/* Dev Tools sub-routes */}

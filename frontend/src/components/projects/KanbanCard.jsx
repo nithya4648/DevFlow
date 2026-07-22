@@ -17,7 +17,7 @@ function formatDeadline(date) {
   return { formatted, isOverdue };
 }
 
-export default function KanbanCard({ project, onEdit, onDelete }) {
+export default function KanbanCard({ project, onEdit, onDelete, canEdit = true, canDelete = true }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
     useSortable({ id: project._id });
 
@@ -41,32 +41,43 @@ export default function KanbanCard({ project, onEdit, onDelete }) {
     >
       {/* Header: title + actions */}
       <div className="flex items-start justify-between gap-2 mb-2">
-        <h3 className="text-sm font-medium text-gray-100 leading-snug line-clamp-2 flex-1">
-          {project.title}
-        </h3>
+        <div className="flex-1 min-w-0">
+          <h3 className="text-sm font-medium text-gray-100 leading-snug line-clamp-2">
+            {project.title}
+          </h3>
+          {project.teamId && (
+            <span className="inline-flex items-center mt-1 text-[9px] font-bold text-cyan-400 bg-cyan-500/10 px-1.5 py-0.5 rounded border border-cyan-500/20">
+              👥 {project.teamId.name || "Team"}
+            </span>
+          )}
+        </div>
         {/* Action buttons - shown on hover, pointer-events separate from drag */}
         <div
           className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
           onPointerDown={(e) => e.stopPropagation()}
         >
-          <button
-            onClick={() => onEdit(project)}
-            className="p-1 rounded-md hover:bg-indigo-500/20 text-gray-400 hover:text-indigo-400 transition-colors"
-            title="Edit"
-          >
-            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-            </svg>
-          </button>
-          <button
-            onClick={() => onDelete(project._id)}
-            className="p-1 rounded-md hover:bg-red-500/20 text-gray-400 hover:text-red-400 transition-colors"
-            title="Delete"
-          >
-            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-            </svg>
-          </button>
+          {canEdit && (
+            <button
+              onClick={() => onEdit(project)}
+              className="p-1 rounded-md hover:bg-indigo-500/20 text-gray-400 hover:text-indigo-400 transition-colors"
+              title="Edit"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+            </button>
+          )}
+          {canDelete && (
+            <button
+              onClick={() => onDelete(project._id)}
+              className="p-1 rounded-md hover:bg-red-500/20 text-gray-400 hover:text-red-400 transition-colors"
+              title="Delete"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </button>
+          )}
         </div>
       </div>
 
@@ -96,9 +107,21 @@ export default function KanbanCard({ project, onEdit, onDelete }) {
 
       {/* Footer: priority + deadline */}
       <div className="flex items-center justify-between mt-1.5">
-        <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${priority.cls}`}>
-          {priority.label}
-        </span>
+        <div className="flex items-center gap-1.5">
+          <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${priority.cls}`}>
+            {priority.label}
+          </span>
+          <button
+            onClick={() => onEdit(project)} // Quick edit opens details where comments can reside
+            className="p-1 rounded text-gray-500 hover:text-indigo-400 hover:bg-white/5 transition"
+            title="Comments & Details"
+            onPointerDown={(e) => e.stopPropagation()}
+          >
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            </svg>
+          </button>
+        </div>
         {deadline && (
           <span className={`text-[10px] flex items-center gap-1 ${deadline.isOverdue ? "text-red-400" : "text-gray-400"}`}>
             <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">

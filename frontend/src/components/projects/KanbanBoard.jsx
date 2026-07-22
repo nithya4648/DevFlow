@@ -15,7 +15,7 @@ import KanbanCard from "./KanbanCard";
 
 const STATUSES = ["todo", "in-progress", "done"];
 
-export default function KanbanBoard({ projects, onStatusChange, onEdit, onDelete, onAddNew }) {
+export default function KanbanBoard({ projects, onStatusChange, onEdit, onDelete, onAddNew, getPerms }) {
   const [activeProject, setActiveProject] = useState(null);
 
   const sensors = useSensors(
@@ -75,6 +75,7 @@ export default function KanbanBoard({ projects, onStatusChange, onEdit, onDelete
             onEdit={onEdit}
             onDelete={onDelete}
             onAddNew={onAddNew}
+            getPerms={getPerms}
           />
         ))}
       </div>

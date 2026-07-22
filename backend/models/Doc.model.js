@@ -25,13 +25,19 @@ const docSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    teamId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Team",
+      default: null,
+    },
   },
   {
     timestamps: true,
   }
 );
 
-docSchema.index({ owner: 1, category: 1, updatedAt: -1 });
+// Indexes for quick filtering
+docSchema.index({ owner: 1, teamId: 1, category: 1, updatedAt: -1 });
 docSchema.index({ title: "text" });
 
 module.exports = mongoose.model("Doc", docSchema);
