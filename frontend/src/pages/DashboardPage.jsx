@@ -1,22 +1,22 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import useAuth from "../hooks/useAuth";
+import { useQuery } from "@tanstack/react-query";
+import { analyticsService } from "../services/analytics.service";
 import UsageStats from "../components/dashboard/UsageStats";
 import RecentProjects from "../components/dashboard/RecentProjects";
 import ActivityFeed from "../components/dashboard/ActivityFeed";
 import PinnedTools from "../components/dashboard/PinnedTools";
+import DashboardCharts from "../components/dashboard/DashboardCharts";
 import { ListSkeleton } from "../components/ui/Skeleton";
 
 export const DashboardPage = () => {
   const { user } = useAuth();
-  const [loading, setLoading] = useState(true);
-
-  // Mock loading animation for widgets to showcase skeletons on first load
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 800);
-    return () => clearTimeout(timer);
-  }, []);
+  
+  const { data: overview, isLoading: loading } = useQuery({
+    queryKey: ["analytics", "overview"],
+    queryFn: analyticsService.getOverview,
+    refetchInterval: 1000 * 60 * 5, // Refetch every 5 minutes
+  });
 
   return (
     <div className="space-y-6">
@@ -37,8 +37,10 @@ export const DashboardPage = () => {
           ))}
         </div>
       ) : (
-        /* Usage Stats Widgets */
-        <UsageStats />
+        <>
+          <UsageStats overview={overview} />
+          <DashboardCharts overview={overview} />
+        </>
       )}
 
       {/* Grid Content */}

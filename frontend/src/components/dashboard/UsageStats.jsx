@@ -1,51 +1,51 @@
 import React from "react";
 import { FaServer, FaKey, FaBookOpen, FaFileCode } from "react-icons/fa";
 
-export const UsageStats = ({ stats }) => {
+export const UsageStats = ({ overview }) => {
   const defaultStats = [
     {
       id: 1,
-      label: "API Requests",
-      value: "4,208",
-      limit: "10,000",
-      pct: 42.08,
+      label: "Projects",
+      value: overview?.totals?.projects || 0,
+      limit: "Unlimited",
+      pct: 0,
       icon: FaServer,
       color: "text-indigo-500",
       bgColor: "bg-indigo-500/10",
     },
     {
       id: 2,
-      label: "Vault Secrets",
-      value: "18",
-      limit: "50",
-      pct: 36,
-      icon: FaKey,
-      color: "text-amber-500",
-      bgColor: "bg-amber-500/10",
+      label: "Snippets",
+      value: overview?.totals?.snippets || 0,
+      limit: "Unlimited",
+      pct: 0,
+      icon: FaFileCode,
+      color: "text-purple-500",
+      bgColor: "bg-purple-500/10",
     },
     {
       id: 3,
-      label: "Notes Stored",
-      value: "142",
-      limit: "500",
-      pct: 28.4,
+      label: "Notes",
+      value: overview?.totals?.notes || 0,
+      limit: "Unlimited",
+      pct: 0,
       icon: FaBookOpen,
       color: "text-sky-500",
       bgColor: "bg-sky-500/10",
     },
     {
       id: 4,
-      label: "Saved Snippets",
-      value: "35",
-      limit: "100",
-      pct: 35,
-      icon: FaFileCode,
-      color: "text-purple-500",
-      bgColor: "bg-purple-500/10",
+      label: "Bookmarks",
+      value: overview?.totals?.bookmarks || 0,
+      limit: "Unlimited",
+      pct: 0,
+      icon: FaKey,
+      color: "text-amber-500",
+      bgColor: "bg-amber-500/10",
     },
   ];
 
-  const list = stats || defaultStats;
+  const list = defaultStats;
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

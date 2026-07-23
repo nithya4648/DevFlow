@@ -12,6 +12,7 @@ const { errorHandler, notFound } = require("./middleware/errorHandler");
 const healthRoutes = require("./routes/health.routes");
 const authRoutes = require("./routes/auth.routes");
 const cookieParser = require("cookie-parser");
+const passport = require("./config/passport");
 
 const app = express();
 const server = http.createServer(app);
@@ -26,6 +27,29 @@ app.set("io", io);
 configureSocket(io);
 
 // Core middleware
+const helmet = require("helmet");
+const compression = require("compression");
+const rateLimit = require("express-rate-limit");
+
+app.use(helmet());
+app.use(compression());
+app.use(passport.initialize());
+
+// Global rate limiting
+const globalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+  message: "Too many requests from this IP, please try again after 15 minutes",
+});
+app.use("/api", globalLimiter);
+
+// Stricter rate limiting for auth routes
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20, // limit each IP to 20 requests per windowMs
+  message: "Too many authentication attempts, please try again after 15 minutes",
+});
+
 app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
 app.use(cookieParser());
 app.use(express.json());
@@ -43,12 +67,14 @@ const commentRoutes = require("./routes/comment.routes");
 const searchRoutes = require("./routes/search.routes");
 const userRoutes = require("./routes/user.routes");
 const apiKeyRoutes = require("./routes/api-key.routes");
+const analyticsRoutes = require("./routes/analytics.routes");
 
 // Routes
 app.use("/api/health", healthRoutes);
-app.use("/api/auth", authRoutes);
+app.use("/api/auth", authLimiter, authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/api-keys", apiKeyRoutes);
+app.use("/api/analytics", analyticsRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api/snippets", snippetRoutes);
 app.use("/api/docs", docRoutes);

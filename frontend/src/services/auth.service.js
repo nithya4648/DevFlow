@@ -39,6 +39,11 @@ const authService = {
     const response = await api.get(`/auth/verify-email/${token}`);
     return response.data;
   },
+
+  resendVerification: async (email) => {
+    const response = await api.post("/auth/resend-verification", { email });
+    return response.data;
+  },
 };
 
 export default authService;

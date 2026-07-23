@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useAuth } from "../../context/AuthContext";
+import useAuth from "../../hooks/useAuth";
 import { useToast } from "../../context/ToastContext";
 import { userService } from "../../services/user.service";
 import { Loader, Settings, Monitor, Laptop } from "lucide-react";

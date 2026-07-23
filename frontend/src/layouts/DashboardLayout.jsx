@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { GlobalSearch } from "../components/ui/GlobalSearch";
 import useAuth from "../hooks/useAuth";
 import useDarkMode from "../hooks/useDarkMode";
 import { useToast } from "../context/ToastContext";
@@ -164,12 +165,20 @@ export const DashboardLayout = () => {
             >
               <FaBars className="h-5 w-5" />
             </button>
-            <h2 className="text-lg font-bold text-gray-900 dark:text-white tracking-tight">
+            <h2 className="text-lg font-bold text-gray-900 dark:text-white tracking-tight hidden sm:block w-32 shrink-0">
               {getPageTitle()}
             </h2>
           </div>
 
+          <div className="flex-1 flex justify-center px-4 max-w-xl mx-auto hidden sm:flex">
+            <GlobalSearch />
+          </div>
+
           <div className="flex items-center gap-4">
+            {/* Search for mobile */}
+            <div className="sm:hidden flex-1">
+              <GlobalSearch />
+            </div>
             {/* Dark Mode Toggle */}
             <button
               onClick={toggleTheme}

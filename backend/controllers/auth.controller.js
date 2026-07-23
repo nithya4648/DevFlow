@@ -104,6 +104,14 @@ const login = async (req, res, next) => {
       return next(error);
     }
 
+    // Check if verified
+    if (!user.isVerified) {
+      const error = new Error("Account not verified. Please check your email.");
+      error.statusCode = 403;
+      error.isVerified = false; // Send this flag to frontend so it can show the resend button
+      return next(error);
+    }
+
     // 4. Generate token and set cookie
     const token = generateAccessToken(user._id);
     setTokenCookie(res, token);
@@ -279,6 +287,67 @@ const verifyEmail = async (req, res, next) => {
   }
 };
 
+// @desc    Google OAuth Callback
+// @route   GET /api/auth/google/callback
+// @access  Public
+const googleCallback = async (req, res, next) => {
+  try {
+    const user = req.user;
+    if (!user) {
+      return res.redirect(`${process.env.CLIENT_URL}/login?error=AuthenticationFailed`);
+    }
+
+    const token = generateAccessToken(user._id);
+    setTokenCookie(res, token);
+
+    res.redirect(`${process.env.CLIENT_URL}/dashboard`);
+  } catch (error) {
+    res.redirect(`${process.env.CLIENT_URL}/login?error=AuthenticationFailed`);
+  }
+};
+
+// @desc    Resend verification email
+// @route   POST /api/auth/resend-verification
+// @access  Public
+const resendVerification = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      const error = new Error("Email is required");
+      error.statusCode = 400;
+      return next(error);
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      // Don't leak existence
+      return res.status(200).json({ success: true, message: "Verification email sent if account exists" });
+    }
+
+    if (user.isVerified) {
+      return res.status(400).json({ success: false, message: "Account is already verified" });
+    }
+
+    // Generate new token
+    const verificationToken = crypto.randomBytes(32).toString("hex");
+    user.verificationToken = verificationToken;
+    user.verificationTokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+    await user.save();
+
+    // Send email
+    sendVerificationEmail(user.email, verificationToken).catch((err) =>
+      console.error(`Error sending email to ${user.email}:`, err.message)
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Verification email resent successfully.",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   register,
   login,
@@ -287,4 +356,6 @@ module.exports = {
   forgotPassword,
   resetPassword,
   verifyEmail,
+  googleCallback,
+  resendVerification,
 };

@@ -1,7 +1,8 @@
 import { useForm } from "react-hook-form";
-import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { useState, useEffect } from "react";
 import useAuth from "../hooks/useAuth";
+import authService from "../services/auth.service";
 import { useToast } from "../context/ToastContext";
 import { FaGoogle, FaEnvelope, FaLock, FaSpinner } from "react-icons/fa";
 
@@ -9,15 +10,33 @@ function LoginPage() {
   const { login } = useAuth();
   const { addToast } = useToast();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [unverifiedEmail, setUnverifiedEmail] = useState("");
+  const [isResending, setIsResending] = useState(false);
+
+  useEffect(() => {
+    const error = searchParams.get("error");
+    if (error) {
+      if (error === "AuthenticationFailed") {
+        addToast("Google login failed or was cancelled.", "error");
+      } else {
+        addToast("An error occurred during login.", "error");
+      }
+      searchParams.delete("error");
+      setSearchParams(searchParams, { replace: true });
+    }
+  }, [searchParams, setSearchParams, addToast]);
 
   const {
     register,
     handleSubmit,
+    getValues,
     formState: { errors },
   } = useForm();
 
   const onSubmit = async (data) => {
+    setUnverifiedEmail("");
     try {
       setIsSubmitting(true);
       const res = await login(data);
@@ -28,9 +47,33 @@ function LoginPage() {
     } catch (err) {
       const errMsg = err.response?.data?.message || err.message || "Invalid credentials";
       addToast(errMsg, "error");
+      if (errMsg === "Account not verified. Please check your email.") {
+        setUnverifiedEmail(data.email);
+      }
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleResendVerification = async () => {
+    if (!unverifiedEmail) return;
+    try {
+      setIsResending(true);
+      const res = await authService.resendVerification(unverifiedEmail);
+      if (res.success) {
+        addToast("Verification email sent! Check your inbox.", "success");
+        setUnverifiedEmail(""); // hide button after resending
+      }
+    } catch (err) {
+      const errMsg = err.response?.data?.message || err.message || "Failed to resend email";
+      addToast(errMsg, "error");
+    } finally {
+      setIsResending(false);
+    }
+  };
+
+  const handleGoogleLogin = () => {
+    window.location.href = `${import.meta.env.VITE_API_URL}/auth/google`;
   };
 
   return (
@@ -104,6 +147,20 @@ function LoginPage() {
             )}
           </div>
 
+          {unverifiedEmail && (
+            <div className="rounded-lg bg-indigo-900/40 border border-indigo-500/50 p-4 text-sm text-indigo-200">
+              <p className="mb-2 text-center text-xs">Didn't receive the verification email?</p>
+              <button
+                type="button"
+                onClick={handleResendVerification}
+                disabled={isResending}
+                className="w-full flex items-center justify-center gap-2 rounded-md bg-indigo-600 py-1.5 text-xs font-semibold text-white transition hover:bg-indigo-500 disabled:opacity-50"
+              >
+                {isResending ? <FaSpinner className="animate-spin" /> : "Resend Verification Email"}
+              </button>
+            </div>
+          )}
+
           {/* Submit Button */}
           <button
             type="submit"
@@ -122,10 +179,9 @@ function LoginPage() {
         </div>
 
         {/* Google OAuth Placeholder */}
-        {/* TODO: Implement full Google OAuth sign in handler */}
         <button
           type="button"
-          onClick={() => addToast("Google login coming soon!", "info")}
+          onClick={handleGoogleLogin}
           className="flex w-full items-center justify-center gap-2 rounded-lg border border-gray-800 bg-gray-950/40 py-2.5 text-sm font-medium text-gray-300 transition hover:bg-gray-800 hover:text-white"
         >
           <FaGoogle className="text-red-500" />

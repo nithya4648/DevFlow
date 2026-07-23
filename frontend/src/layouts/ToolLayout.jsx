@@ -2,6 +2,8 @@
 // Wraps each individual tool page with a back button and breadcrumb
 import { Outlet, useLocation, Link } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
+import { useEffect } from "react";
+import { analyticsService } from "../services/analytics.service";
 
 const TOOL_NAMES = {
   "json-formatter": "JSON Formatter & Validator",
@@ -21,6 +23,12 @@ export default function ToolLayout() {
   const location = useLocation();
   const slug = location.pathname.split("/tools/")[1];
   const toolName = TOOL_NAMES[slug] || "Tool";
+
+  useEffect(() => {
+    if (slug) {
+      analyticsService.logToolUsage(slug).catch(err => console.error("Failed to log tool usage:", err));
+    }
+  }, [slug]);
 
   return (
     <div className="space-y-4">
