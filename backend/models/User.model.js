@@ -44,6 +44,17 @@ const userSchema = new mongoose.Schema(
     verificationTokenExpiry: Date,
     resetPasswordToken: String,
     resetPasswordTokenExpiry: Date,
+    preferences: {
+      theme: {
+        type: String,
+        enum: ["light", "dark", "system"],
+        default: "dark",
+      },
+      defaultLandingPage: {
+        type: String,
+        default: "/dashboard",
+      },
+    },
   },
   {
     timestamps: true,

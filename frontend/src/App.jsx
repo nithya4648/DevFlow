@@ -25,7 +25,7 @@ import DocsPage from "./pages/DocsPage";
 import NotesPage from "./pages/NotesPage";
 import EnvVaultPage from "./pages/EnvVaultPage";
 import BookmarksPage from "./pages/BookmarksPage";
-import SettingsPage from "./pages/PlaceholderPage";
+import SettingsPage from "./pages/SettingsPage";
 import TeamSettingsPage from "./pages/TeamSettingsPage";
 import ActivityFeedPage from "./pages/ActivityFeedPage";
 
@@ -64,7 +64,7 @@ function App() {
                 <Route path="/bookmarks" element={<BookmarksPage />} />
                 <Route path="/teams" element={<TeamSettingsPage />} />
                 <Route path="/activity" element={<ActivityFeedPage />} />
-                <Route path="/settings" element={<SettingsPage title="Settings" icon="⚙️" />} />
+                <Route path="/settings" element={<SettingsPage />} />
 
                 {/* Dev Tools sub-routes */}
                 <Route path="/tools" element={<ToolsIndex />} />

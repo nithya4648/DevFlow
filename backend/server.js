@@ -41,10 +41,14 @@ const notificationRoutes = require("./routes/notification.routes");
 const teamRoutes = require("./routes/team.routes");
 const commentRoutes = require("./routes/comment.routes");
 const searchRoutes = require("./routes/search.routes");
+const userRoutes = require("./routes/user.routes");
+const apiKeyRoutes = require("./routes/api-key.routes");
 
 // Routes
 app.use("/api/health", healthRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/api-keys", apiKeyRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api/snippets", snippetRoutes);
 app.use("/api/docs", docRoutes);
