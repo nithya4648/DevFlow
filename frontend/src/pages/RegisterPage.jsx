@@ -3,13 +3,15 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import useAuth from "../hooks/useAuth";
 import { useToast } from "../context/ToastContext";
-import { FaGoogle, FaUser, FaEnvelope, FaLock, FaSpinner } from "react-icons/fa";
+import { FaGoogle, FaUser, FaEnvelope, FaLock, FaSpinner, FaEye, FaEyeSlash } from "react-icons/fa";
 
 function RegisterPage() {
   const { register: registerUser } = useAuth();
   const { addToast } = useToast();
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const {
     register,
@@ -114,14 +116,22 @@ function RegisterPage() {
                 <FaLock />
               </span>
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 {...register("password", {
                   required: "Password is required",
                   minLength: { value: 6, message: "Password must be at least 6 characters" },
                 })}
                 placeholder="••••••••"
-                className="w-full rounded-lg border border-gray-850 bg-gray-950/50 py-2.5 pl-10 pr-4 text-sm text-white placeholder-gray-600 outline-none ring-primary/40 transition focus:border-primary focus:ring-2"
+                className="w-full rounded-lg border border-gray-850 bg-gray-950/50 py-2.5 pl-10 pr-10 text-sm text-white placeholder-gray-600 outline-none ring-primary/40 transition focus:border-primary focus:ring-2"
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-300 transition focus:outline-none"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </button>
             </div>
             {errors.password && (
               <p className="mt-1 text-xs text-red-500">{errors.password.message}</p>
@@ -138,14 +148,22 @@ function RegisterPage() {
                 <FaLock />
               </span>
               <input
-                type="password"
+                type={showConfirmPassword ? "text" : "password"}
                 {...register("confirmPassword", {
                   required: "Please confirm your password",
                   validate: (value) => value === password || "Passwords do not match",
                 })}
                 placeholder="••••••••"
-                className="w-full rounded-lg border border-gray-850 bg-gray-950/50 py-2.5 pl-10 pr-4 text-sm text-white placeholder-gray-600 outline-none ring-primary/40 transition focus:border-primary focus:ring-2"
+                className="w-full rounded-lg border border-gray-850 bg-gray-950/50 py-2.5 pl-10 pr-10 text-sm text-white placeholder-gray-600 outline-none ring-primary/40 transition focus:border-primary focus:ring-2"
               />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-300 transition focus:outline-none"
+                aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+              >
+                {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+              </button>
             </div>
             {errors.confirmPassword && (
               <p className="mt-1 text-xs text-red-500">{errors.confirmPassword.message}</p>
@@ -169,14 +187,14 @@ function RegisterPage() {
           <div className="flex-grow border-t border-gray-800"></div>
         </div>
 
-        {/* Google OAuth Placeholder */}
+        {/* Google OAuth Button */}
         <button
           type="button"
           onClick={() => window.location.href = `${import.meta.env.VITE_API_URL}/auth/google`}
           className="flex w-full items-center justify-center gap-2 rounded-lg border border-gray-800 bg-gray-950/40 py-2.5 text-sm font-medium text-gray-300 transition hover:bg-gray-800 hover:text-white"
         >
           <FaGoogle className="text-red-500" />
-          Google
+          Continue with Google
         </button>
 
         <p className="mt-6 text-center text-sm text-gray-400">

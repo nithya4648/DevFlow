@@ -10,7 +10,7 @@ const setTokenCookie = (res, token) => {
   const cookieOptions = {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in milliseconds (matching JWT_EXPIRES_IN default)
   };
 
@@ -22,7 +22,7 @@ const clearTokenCookie = (res) => {
     httpOnly: true,
     expires: new Date(0),
     secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
   });
 };
 

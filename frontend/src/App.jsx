@@ -55,6 +55,7 @@ function App() {
             <Route element={<ProtectedRoute />}>
               <Route element={<DashboardLayout />}>
                 <Route path="/" element={<DashboardPage />} />
+                <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/dev-tools" element={<DevToolsPage />} />
                 <Route path="/projects" element={<ProjectsPage />} />
                 <Route path="/snippets" element={<SnippetsPage />} />

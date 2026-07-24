@@ -6,16 +6,16 @@ const getTransporter = async () => {
   const pass = process.env.EMAIL_PASS;
 
   if (user && pass) {
-    console.log(`📧 Configured Nodemailer SMTP transporter using user: ${user}`);
+    console.log(`📧 [TRANSPORTER USED: Gmail] Configured Nodemailer SMTP transporter using user: ${user}`);
     return nodemailer.createTransport({
       service: "Gmail",
       auth: { user, pass },
     });
   } else {
-    console.log("ℹ️ EMAIL_USER/EMAIL_PASS not set. Attempting Ethereal test account fallback...");
+    console.log("ℹ️ [TRANSPORTER USED: Ethereal Fallback] EMAIL_USER/EMAIL_PASS not set. Attempting Ethereal test account fallback...");
     try {
       const testAccount = await nodemailer.createTestAccount();
-      console.log(`🧪 Created Ethereal test email account: ${testAccount.user}`);
+      console.log(`🧪 [TRANSPORTER USED: Ethereal] Created Ethereal test email account: ${testAccount.user}`);
       return nodemailer.createTransport({
         host: "smtp.ethereal.email",
         port: 587,
@@ -60,7 +60,7 @@ const sendEmail = async ({ to, subject, html, text }) => {
     if (previewUrl) {
       console.log(`✉️ Email sent successfully via Ethereal. Preview URL: ${previewUrl}`);
     } else {
-      console.log(`✉️ Email sent successfully to ${to} (Message ID: ${info.messageId})`);
+      console.log(`✉️ Email sent successfully to ${to} via Gmail (Message ID: ${info.messageId})`);
     }
     return info;
   } catch (error) {
