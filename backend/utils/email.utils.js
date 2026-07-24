@@ -6,15 +6,16 @@ const getTransporter = async () => {
   const pass = process.env.EMAIL_PASS;
 
   if (user && pass) {
-    // Return SMTP transporter using user-configured settings
+    console.log(`📧 Configured Nodemailer SMTP transporter using user: ${user}`);
     return nodemailer.createTransport({
-      service: "Gmail", // Common default or SMTP configuration
+      service: "Gmail",
       auth: { user, pass },
     });
   } else {
-    // Fallback: Create ethereal test email account
+    console.log("ℹ️ EMAIL_USER/EMAIL_PASS not set. Attempting Ethereal test account fallback...");
     try {
       const testAccount = await nodemailer.createTestAccount();
+      console.log(`🧪 Created Ethereal test email account: ${testAccount.user}`);
       return nodemailer.createTransport({
         host: "smtp.ethereal.email",
         port: 587,
@@ -25,16 +26,18 @@ const getTransporter = async () => {
         },
       });
     } catch (err) {
-      console.warn("⚠️ Could not create Ethereal email test account, will log emails to console.");
+      console.warn("⚠️ Could not create Ethereal email test account:", err.message);
       return null;
     }
   }
 };
 
 const sendEmail = async ({ to, subject, html, text }) => {
+  console.log(`📧 [EMAIL TRIGGERED] Subject: "${subject}" | To: ${to}`);
   const transporter = await getTransporter();
   
   if (!transporter) {
+    console.warn("⚠️ No email transporter available. Printing email contents to console:");
     console.log("==================================================");
     console.log(`✉️ EMAIL TO: ${to}`);
     console.log(`✉️ SUBJECT: ${subject}`);
@@ -44,7 +47,7 @@ const sendEmail = async ({ to, subject, html, text }) => {
   }
 
   const mailOptions = {
-    from: process.env.EMAIL_USER || '"DevFlow Support" <support@devflow.com>',
+    from: process.env.EMAIL_USER ? `"DevFlow Support" <${process.env.EMAIL_USER}>` : '"DevFlow Support" <support@devflow.com>',
     to,
     subject,
     text,
@@ -53,21 +56,24 @@ const sendEmail = async ({ to, subject, html, text }) => {
 
   try {
     const info = await transporter.sendMail(mailOptions);
-    // If it's an Ethereal test account, log the URL to view the message
     const previewUrl = nodemailer.getTestMessageUrl(info);
     if (previewUrl) {
-      console.log(`✉️ Email sent successfully. Preview URL: ${previewUrl}`);
+      console.log(`✉️ Email sent successfully via Ethereal. Preview URL: ${previewUrl}`);
     } else {
-      console.log(`✉️ Email sent successfully to ${to}`);
+      console.log(`✉️ Email sent successfully to ${to} (Message ID: ${info.messageId})`);
     }
+    return info;
   } catch (error) {
-    console.error(`❌ Failed to send email: ${error.message}`);
-    // Still log it so developer can see the token/link
+    console.error(`❌ Failed to send email to ${to}:`, error.message);
+    if (error.code) console.error(`❌ Error Code: ${error.code}`);
+    if (error.command) console.error(`❌ SMTP Command: ${error.command}`);
+    console.error(`❌ Stack Trace:\n${error.stack}`);
     console.log("==================================================");
-    console.log(`✉️ (FALLBACK LOG) EMAIL TO: ${to}`);
+    console.log(`✉️ (FALLBACK CONSOLE LOG) EMAIL TO: ${to}`);
     console.log(`✉️ SUBJECT: ${subject}`);
     console.log(`✉️ TEXT CONTENT:\n${text}`);
     console.log("==================================================");
+    throw error;
   }
 };
 

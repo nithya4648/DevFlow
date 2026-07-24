@@ -37,6 +37,7 @@ const errorHandler = (err, req, res, next) => {
   res.status(statusCode).json({
     success: false,
     message,
+    ...(err.isVerified !== undefined && { isVerified: err.isVerified }),
     ...(errors && { errors }),
     ...(process.env.NODE_ENV === "development" && { stack: err.stack }),
   });

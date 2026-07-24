@@ -43,13 +43,14 @@ const register = async (req, res, next) => {
 
     // 4. Create user
     const isTestAccount = email.toLowerCase() === "test@example.com";
+
     const user = await User.create({
       name,
       email,
       password,
       avatar,
-      verificationToken,
-      verificationTokenExpiry,
+      verificationToken: isTestAccount ? undefined : verificationToken,
+      verificationTokenExpiry: isTestAccount ? undefined : verificationTokenExpiry,
       isVerified: isTestAccount,
     });
 
@@ -63,16 +64,16 @@ const register = async (req, res, next) => {
       message: `Welcome to DevFlow, ${user.name}! 🚀 Explore your new developer dashboard.`,
     });
     
-    // Emit real-time socket event if they connect immediately, though usually they connect after this response
     emitNotificationToUser(req, user._id, welcomeNote);
     // ---------------------------------------------
 
-    // 5. Send verification email (async)
+    // 5. Send verification email
     if (isTestAccount) {
-      console.log(`🧪 Test account registration for ${user.email}; skipping email verification requirement.`);
+      console.log(`🧪 Demo account registration for ${user.email} — skipping email verification.`);
     } else {
+      console.log(`✉️ Sending verification email to ${user.email}...`);
       sendVerificationEmail(user.email, verificationToken).catch((err) =>
-        console.error(`Error sending email to ${user.email}:`, err.message)
+        console.error(`❌ Error in async sendVerificationEmail for ${user.email}:`, err.message)
       );
     }
 

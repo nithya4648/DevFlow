@@ -1,6 +1,6 @@
 const User = require("../models/User.model");
 const bcrypt = require("bcrypt");
-const cloudinary = require("../config/cloudinary");
+const { cloudinary, isCloudinaryConfigured } = require("../config/cloudinary");
 
 
 // @desc    Update user profile (name, avatar)
@@ -22,20 +22,31 @@ const updateProfile = async (req, res, next) => {
     }
 
     if (req.file) {
-      // Upload to Cloudinary using a buffer
-      const uploadPromise = new Promise((resolve, reject) => {
-        const stream = cloudinary.uploader.upload_stream(
-          { folder: "devflow_avatars" },
-          (error, result) => {
-            if (error) reject(error);
-            else resolve(result);
-          }
-        );
-        stream.end(req.file.buffer);
-      });
+      if (isCloudinaryConfigured()) {
+        console.log("☁️ Uploading avatar file to Cloudinary...");
+        const uploadPromise = new Promise((resolve, reject) => {
+          const stream = cloudinary.uploader.upload_stream(
+            { folder: "devflow_avatars", resource_type: "image" },
+            (error, result) => {
+              if (error) {
+                console.error("❌ Cloudinary upload failed:", error.message || error);
+                reject(error);
+              } else {
+                console.log("✅ Cloudinary upload successful. Secure URL:", result.secure_url);
+                resolve(result);
+              }
+            }
+          );
+          stream.end(req.file.buffer);
+        });
 
-      const result = await uploadPromise;
-      user.avatar = result.secure_url;
+        const result = await uploadPromise;
+        user.avatar = result.secure_url;
+      } else {
+        console.log("ℹ️ Cloudinary credentials not provided in .env — using Data URI fallback for avatar.");
+        const base64Image = `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`;
+        user.avatar = base64Image;
+      }
     }
 
     await user.save();

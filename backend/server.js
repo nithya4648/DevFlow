@@ -36,17 +36,18 @@ app.use(compression());
 app.use(passport.initialize());
 
 // Global rate limiting
+const isDev = process.env.NODE_ENV === "development";
 const globalLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
+  windowMs: 15 * 60 * 1000,
+  max: isDev ? 1000 : 100,
   message: "Too many requests from this IP, please try again after 15 minutes",
 });
 app.use("/api", globalLimiter);
 
-// Stricter rate limiting for auth routes
+// Rate limiting for auth routes
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 20, // limit each IP to 20 requests per windowMs
+  max: isDev ? 500 : 20,
   message: "Too many authentication attempts, please try again after 15 minutes",
 });
 
