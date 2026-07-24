@@ -3,6 +3,6 @@ node_modules
 .env.local
 build
 .DS_Store
-backend/.env
-frontend/.env
+backend/.env.local
+frontend/.env.local
 dist/
