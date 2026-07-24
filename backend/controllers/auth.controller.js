@@ -42,6 +42,7 @@ const register = async (req, res, next) => {
     const avatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=6366f1&color=fff&size=128`;
 
     // 4. Create user
+    const isTestAccount = email.toLowerCase() === "test@example.com";
     const user = await User.create({
       name,
       email,
@@ -49,6 +50,7 @@ const register = async (req, res, next) => {
       avatar,
       verificationToken,
       verificationTokenExpiry,
+      isVerified: isTestAccount,
     });
 
     // --- CREATE AND EMIT WELCOME NOTIFICATION ---
@@ -66,13 +68,19 @@ const register = async (req, res, next) => {
     // ---------------------------------------------
 
     // 5. Send verification email (async)
-    sendVerificationEmail(user.email, verificationToken).catch((err) =>
-      console.error(`Error sending email to ${user.email}:`, err.message)
-    );
+    if (isTestAccount) {
+      console.log(`🧪 Test account registration for ${user.email}; skipping email verification requirement.`);
+    } else {
+      sendVerificationEmail(user.email, verificationToken).catch((err) =>
+        console.error(`Error sending email to ${user.email}:`, err.message)
+      );
+    }
 
     res.status(201).json({
       success: true,
-      message: "Registration successful! Please check your email to verify your account.",
+      message: isTestAccount
+        ? "Registration successful! Your test account is ready to use."
+        : "Registration successful! Please check your email to verify your account.",
     });
   } catch (error) {
     next(error);
