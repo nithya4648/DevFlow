@@ -6,6 +6,7 @@ const express = require("express");
 const cors = require("cors");
 const http = require("http");
 const { Server } = require("socket.io");
+const pinoHttp = require("pino-http");
 
 const connectDB = require("./config/db");
 const { errorHandler, notFound } = require("./middleware/errorHandler");
@@ -13,6 +14,7 @@ const healthRoutes = require("./routes/health.routes");
 const authRoutes = require("./routes/auth.routes");
 const cookieParser = require("cookie-parser");
 const passport = require("./config/passport");
+const logger = require("./utils/logger");
 
 const app = express();
 const server = http.createServer(app);
@@ -34,6 +36,7 @@ const rateLimit = require("express-rate-limit");
 app.use(helmet());
 app.use(compression());
 app.use(passport.initialize());
+app.use(pinoHttp({ logger }));
 
 // Global rate limiting
 const isDev = process.env.NODE_ENV === "development";
@@ -93,10 +96,12 @@ app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 
-// Start server immediately; connectDB retries in background if DB is unreachable
-server.listen(PORT, () => {
-  console.log(`🚀 DevFlow API running on port ${PORT}`);
-});
+if (require.main === module) {
+  server.listen(PORT, () => {
+    logger.info({ port: PORT }, "DevFlow API running");
+  });
 
-// Connect to MongoDB (retries automatically on failure)
-connectDB();
+  connectDB();
+}
+
+module.exports = { app, server, connectDB };

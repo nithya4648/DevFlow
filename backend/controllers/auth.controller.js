@@ -15,6 +15,7 @@ const {
   sendVerificationEmail,
   sendPasswordResetEmail,
 } = require("../utils/email.utils");
+const logger = require("../utils/logger");
 
 // @desc    Register a new user
 // @route   POST /api/auth/register
@@ -66,9 +67,9 @@ const register = async (req, res, next) => {
     // ---------------------------------------------
 
     // 5. Send verification email
-    console.log(`✉️ Sending verification email to ${user.email}...`);
+    logger.info({ email: user.email }, "Sending verification email");
     sendVerificationEmail(user.email, verificationToken).catch((err) =>
-      console.error(`❌ Error in async sendVerificationEmail for ${user.email}:`, err.message)
+      logger.error({ err, email: user.email }, "Async verification email failed")
     );
 
     res.status(201).json({
@@ -186,7 +187,7 @@ const forgotPassword = async (req, res, next) => {
     const user = await User.findOne({ email });
     if (!user) {
       // Return 200 to prevent user enumeration, but log for local debugging
-      console.log(`Password reset requested for non-existent email: ${email}`);
+      logger.info({ email }, "Password reset requested for non-existent email");
       return res.status(200).json({
         success: true,
         message: "If a user with that email exists, a password reset link has been sent.",
@@ -204,7 +205,7 @@ const forgotPassword = async (req, res, next) => {
 
     // 5. Send password reset email (async)
     sendPasswordResetEmail(user.email, resetPasswordToken).catch((err) =>
-      console.error(`Error sending email to ${user.email}:`, err.message)
+      logger.error({ err, email: user.email }, "Password reset email failed")
     );
 
     res.status(200).json({
@@ -337,7 +338,7 @@ const resendVerification = async (req, res, next) => {
 
     // Send email
     sendVerificationEmail(user.email, verificationToken).catch((err) =>
-      console.error(`Error sending email to ${user.email}:`, err.message)
+      logger.error({ err, email: user.email }, "Resend verification email failed")
     );
 
     res.status(200).json({

@@ -1,10 +1,11 @@
 const mongoose = require("mongoose");
+const logger = require("../utils/logger");
 
 const connectDB = async () => {
   const uri = process.env.MONGO_URI;
 
   if (!uri) {
-    console.error("❌ MONGO_URI is not defined in .env");
+    logger.error("MONGO_URI is not defined in .env");
     process.exit(1);
   }
 
@@ -14,10 +15,10 @@ const connectDB = async () => {
         serverSelectionTimeoutMS: 10000, // 10s timeout
         socketTimeoutMS: 45000,
       });
-      console.log(`✅ MongoDB connected: ${conn.connection.host}`);
+      logger.info({ host: conn.connection.host }, "MongoDB connected");
     } catch (error) {
-      console.error(`❌ MongoDB connection failed: ${error.message}`);
-      console.log("⏳ Retrying MongoDB connection in 5 seconds...");
+      logger.error({ err: error }, "MongoDB connection failed");
+      logger.info("Retrying MongoDB connection in 5 seconds...");
       setTimeout(connect, 5000);
     }
   };

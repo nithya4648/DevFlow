@@ -61,7 +61,8 @@ const decrypt = (encryptedPayload) => {
 
     return decrypted;
   } catch (error) {
-    console.error("Decryption failed:", error.message);
+    const logger = require("./logger");
+    logger.error({ err: error }, "Decryption failed");
     return "[DECRYPTION_ERROR]";
   }
 };

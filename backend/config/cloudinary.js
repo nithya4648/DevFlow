@@ -1,4 +1,5 @@
 const cloudinary = require("cloudinary").v2;
+const logger = require("../utils/logger");
 
 const isCloudinaryConfigured = () => {
   return !!(
@@ -14,9 +15,9 @@ if (isCloudinaryConfigured()) {
     api_key: process.env.CLOUDINARY_API_KEY,
     api_secret: process.env.CLOUDINARY_API_SECRET,
   });
-  console.log("☁️ Cloudinary SDK configured with environment credentials.");
+  logger.info("Cloudinary SDK configured with environment credentials");
 } else {
-  console.warn("⚠️ Cloudinary credentials missing in .env (CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET).");
+  logger.warn("Cloudinary credentials missing in .env (CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET)");
 }
 
 module.exports = { cloudinary, isCloudinaryConfigured };

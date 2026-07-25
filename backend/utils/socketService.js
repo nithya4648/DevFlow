@@ -1,6 +1,7 @@
 // backend/utils/socketService.js
 const jwt = require("jsonwebtoken");
 const User = require("../models/User.model");
+const logger = require("./logger");
 
 /**
  * Configure socket.io to authenticate connections using the JWT token
@@ -58,7 +59,7 @@ const configureSocket = (io) => {
         socket.join(`team_${t._id}`);
       });
     } catch (err) {
-      console.error("Socket team rooms join error:", err);
+      logger.error({ err }, "Socket team rooms join error");
     }
     
     // console.log(`Socket ${socket.id} connected for user ${socket.user.name}`);
