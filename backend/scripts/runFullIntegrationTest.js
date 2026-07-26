@@ -12,7 +12,7 @@ dns.setServers(["8.8.8.8", "8.8.4.4"]);
 const mongoose = require("mongoose");
 const User = require("../models/User.model");
 
-const BASE_URL = "http://localhost:5001";
+const BASE_URL = "https://devflow-vfnd.onrender.com";
 
 let testResults = [];
 

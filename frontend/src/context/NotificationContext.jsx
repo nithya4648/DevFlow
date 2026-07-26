@@ -38,7 +38,7 @@ export const NotificationProvider = ({ children }) => {
     if (!user) return; // Only connect if authenticated
 
     // Since we use httpOnly cookies, credentials: true automatically sends the devflow_token cookie to the backend during the handshake
-    const socketInstance = io(import.meta.env.VITE_SOCKET_URL || "http://localhost:5001", {
+    const socketInstance = io(import.meta.env.VITE_SOCKET_URL || "https://devflow-vfnd.onrender.com", {
       withCredentials: true,
       transports: ["websocket", "polling"],
     });

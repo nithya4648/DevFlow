@@ -11,7 +11,7 @@ if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
 
 if (!process.env.GOOGLE_CALLBACK_URL) {
   throw new Error(
-    "Missing GOOGLE_CALLBACK_URL in .env (e.g. http://localhost:5001/api/auth/google/callback)"
+    "Missing GOOGLE_CALLBACK_URL in .env (e.g. https://devflow-vfnd.onrender.com/api/auth/google/callback)"
   );
 }
 

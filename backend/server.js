@@ -54,7 +54,8 @@ const authLimiter = rateLimit({
   message: "Too many authentication attempts, please try again after 15 minutes",
 });
 
-const allowedOrigins = [process.env.CLIENT_URL, "http://localhost:5173"]; // Add more origins as needed
+const allowedOrigins = [process.env.CLIENT_URL, "https://dev-flow-zeta-ashy.vercel.app"];
+// Add more origins as needed
 app.use(cors({
   origin: (origin, callback) => {
     // Allow requests with no origin (like mobile apps, curl) or whitelisted origins

@@ -66,7 +66,7 @@ const sendEmail = async ({ to, subject, html, text }) => {
 };
 
 const sendVerificationEmail = async (email, token) => {
-  const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
+  const clientUrl = process.env.CLIENT_URL || "https://dev-flow-zeta-ashy.vercel.app";
   const verificationLink = `${clientUrl}/verify-email/${token}`;
 
   await sendEmail({
@@ -91,7 +91,7 @@ const sendVerificationEmail = async (email, token) => {
 };
 
 const sendPasswordResetEmail = async (email, token) => {
-  const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
+  const clientUrl = process.env.CLIENT_URL || "https://dev-flow-zeta-ashy.vercel.app";
   const resetLink = `${clientUrl}/reset-password/${token}`;
 
   await sendEmail({
