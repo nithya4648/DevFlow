@@ -190,7 +190,7 @@ function RegisterPage() {
         {/* Google OAuth Button */}
         <button
           type="button"
-          onClick={() => window.location.href = `${import.meta.env.VITE_API_URL}/auth/google`}
+          onClick={() => window.location.href = `${import.meta.env.VITE_SOCKET_URL}/api/auth/google`}
           className="flex w-full items-center justify-center gap-2 rounded-lg border border-gray-800 bg-gray-950/40 py-2.5 text-sm font-medium text-gray-300 transition hover:bg-gray-800 hover:text-white"
         >
           <FaGoogle className="text-red-500" />
