@@ -101,6 +101,11 @@ app.use("/api/teams", teamRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/search", searchRoutes);
 
+// Root health-check — must exist so Render's health pings and browsers don't get a 404
+app.get("/", (req, res) => {
+  res.status(200).json({ success: true, message: "DevFlow API is running" });
+});
+
 // Error handling (always last)
 app.use(notFound);
 app.use(errorHandler);
