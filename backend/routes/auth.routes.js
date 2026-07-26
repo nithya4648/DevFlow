@@ -14,6 +14,24 @@ const {
   resendVerification,
 } = require("../controllers/auth.controller");
 
+router.get("/", (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "DevFlow Auth API is operational",
+    endpoints: {
+      register: "POST /api/auth/register",
+      login: "POST /api/auth/login",
+      logout: "POST /api/auth/logout",
+      me: "GET /api/auth/me",
+      forgotPassword: "POST /api/auth/forgot-password",
+      resetPassword: "POST /api/auth/reset-password/:token",
+      verifyEmail: "GET /api/auth/verify-email/:token",
+      resendVerification: "POST /api/auth/resend-verification",
+      google: "GET /api/auth/google",
+    },
+  });
+});
+
 router.post("/register", register);
 router.post("/login", login);
 router.post("/logout", logout);
