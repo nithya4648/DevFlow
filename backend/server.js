@@ -54,7 +54,7 @@ if (!isTest) {
 // Rate limiting for auth routes
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: isTest ? 10000 : isDev ? 500 : 20,
+  max: isTest ? 10000 : isDev ? 500 : 100,
   message: "Too many authentication attempts, please try again after 15 minutes",
 });
 
