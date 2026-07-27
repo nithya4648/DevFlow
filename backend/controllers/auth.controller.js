@@ -71,14 +71,22 @@ const register = async (req, res, next) => {
     // ---------------------------------------------
 
     // 5. Send verification email
-    logger.info({ email: user.email }, "Sending verification email");
-    sendVerificationEmail(user.email, verificationToken).catch((err) =>
-      logger.error({ err, email: user.email }, "Async verification email failed")
-    );
+    let emailSent = false;
+    try {
+      logger.info({ email: user.email }, "Sending verification email");
+      await sendVerificationEmail(user.email, verificationToken);
+      emailSent = true;
+      logger.info({ email: user.email }, "Verification email sent successfully");
+    } catch (emailErr) {
+      logger.error({ err: emailErr, email: user.email }, "Failed to send verification email");
+    }
 
     res.status(201).json({
       success: true,
-      message: "Registration successful! Please check your email to verify your account.",
+      emailSent,
+      message: emailSent
+        ? "Registration successful! Please check your email to verify your account."
+        : "Registration successful! However, we couldn't send the verification email. Please use 'Resend Verification' to try again.",
     });
   } catch (error) {
     next(error);

@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { protect } = require("../middleware/auth.middleware");
 const passport = require("passport");
+const logger = require("../utils/logger");
 const {
   register,
   login,
@@ -50,7 +51,25 @@ router.get(
 );
 router.get(
   "/google/callback",
-  passport.authenticate("google", { session: false, failureRedirect: `${clientUrl}/login?error=AuthenticationFailed` }),
+  (req, res, next) => {
+    passport.authenticate("google", { session: false }, (err, user, info) => {
+      const redirectUrl = process.env.CLIENT_URL || "https://dev-flow-zeta-ashy.vercel.app";
+
+      if (err) {
+        logger.error({ err }, "Google OAuth callback error");
+        return res.redirect(`${redirectUrl}/login?error=AuthenticationFailed`);
+      }
+
+      if (!user) {
+        logger.warn({ info }, "Google OAuth callback: no user returned");
+        return res.redirect(`${redirectUrl}/login?error=AuthenticationFailed`);
+      }
+
+      // Attach user to req so googleCallback controller can use it
+      req.user = user;
+      next();
+    })(req, res, next);
+  },
   googleCallback
 );
 

@@ -1,6 +1,7 @@
 const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const User = require("../models/User.model");
+const logger = require("../utils/logger");
 
 // Fail fast on startup if Google OAuth credentials are missing
 if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
@@ -68,6 +69,7 @@ passport.use(
           return done(null, newUser);
         }
       } catch (error) {
+        logger.error({ err: error, profileId: profile.id }, "Google OAuth user creation/lookup failed");
         return done(error, null);
       }
     }

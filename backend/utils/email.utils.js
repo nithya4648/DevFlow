@@ -4,7 +4,7 @@ const logger = require("./logger");
 // Create Nodemailer transporter using Gmail SMTP
 let smtpTransporter = null;
 const smtpUser = process.env.EMAIL_USER || process.env.GMAIL_USER;
-const smtpPass = process.env.EMAIL_APP_PASSWORD || process.env.GMAIL_PASS;
+const smtpPass = process.env.EMAIL_APP_PASSWORD || process.env.EMAIL_PASS || process.env.GMAIL_PASS;
 
 if (process.env.NODE_ENV !== "test" && smtpUser && smtpPass) {
   smtpTransporter = nodemailer.createTransport({
