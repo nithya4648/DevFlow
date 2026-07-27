@@ -64,9 +64,11 @@ const sendEmail = async ({ to, subject, html, text }) => {
     }
   }
 
-  const err = new Error("No email service configured. Set GMAIL_USER/GMAIL_PASS or RESEND_API_KEY in environment.");
-  logger.error({ err }, "Email dispatch error");
-  throw err;
+  logger.warn(
+    { to, subject },
+    "No email provider (GMAIL_USER/GMAIL_PASS or RESEND_API_KEY) configured. Email dispatch skipped."
+  );
+  return { simulated: true };
 };
 
 const sendVerificationEmail = async (email, token) => {
