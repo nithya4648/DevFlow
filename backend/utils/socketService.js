@@ -74,7 +74,7 @@ const configureSocket = (io) => {
  * Helper to emit a notification to a specific user
  */
 const emitNotificationToUser = (req, userId, notificationObj) => {
-  const io = req.app.get("io");
+  const io = req && req.app ? req.app.get("io") : global.io;
   if (io) {
     io.to(`user_${userId}`).emit("notification:new", notificationObj);
   }

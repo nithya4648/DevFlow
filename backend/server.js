@@ -26,6 +26,7 @@ const io = new Server(server, {
   cors: { origin: process.env.CLIENT_URL, credentials: true },
 });
 app.set("io", io);
+global.io = io;
 configureSocket(io);
 
 // Core middleware
