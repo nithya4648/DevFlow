@@ -9,8 +9,8 @@ const generateAccessToken = (userId) => {
 const setTokenCookie = (res, token) => {
   const cookieOptions = {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    secure: true,
+    sameSite: "none",
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in milliseconds (matching JWT_EXPIRES_IN default)
   };
 
@@ -21,8 +21,8 @@ const clearTokenCookie = (res) => {
   res.cookie("devflow_token", "", {
     httpOnly: true,
     expires: new Date(0),
-    secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    secure: true,
+    sameSite: "none",
   });
 };
 
