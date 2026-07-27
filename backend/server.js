@@ -41,19 +41,28 @@ app.use(pinoHttp({ logger }));
 
 // Global rate limiting
 const isDev = process.env.NODE_ENV === "development";
+const isTest = process.env.NODE_ENV === "test";
 const globalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: isDev ? 1000 : 100,
+  max: isTest ? 10000 : isDev ? 1000 : 100,
   message: "Too many requests from this IP, please try again after 15 minutes",
 });
-app.use("/api", globalLimiter);
+if (!isTest) {
+  app.use("/api", globalLimiter);
+}
 
 // Rate limiting for auth routes
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: isDev ? 500 : 20,
+  max: isTest ? 10000 : isDev ? 500 : 20,
   message: "Too many authentication attempts, please try again after 15 minutes",
 });
+
+if (!isTest) {
+  app.use("/api/auth/login", authLimiter);
+  app.use("/api/auth/register", authLimiter);
+  app.use("/api/auth/forgot-password", authLimiter);
+}
 
 const allowedOrigins = [process.env.CLIENT_URL, "https://dev-flow-zeta-ashy.vercel.app"];
 // Add more origins as needed

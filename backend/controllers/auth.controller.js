@@ -54,16 +54,20 @@ const register = async (req, res, next) => {
     });
 
     // --- CREATE AND EMIT WELCOME NOTIFICATION ---
-    const Notification = require("../models/Notification.model");
-    const { emitNotificationToUser } = require("../utils/socketService");
-    
-    const welcomeNote = await Notification.create({
-      recipient: user._id,
-      type: "success",
-      message: `Welcome to DevFlow, ${user.name}! 🚀 Explore your new developer dashboard.`,
-    });
-    
-    emitNotificationToUser(req, user._id, welcomeNote);
+    try {
+      const Notification = require("../models/Notification.model");
+      const { emitNotificationToUser } = require("../utils/socketService");
+      
+      const welcomeNote = await Notification.create({
+        recipient: user._id,
+        type: "success",
+        message: `Welcome to DevFlow, ${user.name}! 🚀 Explore your new developer dashboard.`,
+      });
+      
+      emitNotificationToUser(req, user._id, welcomeNote);
+    } catch (noteErr) {
+      logger.error({ err: noteErr }, "Failed to create welcome notification");
+    }
     // ---------------------------------------------
 
     // 5. Send verification email

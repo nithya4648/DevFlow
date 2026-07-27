@@ -12,7 +12,17 @@ describe('Authentication Flow', () => {
     password: 'Password123!'
   };
 
+  jest.setTimeout(30000);
+
+  beforeAll(async () => {
+    if (mongoose.connection.readyState === 0) {
+      await mongoose.connect(process.env.MONGO_URI);
+    }
+    await User.deleteMany({ email: testUser.email });
+  });
+
   afterAll(async () => {
+    await User.deleteMany({ email: testUser.email });
     await mongoose.connection.close();
   });
 

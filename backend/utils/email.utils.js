@@ -7,7 +7,7 @@ let smtpTransporter = null;
 const smtpUser = process.env.EMAIL_USER || process.env.GMAIL_USER;
 const smtpPass = process.env.EMAIL_PASS || process.env.GMAIL_PASS;
 
-if (smtpUser && smtpPass) {
+if (process.env.NODE_ENV !== "test" && smtpUser && smtpPass) {
   smtpTransporter = nodemailer.createTransport({
     service: process.env.EMAIL_SERVICE || "gmail",
     host: process.env.EMAIL_HOST || "smtp.gmail.com",
@@ -22,11 +22,15 @@ if (smtpUser && smtpPass) {
 }
 
 let resendClient = null;
-if (process.env.RESEND_API_KEY) {
+if (process.env.NODE_ENV !== "test" && process.env.RESEND_API_KEY) {
   resendClient = new Resend(process.env.RESEND_API_KEY);
 }
 
 const sendEmail = async ({ to, subject, html, text }) => {
+  if (process.env.NODE_ENV === "test") {
+    logger.info({ to, subject }, "Email dispatch skipped in test environment");
+    return { simulated: true };
+  }
   logger.info({ to, subject }, "Email sending triggered");
   const fromEmail = process.env.EMAIL_FROM || smtpUser || "DevFlow <onboarding@resend.dev>";
 
