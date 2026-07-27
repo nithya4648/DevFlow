@@ -1,42 +1,91 @@
+const nodemailer = require("nodemailer");
 const { Resend } = require("resend");
 const logger = require("./logger");
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Create Nodemailer transporter for Gmail / SMTP if credentials exist
+let smtpTransporter = null;
+const smtpUser = process.env.EMAIL_USER || process.env.GMAIL_USER;
+const smtpPass = process.env.EMAIL_PASS || process.env.GMAIL_PASS;
+
+if (smtpUser && smtpPass) {
+  smtpTransporter = nodemailer.createTransport({
+    service: process.env.EMAIL_SERVICE || "gmail",
+    host: process.env.EMAIL_HOST || "smtp.gmail.com",
+    port: parseInt(process.env.EMAIL_PORT || "587", 10),
+    secure: process.env.EMAIL_SECURE === "true", // true for 465, false for 587
+    auth: {
+      user: smtpUser,
+      pass: smtpPass,
+    },
+  });
+  logger.info("Nodemailer Gmail SMTP transporter initialized");
+}
+
+let resendClient = null;
+if (process.env.RESEND_API_KEY) {
+  resendClient = new Resend(process.env.RESEND_API_KEY);
+}
 
 const sendEmail = async ({ to, subject, html, text }) => {
   logger.info({ to, subject }, "Email sending triggered");
-  try {
-    const data = await resend.emails.send({
-      from: process.env.EMAIL_FROM || "DevFlow <onboarding@resend.dev>",
-      to,
-      subject,
-      html,
-      text,
-    });
-    logger.info({ to, data }, "Email sent successfully via Resend");
-    return data;
-  } catch (error) {
-    logger.error({ err: error, to, subject }, "Failed to send email via Resend");
-    throw error;
+  const fromEmail = process.env.EMAIL_FROM || smtpUser || "DevFlow <onboarding@resend.dev>";
+
+  if (smtpTransporter) {
+    try {
+      const info = await smtpTransporter.sendMail({
+        from: fromEmail,
+        to,
+        subject,
+        html,
+        text,
+      });
+      logger.info({ to, messageId: info.messageId }, "Email sent successfully via Nodemailer (Gmail SMTP)");
+      return info;
+    } catch (error) {
+      logger.error({ err: error, to, subject }, "Failed to send email via Nodemailer SMTP");
+      throw error;
+    }
   }
+
+  if (resendClient) {
+    try {
+      const data = await resendClient.emails.send({
+        from: fromEmail,
+        to,
+        subject,
+        html,
+        text,
+      });
+      logger.info({ to, data }, "Email sent successfully via Resend");
+      return data;
+    } catch (error) {
+      logger.error({ err: error, to, subject }, "Failed to send email via Resend");
+      throw error;
+    }
+  }
+
+  const err = new Error("No email service configured. Set GMAIL_USER/GMAIL_PASS or RESEND_API_KEY in environment.");
+  logger.error({ err }, "Email dispatch error");
+  throw err;
 };
 
 const sendVerificationEmail = async (email, token) => {
-  const clientUrl = process.env.CLIENT_URL || "https://dev-flow-zeta-ashy.vercel.app";
+  const clientUrl = process.env.CLIENT_URL || process.env.BACKEND_URL || "https://dev-flow-zeta-ashy.vercel.app";
   const verificationLink = `${clientUrl}/verify-email/${token}`;
 
   await sendEmail({
     to: email,
     subject: "Verify your DevFlow account",
-    text: `Welcome to DevFlow! Please verify your email by visiting this link: ${verificationLink}`,
+    text: `Welcome to DevFlow! Please verify your email address by visiting this link: ${verificationLink}. This link is valid for 24 hours.`,
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
         <h2 style="color: #6366f1; text-align: center;">Welcome to DevFlow</h2>
         <p>Hi there,</p>
-        <p>Thank you for signing up! Please verify your email address to get started and unlock all features of the DevFlow platform.</p>
+        <p>Thank you for signing up! Please verify your email address to activate your DevFlow account.</p>
         <div style="text-align: center; margin: 30px 0;">
           <a href="${verificationLink}" style="background-color: #6366f1; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">Verify Email Address</a>
         </div>
+        <p>This verification link is valid for 24 hours.</p>
         <p>If the button above doesn't work, copy and paste this URL into your browser:</p>
         <p style="word-break: break-all; color: #4f46e5;">${verificationLink}</p>
         <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;" />
@@ -47,7 +96,7 @@ const sendVerificationEmail = async (email, token) => {
 };
 
 const sendPasswordResetEmail = async (email, token) => {
-  const clientUrl = process.env.CLIENT_URL || "https://dev-flow-zeta-ashy.vercel.app";
+  const clientUrl = process.env.CLIENT_URL || process.env.BACKEND_URL || "https://dev-flow-zeta-ashy.vercel.app";
   const resetLink = `${clientUrl}/reset-password/${token}`;
 
   await sendEmail({

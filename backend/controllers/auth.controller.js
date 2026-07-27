@@ -108,7 +108,7 @@ const login = async (req, res, next) => {
 
     // Check if verified
     if (!user.isVerified) {
-      const error = new Error("Account not verified. Please check your email.");
+      const error = new Error("Please verify your email before logging in.");
       error.statusCode = 403;
       error.isVerified = false; // Send this flag to frontend so it can show the resend button
       return next(error);

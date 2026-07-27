@@ -48,7 +48,11 @@ function LoginPage() {
     } catch (err) {
       const errMsg = err.response?.data?.message || err.message || "Invalid credentials";
       addToast(errMsg, "error");
-      if (err.response?.data?.isVerified === false || errMsg.toLowerCase().includes("not verified")) {
+      if (
+        err.response?.data?.isVerified === false ||
+        errMsg.toLowerCase().includes("not verified") ||
+        errMsg.toLowerCase().includes("verify your email")
+      ) {
         setUnverifiedEmail(data.email);
       }
     } finally {

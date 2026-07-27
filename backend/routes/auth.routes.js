@@ -41,6 +41,8 @@ router.post("/reset-password/:token", resetPassword);
 router.get("/verify-email/:token", verifyEmail);
 router.post("/resend-verification", resendVerification);
 
+const clientUrl = process.env.CLIENT_URL || "https://dev-flow-zeta-ashy.vercel.app";
+
 // Google OAuth routes
 router.get(
   "/google",
@@ -48,7 +50,7 @@ router.get(
 );
 router.get(
   "/google/callback",
-  passport.authenticate("google", { session: false, failureRedirect: "/login?error=AuthenticationFailed" }),
+  passport.authenticate("google", { session: false, failureRedirect: `${clientUrl}/login?error=AuthenticationFailed` }),
   googleCallback
 );
 
