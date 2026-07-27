@@ -1,18 +1,14 @@
 const nodemailer = require("nodemailer");
-const { Resend } = require("resend");
 const logger = require("./logger");
 
-// Create Nodemailer transporter for Gmail / SMTP if credentials exist
+// Create Nodemailer transporter using Gmail SMTP
 let smtpTransporter = null;
 const smtpUser = process.env.EMAIL_USER || process.env.GMAIL_USER;
-const smtpPass = process.env.EMAIL_PASS || process.env.GMAIL_PASS;
+const smtpPass = process.env.EMAIL_APP_PASSWORD || process.env.GMAIL_PASS;
 
 if (process.env.NODE_ENV !== "test" && smtpUser && smtpPass) {
   smtpTransporter = nodemailer.createTransport({
-    service: process.env.EMAIL_SERVICE || "gmail",
-    host: process.env.EMAIL_HOST || "smtp.gmail.com",
-    port: parseInt(process.env.EMAIL_PORT || "587", 10),
-    secure: process.env.EMAIL_SECURE === "true", // true for 465, false for 587
+    service: "gmail",
     auth: {
       user: smtpUser,
       pass: smtpPass,
@@ -21,18 +17,13 @@ if (process.env.NODE_ENV !== "test" && smtpUser && smtpPass) {
   logger.info("Nodemailer Gmail SMTP transporter initialized");
 }
 
-let resendClient = null;
-if (process.env.NODE_ENV !== "test" && process.env.RESEND_API_KEY) {
-  resendClient = new Resend(process.env.RESEND_API_KEY);
-}
-
 const sendEmail = async ({ to, subject, html, text }) => {
   if (process.env.NODE_ENV === "test") {
     logger.info({ to, subject }, "Email dispatch skipped in test environment");
     return { simulated: true };
   }
   logger.info({ to, subject }, "Email sending triggered");
-  const fromEmail = process.env.EMAIL_FROM || smtpUser || "DevFlow <onboarding@resend.dev>";
+  const fromEmail = `DevFlow <${smtpUser}>`;
 
   if (smtpTransporter) {
     try {
@@ -51,26 +42,9 @@ const sendEmail = async ({ to, subject, html, text }) => {
     }
   }
 
-  if (resendClient) {
-    try {
-      const data = await resendClient.emails.send({
-        from: fromEmail,
-        to,
-        subject,
-        html,
-        text,
-      });
-      logger.info({ to, data }, "Email sent successfully via Resend");
-      return data;
-    } catch (error) {
-      logger.error({ err: error, to, subject }, "Failed to send email via Resend");
-      throw error;
-    }
-  }
-
   logger.warn(
     { to, subject },
-    "No email provider (GMAIL_USER/GMAIL_PASS or RESEND_API_KEY) configured. Email dispatch skipped."
+    "No Gmail SMTP credentials (EMAIL_USER / EMAIL_APP_PASSWORD) configured. Email dispatch skipped."
   );
   return { simulated: true };
 };
