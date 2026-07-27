@@ -1,66 +1,22 @@
-const nodemailer = require("nodemailer");
+const { Resend } = require("resend");
 const logger = require("./logger");
 
-// Create nodemailer transporter
-const getTransporter = async () => {
-  const user = process.env.EMAIL_USER;
-  const pass = process.env.EMAIL_PASS;
-
-  if (user && pass) {
-    logger.info({ user }, "Configured Nodemailer SMTP transporter using Gmail");
-    return nodemailer.createTransport({
-      service: "Gmail",
-      auth: { user, pass },
-    });
-  } else {
-    logger.info("EMAIL_USER/EMAIL_PASS not set. Attempting Ethereal test account fallback");
-    try {
-      const testAccount = await nodemailer.createTestAccount();
-      logger.info({ user: testAccount.user }, "Created Ethereal test email account");
-      return nodemailer.createTransport({
-        host: "smtp.ethereal.email",
-        port: 587,
-        secure: false,
-        auth: {
-          user: testAccount.user,
-          pass: testAccount.pass,
-        },
-      });
-    } catch (err) {
-      logger.warn({ err }, "Could not create Ethereal email test account");
-      return null;
-    }
-  }
-};
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const sendEmail = async ({ to, subject, html, text }) => {
   logger.info({ to, subject }, "Email sending triggered");
-  const transporter = await getTransporter();
-  
-  if (!transporter) {
-    logger.warn({ to, subject }, "No email transporter available; logging email contents instead");
-    return;
-  }
-
-  const mailOptions = {
-    from: process.env.EMAIL_USER ? `"DevFlow Support" <${process.env.EMAIL_USER}>` : '"DevFlow Support" <support@devflow.com>',
-    to,
-    subject,
-    text,
-    html,
-  };
-
   try {
-    const info = await transporter.sendMail(mailOptions);
-    const previewUrl = nodemailer.getTestMessageUrl(info);
-    if (previewUrl) {
-      logger.info({ previewUrl, to }, "Email sent successfully via Ethereal");
-    } else {
-      logger.info({ to, messageId: info.messageId }, "Email sent successfully via Gmail");
-    }
-    return info;
+    const data = await resend.emails.send({
+      from: process.env.EMAIL_FROM || "DevFlow <onboarding@resend.dev>",
+      to,
+      subject,
+      html,
+      text,
+    });
+    logger.info({ to, data }, "Email sent successfully via Resend");
+    return data;
   } catch (error) {
-    logger.error({ err: error, to, subject }, "Failed to send email");
+    logger.error({ err: error, to, subject }, "Failed to send email via Resend");
     throw error;
   }
 };
@@ -117,6 +73,7 @@ const sendPasswordResetEmail = async (email, token) => {
 };
 
 module.exports = {
+  sendEmail,
   sendVerificationEmail,
   sendPasswordResetEmail,
 };
