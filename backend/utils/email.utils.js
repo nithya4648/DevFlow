@@ -50,8 +50,10 @@ const sendEmail = async ({ to, subject, html, text }) => {
 };
 
 const sendVerificationEmail = async (email, token) => {
-  const clientUrl = process.env.CLIENT_URL || process.env.BACKEND_URL || "https://dev-flow-zeta-ashy.vercel.app";
-  const verificationLink = `${clientUrl}/verify-email/${token}`;
+  if (!process.env.CLIENT_URL) {
+    throw new Error("CLIENT_URL environment variable is required for email links");
+  }
+  const verificationLink = `${process.env.CLIENT_URL}/verify-email/${token}`;
 
   await sendEmail({
     to: email,
@@ -76,8 +78,10 @@ const sendVerificationEmail = async (email, token) => {
 };
 
 const sendPasswordResetEmail = async (email, token) => {
-  const clientUrl = process.env.CLIENT_URL || process.env.BACKEND_URL || "https://dev-flow-zeta-ashy.vercel.app";
-  const resetLink = `${clientUrl}/reset-password/${token}`;
+  if (!process.env.CLIENT_URL) {
+    throw new Error("CLIENT_URL environment variable is required for email links");
+  }
+  const resetLink = `${process.env.CLIENT_URL}/reset-password/${token}`;
 
   await sendEmail({
     to: email,
