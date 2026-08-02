@@ -72,22 +72,52 @@ const register = async (req, res, next) => {
 
     // 5. Send verification email
     let emailSent = false;
+    let emailReason = null;
+    let emailDetails = null;
+
     try {
       logger.info({ email: user.email }, "Sending verification email");
-      await sendVerificationEmail(user.email, verificationToken);
-      emailSent = true;
-      logger.info({ email: user.email }, "Verification email sent successfully");
+      const result = await sendVerificationEmail(user.email, verificationToken);
+      if (result && result.simulated && process.env.NODE_ENV !== "test") {
+        emailSent = false;
+        emailReason = "missing_config";
+        emailDetails = "Email dispatch was skipped because SMTP environment variables are missing.";
+      } else {
+        emailSent = true;
+        logger.info({ email: user.email }, "Verification email sent successfully");
+      }
     } catch (emailErr) {
       logger.error({ err: emailErr, email: user.email }, "Failed to send verification email");
+      emailSent = false;
+      if (
+        emailErr.code === "MISSING_CONFIG" ||
+        emailErr.message?.includes("CLIENT_URL") ||
+        emailErr.message?.includes("EMAIL_USER") ||
+        emailErr.message?.includes("EMAIL_APP_PASSWORD") ||
+        emailErr.message?.includes("credentials")
+      ) {
+        emailReason = "missing_config";
+        emailDetails = emailErr.message || "Missing required server environment variables (EMAIL_USER, EMAIL_APP_PASSWORD/EMAIL_PASS, or CLIENT_URL).";
+      } else {
+        emailReason = "smtp_error";
+        emailDetails = emailErr.message || "SMTP error occurred while attempting to send verification email.";
+      }
     }
 
-    res.status(201).json({
+    const responsePayload = {
       success: true,
       emailSent,
       message: emailSent
         ? "Registration successful! Please check your email to verify your account."
         : "Registration successful! However, we couldn't send the verification email. Please use 'Resend Verification' to try again.",
-    });
+    };
+
+    if (!emailSent) {
+      responsePayload.reason = emailReason;
+      responsePayload.emailDetails = emailDetails;
+    }
+
+    res.status(201).json(responsePayload);
   } catch (error) {
     next(error);
   }

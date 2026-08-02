@@ -15,6 +15,10 @@ const authRoutes = require("./routes/auth.routes");
 const cookieParser = require("cookie-parser");
 const passport = require("./config/passport");
 const logger = require("./utils/logger");
+const { checkEmailConfig } = require("./utils/email.utils");
+
+// Run startup verification for email environment variables
+checkEmailConfig();
 
 const app = express();
 const server = http.createServer(app);

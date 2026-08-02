@@ -1,21 +1,63 @@
 const nodemailer = require("nodemailer");
 const logger = require("./logger");
 
-// Create Nodemailer transporter using Gmail SMTP
+// Nodemailer transporter instance
 let smtpTransporter = null;
-const smtpUser = process.env.EMAIL_USER || process.env.GMAIL_USER;
-const smtpPass = process.env.EMAIL_APP_PASSWORD || process.env.EMAIL_PASS || process.env.GMAIL_PASS;
 
-if (process.env.NODE_ENV !== "test" && smtpUser && smtpPass) {
-  smtpTransporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: smtpUser,
-      pass: smtpPass,
-    },
-  });
-  logger.info("Nodemailer Gmail SMTP transporter initialized");
-}
+const getTransporter = () => {
+  const smtpUser = process.env.EMAIL_USER || process.env.GMAIL_USER;
+  const smtpPass = process.env.EMAIL_APP_PASSWORD || process.env.EMAIL_PASS || process.env.GMAIL_PASS;
+
+  if (process.env.NODE_ENV === "test") {
+    return null;
+  }
+
+  if (smtpUser && smtpPass) {
+    if (!smtpTransporter) {
+      smtpTransporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          user: smtpUser,
+          pass: smtpPass,
+        },
+      });
+      logger.info("Nodemailer Gmail SMTP transporter initialized");
+    }
+    return smtpTransporter;
+  }
+
+  return null;
+};
+
+const checkEmailConfig = () => {
+  const missing = [];
+  if (!process.env.EMAIL_USER && !process.env.GMAIL_USER) {
+    missing.push("EMAIL_USER (or GMAIL_USER)");
+  }
+  if (!process.env.EMAIL_APP_PASSWORD && !process.env.EMAIL_PASS && !process.env.GMAIL_PASS) {
+    missing.push("EMAIL_APP_PASSWORD (or EMAIL_PASS/GMAIL_PASS)");
+  }
+  if (!process.env.CLIENT_URL) {
+    missing.push("CLIENT_URL");
+  }
+
+  if (missing.length > 0) {
+    const isProd = process.env.NODE_ENV === "production";
+    const warnMsg = `Missing email configuration environment variables: ${missing.join(", ")}. Verification emails and password resets will fail!`;
+
+    if (isProd) {
+      logger.error(`🚨 CRITICAL PRODUCTION WARNING: ${warnMsg} Please add these in your Render Dashboard environment variables.`);
+      console.error(`🚨 CRITICAL PRODUCTION WARNING: ${warnMsg} Please add these in your Render Dashboard environment variables.`);
+    } else {
+      logger.warn(`⚠️ EMAIL CONFIG WARNING: ${warnMsg}`);
+      console.warn(`⚠️ EMAIL CONFIG WARNING: ${warnMsg}`);
+    }
+    return { valid: false, missing };
+  }
+
+  logger.info("Email configuration environment variables verified");
+  return { valid: true, missing: [] };
+};
 
 const sendEmail = async ({ to, subject, html, text }) => {
   if (process.env.NODE_ENV === "test") {
@@ -23,11 +65,26 @@ const sendEmail = async ({ to, subject, html, text }) => {
     return { simulated: true };
   }
   logger.info({ to, subject }, "Email sending triggered");
+
+  const smtpUser = process.env.EMAIL_USER || process.env.GMAIL_USER;
+  const smtpPass = process.env.EMAIL_APP_PASSWORD || process.env.EMAIL_PASS || process.env.GMAIL_PASS;
+
+  if (!smtpUser || !smtpPass) {
+    logger.warn(
+      { to, subject },
+      "No Gmail SMTP credentials (EMAIL_USER / EMAIL_APP_PASSWORD) configured. Email dispatch skipped."
+    );
+    const err = new Error("Missing SMTP credentials: EMAIL_USER or EMAIL_APP_PASSWORD/EMAIL_PASS environment variables are not set");
+    err.code = "MISSING_CONFIG";
+    throw err;
+  }
+
+  const transporter = getTransporter();
   const fromEmail = `DevFlow <${smtpUser}>`;
 
-  if (smtpTransporter) {
+  if (transporter) {
     try {
-      const info = await smtpTransporter.sendMail({
+      const info = await transporter.sendMail({
         from: fromEmail,
         to,
         subject,
@@ -42,20 +99,20 @@ const sendEmail = async ({ to, subject, html, text }) => {
     }
   }
 
-  logger.warn(
-    { to, subject },
-    "No Gmail SMTP credentials (EMAIL_USER / EMAIL_APP_PASSWORD) configured. Email dispatch skipped."
-  );
-  return { simulated: true };
+  const err = new Error("Failed to initialize Nodemailer SMTP transporter");
+  err.code = "SMTP_INIT_ERROR";
+  throw err;
 };
 
 const sendVerificationEmail = async (email, token) => {
   if (!process.env.CLIENT_URL) {
-    throw new Error("CLIENT_URL environment variable is required for email links");
+    const err = new Error("CLIENT_URL environment variable is required for email links");
+    err.code = "MISSING_CONFIG";
+    throw err;
   }
   const verificationLink = `${process.env.CLIENT_URL}/verify-email/${token}`;
 
-  await sendEmail({
+  return await sendEmail({
     to: email,
     subject: "Verify your DevFlow account",
     text: `Welcome to DevFlow! Please verify your email address by visiting this link: ${verificationLink}. This link is valid for 24 hours.`,
@@ -79,11 +136,13 @@ const sendVerificationEmail = async (email, token) => {
 
 const sendPasswordResetEmail = async (email, token) => {
   if (!process.env.CLIENT_URL) {
-    throw new Error("CLIENT_URL environment variable is required for email links");
+    const err = new Error("CLIENT_URL environment variable is required for email links");
+    err.code = "MISSING_CONFIG";
+    throw err;
   }
   const resetLink = `${process.env.CLIENT_URL}/reset-password/${token}`;
 
-  await sendEmail({
+  return await sendEmail({
     to: email,
     subject: "Reset your DevFlow password",
     text: `You requested a password reset. Please click this link to reset it: ${resetLink}. This link is valid for 1 hour.`,
@@ -109,4 +168,6 @@ module.exports = {
   sendEmail,
   sendVerificationEmail,
   sendPasswordResetEmail,
+  checkEmailConfig,
 };
+
