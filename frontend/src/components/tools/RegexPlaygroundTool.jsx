@@ -41,32 +41,30 @@ export default function RegexPlaygroundTool() {
   }, [debouncedPattern, debouncedText, flags]);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 font-ui">
       {/* Regex input */}
       <ToolCard title="Regular Expression">
-        <div className="flex gap-3 items-center">
-          <span className="text-xl font-black text-gray-300 dark:text-gray-700">/</span>
+        <div className="flex gap-2 items-center">
+          <span className="text-lg font-mono font-bold text-gh-muted">/</span>
           <input
             type="text"
             value={pattern}
             onChange={(e) => setPattern(e.target.value)}
             placeholder="Enter regex pattern…"
-            className={`flex-1 rounded-xl border px-4 py-2.5 text-sm font-mono text-gray-800 outline-none transition dark:text-gray-200 ${
-              error
-                ? "border-red-500 bg-red-500/5 focus:ring-red-500/20"
-                : "border-gray-200 bg-gray-50 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 dark:border-gray-700 dark:bg-gray-950/50"
+            className={`flex-1 gh-input text-xs font-mono ${
+              error ? "!border-red-400 focus:!ring-red-400" : ""
             }`}
           />
-          <span className="text-xl font-black text-gray-300 dark:text-gray-700">/</span>
-          <div className="flex gap-1.5">
+          <span className="text-lg font-mono font-bold text-gh-muted">/</span>
+          <div className="flex gap-1">
             {FLAGS.map((f) => (
               <button
                 key={f}
                 onClick={() => toggleFlag(f)}
-                className={`h-8 w-8 rounded-lg text-xs font-black font-mono transition ${
+                className={`h-7 w-7 rounded-md text-xs font-mono font-semibold transition-colors ${
                   flags.includes(f)
-                    ? "bg-indigo-500 text-white"
-                    : "bg-gray-100 text-gray-400 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-500 dark:hover:bg-gray-700"
+                    ? "bg-accent-light text-accent-fg border border-accent-border"
+                    : "btn-secondary"
                 }`}
               >
                 {f}
@@ -75,7 +73,7 @@ export default function RegexPlaygroundTool() {
           </div>
         </div>
         {error && (
-          <p className="mt-2 text-xs text-red-500">{error}</p>
+          <p className="mt-2 text-xs font-mono text-red-400">{error}</p>
         )}
       </ToolCard>
 
@@ -85,7 +83,7 @@ export default function RegexPlaygroundTool() {
           rows={4}
           value={testString}
           onChange={(e) => setTestString(e.target.value)}
-          className="w-full resize-none rounded-xl border border-gray-200 bg-gray-50 p-4 text-sm font-mono text-gray-800 placeholder-gray-400 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 dark:border-gray-700 dark:bg-gray-950/50 dark:text-gray-200 transition"
+          className="gh-input text-xs font-mono resize-none w-full"
         />
       </ToolCard>
 
@@ -93,17 +91,17 @@ export default function RegexPlaygroundTool() {
       <ToolCard
         title="Match Highlights"
         actions={
-          <span className={`text-xs font-bold px-2.5 py-1 rounded-lg ${matchCount > 0 ? "bg-green-500/10 text-green-500" : "bg-gray-100 text-gray-400 dark:bg-gray-800"}`}>
+          <span className={`text-xs font-mono font-semibold px-2 py-0.5 rounded-md ${matchCount > 0 ? "bg-accent-light text-accent-fg border border-accent-border" : "bg-gh-subtle text-gh-muted border border-gh-border"}`}>
             {matchCount} match{matchCount !== 1 ? "es" : ""}
           </span>
         }
       >
-        <p className="rounded-xl bg-gray-50 dark:bg-gray-950/50 p-4 text-sm font-mono leading-relaxed text-gray-700 dark:text-gray-300 break-words whitespace-pre-wrap">
+        <p className="rounded-md bg-gh-bg border border-gh-border p-3 text-xs font-mono leading-relaxed text-gh-text break-words whitespace-pre-wrap">
           {segments.map((seg, i) =>
             seg.match ? (
               <mark
                 key={i}
-                className="rounded bg-yellow-300 text-yellow-900 px-0.5 dark:bg-yellow-500/30 dark:text-yellow-300"
+                className="rounded bg-accent-light text-accent-fg border border-accent-border px-1 py-0.5"
               >
                 {seg.text}
               </mark>

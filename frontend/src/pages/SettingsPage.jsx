@@ -34,23 +34,23 @@ const SettingsPage = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
+    <div className="max-w-6xl mx-auto space-y-6 font-ui">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Settings</h1>
+        <h1 className="text-xl font-bold text-gh-heading font-mono">Settings</h1>
       </div>
 
       <div className="flex flex-col md:flex-row gap-6">
         {/* Sidebar */}
-        <aside className="w-full md:w-64 flex-shrink-0">
-          <nav className="flex space-x-2 md:flex-col md:space-x-0 md:space-y-1 overflow-x-auto pb-4 md:pb-0">
+        <aside className="w-full md:w-56 shrink-0">
+          <nav className="flex space-x-1 md:flex-col md:space-x-0 md:space-y-0.5 overflow-x-auto pb-2 md:pb-0">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex-shrink-0 px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                className={`shrink-0 px-3 py-2 text-xs font-mono font-medium rounded-md transition-colors ${
                   activeTab === tab.id
-                    ? "bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-400"
-                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800/50 dark:hover:text-gray-200"
+                    ? "bg-accent-light text-accent-fg border border-accent-border font-semibold"
+                    : "text-gh-text hover:bg-gh-subtle hover:text-gh-heading border border-transparent"
                 } md:justify-start text-left`}
               >
                 {tab.label}
@@ -60,7 +60,7 @@ const SettingsPage = () => {
         </aside>
 
         {/* Content Area */}
-        <div className="flex-1 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm min-h-[500px]">
+        <div className="flex-1 gh-card p-6 min-h-[500px]">
           {renderTabContent()}
         </div>
       </div>

@@ -77,41 +77,41 @@ export default function CommentSection({ targetType, targetId, teamId }) {
   }
 
   return (
-    <div className="mt-8 border-t border-white/5 pt-6">
-      <h3 className="text-sm font-semibold text-gray-200 mb-4 flex items-center gap-2">
+    <div className="mt-6 border-t border-gh-border pt-5 font-ui">
+      <h3 className="text-xs font-mono font-semibold text-gh-heading mb-3 flex items-center gap-2">
         <span>💬</span> Comments ({localComments.length})
       </h3>
 
       {/* List */}
-      <div className="space-y-4 mb-4 max-h-[300px] overflow-y-auto pr-2">
+      <div className="space-y-3 mb-3 max-h-[280px] overflow-y-auto pr-1">
         {isLoading && localComments.length === 0 ? (
-          <p className="text-xs text-gray-500">Loading comments...</p>
+          <p className="text-xs text-gh-muted font-mono">Loading comments...</p>
         ) : localComments.length === 0 ? (
-          <p className="text-xs text-gray-500 italic">No comments yet. Start the conversation!</p>
+          <p className="text-xs text-gh-muted font-mono italic">No comments yet. Start the conversation!</p>
         ) : (
           localComments.map((c) => {
             const isAuthor = c.author?._id === user?._id;
             return (
-              <div key={c._id} className="flex items-start gap-3 text-xs bg-white/3 border border-white/5 p-3 rounded-xl">
+              <div key={c._id} className="flex items-start gap-2.5 text-xs bg-gh-subtle border border-gh-border p-2.5 rounded-md">
                 {c.author?.avatar ? (
-                  <img src={c.author.avatar} alt="avatar" className="w-6 h-6 rounded-full" />
+                  <img src={c.author.avatar} alt="avatar" className="w-6 h-6 rounded-full shrink-0" />
                 ) : (
-                  <div className="w-6 h-6 rounded-full bg-gray-700 flex items-center justify-center font-bold text-gray-200">
+                  <div className="w-6 h-6 rounded-full bg-gh-border flex items-center justify-center font-bold text-gh-heading text-[10px] shrink-0">
                     {c.author?.name ? c.author.name[0].toUpperCase() : "?"}
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="font-semibold text-gray-300">{c.author?.name || "Unknown"}</span>
-                    <span className="text-[10px] text-gray-600">{new Date(c.createdAt).toLocaleString()}</span>
+                  <div className="flex items-center justify-between mb-0.5">
+                    <span className="font-mono font-semibold text-gh-heading">{c.author?.name || "Unknown"}</span>
+                    <span className="text-[10px] text-gh-muted font-mono">{new Date(c.createdAt).toLocaleString()}</span>
                   </div>
-                  <p className="text-gray-400 leading-relaxed font-sans whitespace-pre-wrap">{c.content}</p>
+                  <p className="text-gh-text leading-relaxed whitespace-pre-wrap">{c.content}</p>
                 </div>
 
                 {isAuthor && (
                   <button
                     onClick={() => handleDelete(c._id)}
-                    className="p-1 rounded text-gray-600 hover:text-red-400 hover:bg-red-500/10 transition shrink-0 self-start"
+                    className="p-1 rounded text-gh-muted hover:text-red-400 hover:bg-red-500/10 transition shrink-0 self-start"
                     title="Delete comment"
                   >
                     <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -132,12 +132,12 @@ export default function CommentSection({ targetType, targetId, teamId }) {
           value={commentText}
           onChange={(e) => setCommentText(e.target.value)}
           placeholder="Write a comment..."
-          className="flex-1 bg-gray-900 border border-white/10 rounded-xl px-3 py-2 text-xs text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition"
+          className="gh-input flex-1 text-xs"
         />
         <button
           type="submit"
           disabled={createMutation.isPending || !commentText.trim()}
-          className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-55 text-white text-xs font-semibold rounded-xl transition"
+          className="btn-primary text-xs px-4 disabled:opacity-50"
         >
           Send
         </button>

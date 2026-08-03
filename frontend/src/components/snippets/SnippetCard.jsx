@@ -12,17 +12,17 @@ const LANG_EXT = {
 };
 
 const LANG_COLOR = {
-  javascript: "text-yellow-400 bg-yellow-400/10",
-  typescript: "text-blue-400 bg-blue-400/10",
-  python: "text-green-400 bg-green-400/10",
-  rust: "text-orange-400 bg-orange-400/10",
-  go: "text-cyan-400 bg-cyan-400/10",
-  java: "text-red-400 bg-red-400/10",
-  html: "text-orange-400 bg-orange-400/10",
-  css: "text-pink-400 bg-pink-400/10",
-  sql: "text-purple-400 bg-purple-400/10",
-  bash: "text-emerald-400 bg-emerald-400/10",
-  shell: "text-emerald-400 bg-emerald-400/10",
+  javascript: "text-yellow-400 bg-yellow-400/10 border-yellow-400/20",
+  typescript: "text-blue-400 bg-blue-400/10 border-blue-400/20",
+  python:     "text-emerald-400 bg-emerald-400/10 border-emerald-400/20",
+  rust:       "text-orange-400 bg-orange-400/10 border-orange-400/20",
+  go:         "text-cyan-400 bg-cyan-400/10 border-cyan-400/20",
+  java:       "text-red-400 bg-red-400/10 border-red-400/20",
+  html:       "text-orange-400 bg-orange-400/10 border-orange-400/20",
+  css:        "text-pink-400 bg-pink-400/10 border-pink-400/20",
+  sql:        "text-violet-400 bg-violet-400/10 border-violet-400/20",
+  bash:       "text-accent-fg bg-accent-light border-accent-border",
+  shell:      "text-accent-fg bg-accent-light border-accent-border",
 };
 
 function exportSnippet(snippet) {
@@ -38,31 +38,31 @@ function exportSnippet(snippet) {
 
 export default function SnippetCard({ snippet, onEdit, onDelete, onToggleFavorite, canEdit = true, canDelete = true }) {
   const [copied, copy] = useCopyToClipboard();
-  const langColor = LANG_COLOR[snippet.language] || "text-gray-400 bg-gray-400/10";
+  const langColor = LANG_COLOR[snippet.language] || "text-gh-muted bg-gh-subtle border-gh-border";
   const codePreview = snippet.code.split("\n").slice(0, 5).join("\n");
   const lineCount = snippet.code.split("\n").length;
 
   return (
-    <div className="group relative bg-white/3 dark:bg-gray-900/50 border border-white/8 hover:border-indigo-500/30 rounded-2xl overflow-hidden transition-all duration-200 hover:shadow-lg hover:shadow-indigo-900/10">
+    <div className="group gh-card overflow-hidden hover:border-accent-border transition-colors font-ui">
       {/* Card header */}
       <div className="flex items-start justify-between gap-3 px-4 pt-4 pb-2">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap mb-1">
-            <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${langColor}`}>
+            <span className={`text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded-md border ${langColor}`}>
               {snippet.language}
             </span>
             {snippet.folder && (
-              <span className="text-[10px] text-gray-500 flex items-center gap-1">
+              <span className="text-[10px] text-gh-muted font-mono flex items-center gap-1">
                 📁 {snippet.folder}
               </span>
             )}
           </div>
-          <h3 className="text-sm font-semibold text-gray-100 truncate">{snippet.title}</h3>
+          <h3 className="text-sm font-semibold text-gh-heading truncate">{snippet.title}</h3>
           {snippet.description && (
-            <p className="text-xs text-gray-500 line-clamp-1 mt-0.5">{snippet.description}</p>
+            <p className="text-xs text-gh-muted line-clamp-1 mt-0.5 font-mono">{snippet.description}</p>
           )}
           {snippet.teamId && (
-            <span className="inline-flex items-center mt-1 text-[9px] font-bold text-cyan-400 bg-cyan-500/10 px-1.5 py-0.5 rounded border border-cyan-500/20">
+            <span className="inline-flex items-center mt-1 text-[9px] font-mono font-bold text-sky-400 bg-sky-400/10 px-1.5 py-0.5 rounded border border-sky-400/20">
               👥 {snippet.teamId.name || "Team"}
             </span>
           )}
@@ -71,8 +71,8 @@ export default function SnippetCard({ snippet, onEdit, onDelete, onToggleFavorit
         {/* Favorite star */}
         <button
           onClick={() => onToggleFavorite(snippet._id, !snippet.isFavorite)}
-          className={`shrink-0 transition-all ${
-            snippet.isFavorite ? "text-amber-400" : "text-gray-600 hover:text-amber-400"
+          className={`shrink-0 transition-colors ${
+            snippet.isFavorite ? "text-amber-400" : "text-gh-muted hover:text-amber-400"
           }`}
           title={snippet.isFavorite ? "Remove from favorites" : "Add to favorites"}
         >
@@ -83,16 +83,16 @@ export default function SnippetCard({ snippet, onEdit, onDelete, onToggleFavorit
       </div>
 
       {/* Code preview */}
-      <div className="mx-4 mb-3 rounded-xl bg-gray-950/60 border border-white/5 overflow-hidden">
-        <div className="flex items-center justify-between px-3 py-1.5 border-b border-white/5">
-          <span className="text-[10px] text-gray-600">{lineCount} lines</span>
+      <div className="mx-4 mb-3 rounded-md bg-gh-bg border border-gh-border overflow-hidden">
+        <div className="flex items-center justify-between px-3 py-1.5 border-b border-gh-border bg-gh-subtle">
+          <span className="text-[10px] text-gh-muted font-mono">{lineCount} lines</span>
           <div className="flex gap-1.5">
             <span className="w-2 h-2 rounded-full bg-red-500/40" />
             <span className="w-2 h-2 rounded-full bg-amber-500/40" />
-            <span className="w-2 h-2 rounded-full bg-emerald-500/40" />
+            <span className="w-2 h-2 rounded-full bg-accent-fg/40" />
           </div>
         </div>
-        <pre className="px-3 py-2.5 text-[11px] text-gray-300 font-mono overflow-hidden leading-relaxed">
+        <pre className="px-3 py-2.5 text-[11px] text-gh-text font-mono overflow-hidden leading-relaxed">
           <code>{codePreview}{lineCount > 5 ? "\n…" : ""}</code>
         </pre>
       </div>
@@ -101,28 +101,28 @@ export default function SnippetCard({ snippet, onEdit, onDelete, onToggleFavorit
       {snippet.tags?.length > 0 && (
         <div className="flex flex-wrap gap-1 px-4 mb-3">
           {snippet.tags.slice(0, 4).map((tag) => (
-            <span key={tag} className="text-[10px] px-1.5 py-0.5 rounded-full bg-white/5 text-gray-400 border border-white/8">
+            <span key={tag} className="gh-badge">
               #{tag}
             </span>
           ))}
           {snippet.tags.length > 4 && (
-            <span className="text-[10px] text-gray-600">+{snippet.tags.length - 4}</span>
+            <span className="text-[10px] text-gh-muted font-mono">+{snippet.tags.length - 4}</span>
           )}
         </div>
       )}
 
       {/* Action row */}
-      <div className="flex items-center justify-between px-4 pb-3 gap-2">
-        <span className="text-[10px] text-gray-600">
+      <div className="flex items-center justify-between px-4 pb-3 gap-2 border-t border-gh-border pt-2">
+        <span className="text-[10px] text-gh-muted font-mono">
           {new Date(snippet.updatedAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
         </span>
 
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-0.5">
           {/* Copy */}
           <button
             onClick={() => copy(snippet.code)}
             title="Copy code"
-            className="flex items-center gap-1 px-2 py-1 rounded-lg text-xs text-gray-400 hover:text-emerald-400 hover:bg-emerald-400/10 transition-all"
+            className="flex items-center gap-1 px-2 py-1 rounded-md text-xs font-mono text-gh-muted hover:text-accent-fg hover:bg-accent-light transition-colors"
           >
             {copied ? (
               <><svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg> Copied</>
@@ -135,7 +135,7 @@ export default function SnippetCard({ snippet, onEdit, onDelete, onToggleFavorit
           <button
             onClick={() => exportSnippet(snippet)}
             title="Download as file"
-            className="p-1.5 rounded-lg text-gray-400 hover:text-blue-400 hover:bg-blue-400/10 transition-all"
+            className="p-1.5 rounded-md text-gh-muted hover:text-accent-blue hover:bg-accent-blue/10 transition-colors"
           >
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -147,7 +147,7 @@ export default function SnippetCard({ snippet, onEdit, onDelete, onToggleFavorit
             <button
               onClick={() => onEdit(snippet)}
               title="Edit snippet"
-              className="p-1.5 rounded-lg text-gray-400 hover:text-indigo-400 hover:bg-indigo-400/10 transition-all"
+              className="p-1.5 rounded-md text-gh-muted hover:text-gh-heading hover:bg-gh-subtle transition-colors"
             >
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -160,7 +160,7 @@ export default function SnippetCard({ snippet, onEdit, onDelete, onToggleFavorit
             <button
               onClick={() => onDelete(snippet._id)}
               title="Delete snippet"
-              className="p-1.5 rounded-lg text-gray-400 hover:text-red-400 hover:bg-red-400/10 transition-all"
+              className="p-1.5 rounded-md text-gh-muted hover:text-red-400 hover:bg-red-400/10 transition-colors"
             >
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />

@@ -7,7 +7,7 @@ import { Loader, AlertTriangle, ShieldCheck } from "lucide-react";
 const SecurityTab = () => {
   const { user } = useAuth();
   const { addToast } = useToast();
-  
+
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -45,20 +45,20 @@ const SecurityTab = () => {
 
   if (!user?.password && user?.googleId) {
     return (
-      <div className="max-w-2xl">
+      <div className="max-w-2xl font-ui">
         <div>
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Security</h2>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          <h2 className="text-base font-bold text-gh-heading font-mono">Security</h2>
+          <p className="mt-0.5 text-xs text-gh-muted font-mono">
             Manage your account security and password.
           </p>
         </div>
-        <div className="mt-6 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700/50 rounded-lg p-4 flex items-start">
-          <AlertTriangle className="h-5 w-5 text-yellow-600 dark:text-yellow-500 mt-0.5 mr-3 shrink-0" />
+        <div className="mt-5 bg-amber-500/10 border border-amber-500/20 rounded-md p-3.5 flex items-start">
+          <AlertTriangle className="h-4 w-4 text-amber-400 mt-0.5 mr-2.5 shrink-0" />
           <div>
-            <h3 className="text-sm font-medium text-yellow-800 dark:text-yellow-400">
+            <h3 className="text-xs font-mono font-semibold text-amber-400">
               Google Authentication
             </h3>
-            <p className="mt-1 text-sm text-yellow-700 dark:text-yellow-500">
+            <p className="mt-0.5 text-xs text-amber-400/90 font-mono">
               You are logged in using Google. You cannot change your password here. Please manage your security settings through your Google account.
             </p>
           </div>
@@ -68,26 +68,26 @@ const SecurityTab = () => {
   }
 
   return (
-    <div className="space-y-6 max-w-2xl">
+    <div className="space-y-5 max-w-2xl font-ui">
       <div>
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center">
-          <ShieldCheck className="h-6 w-6 mr-2 text-indigo-500" />
+        <h2 className="text-base font-bold text-gh-heading font-mono flex items-center gap-2">
+          <ShieldCheck className="h-5 w-5 text-accent-fg" />
           Security
         </h2>
-        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+        <p className="mt-0.5 text-xs text-gh-muted font-mono">
           Update your password to keep your account secure.
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-4">
         {error && (
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 p-3 rounded-lg text-sm">
+          <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-md text-xs font-mono">
             {error}
           </div>
         )}
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <label className="block text-xs font-mono font-medium text-gh-muted mb-1">
             Current Password
           </label>
           <input
@@ -95,12 +95,12 @@ const SecurityTab = () => {
             value={currentPassword}
             onChange={(e) => setCurrentPassword(e.target.value)}
             required
-            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            className="gh-input text-xs font-mono w-full"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <label className="block text-xs font-mono font-medium text-gh-muted mb-1">
             New Password
           </label>
           <input
@@ -108,15 +108,15 @@ const SecurityTab = () => {
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
             required
-            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            className="gh-input text-xs font-mono w-full"
           />
-          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+          <p className="mt-1 text-[11px] text-gh-muted font-mono">
             Must be at least 6 characters long.
           </p>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <label className="block text-xs font-mono font-medium text-gh-muted mb-1">
             Confirm New Password
           </label>
           <input
@@ -124,19 +124,19 @@ const SecurityTab = () => {
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             required
-            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            className="gh-input text-xs font-mono w-full"
           />
         </div>
 
-        <div className="pt-4 flex justify-end">
+        <div className="pt-2 flex justify-end">
           <button
             type="submit"
             disabled={isLoading || !currentPassword || !newPassword || !confirmPassword}
-            className="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="btn-primary text-xs font-mono"
           >
             {isLoading ? (
               <>
-                <Loader className="animate-spin -ml-1 mr-2 h-4 w-4" />
+                <Loader className="animate-spin -ml-1 mr-2 h-3.5 w-3.5" />
                 Updating...
               </>
             ) : (

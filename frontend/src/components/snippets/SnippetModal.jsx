@@ -117,15 +117,15 @@ export default function SnippetModal({ isOpen, onClose, onSubmit, initialData, i
     <div
       ref={overlayRef}
       onClick={handleOverlayClick}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 font-ui"
     >
-      <div className="w-full max-w-3xl bg-gray-900 border border-white/10 rounded-2xl shadow-2xl flex flex-col max-h-[90vh]">
+      <div className="w-full max-w-3xl bg-gh-surface border border-gh-border rounded-md shadow-lg flex flex-col max-h-[90vh]">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 shrink-0">
-          <h2 className="text-base font-semibold text-gray-100">
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-gh-border shrink-0">
+          <h2 className="text-sm font-bold text-gh-heading font-mono">
             {initialData ? "Edit Snippet" : "New Snippet"}
           </h2>
-          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white transition-colors">
+          <button onClick={onClose} className="p-1.5 rounded-md hover:bg-gh-subtle text-gh-muted hover:text-gh-heading transition-colors">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -136,26 +136,23 @@ export default function SnippetModal({ isOpen, onClose, onSubmit, initialData, i
         <form onSubmit={handleSubmit(onFormSubmit)} className="flex flex-col flex-1 min-h-0 overflow-hidden">
           <div className="flex-1 overflow-y-auto">
             {/* Metadata fields */}
-            <div className="px-6 pt-5 space-y-4">
+            <div className="px-5 pt-4 space-y-4">
               {/* Title + Language */}
               <div className="grid grid-cols-3 gap-3">
                 <div className="col-span-2">
-                  <label className="block text-xs font-medium text-gray-400 mb-1">Title *</label>
+                  <label className="block text-xs font-mono font-medium text-gh-muted mb-1">Title *</label>
                   <input
                     {...register("title", { required: "Title is required" })}
                     placeholder="Snippet title…"
-                    className="w-full bg-gray-800 border border-white/10 rounded-xl px-3 py-2 text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition"
+                    className="gh-input text-sm w-full"
                   />
-                  {errors.title && <p className="text-xs text-red-400 mt-1">{errors.title.message}</p>}
+                  {errors.title && <p className="text-xs text-red-400 font-mono mt-1">{errors.title.message}</p>}
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-400 mb-1">Language *</label>
-                  <select
-                    {...register("language")}
-                    className="w-full bg-gray-800 border border-white/10 rounded-xl px-3 py-2 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition"
-                  >
+                  <label className="block text-xs font-mono font-medium text-gh-muted mb-1">Language *</label>
+                  <select {...register("language")} className="gh-input text-sm w-full">
                     {LANGUAGES.map((l) => (
-                      <option key={l.value} value={l.value}>{l.label}</option>
+                      <option key={l.value} value={l.value} className="bg-gh-surface">{l.label}</option>
                     ))}
                   </select>
                 </div>
@@ -164,19 +161,19 @@ export default function SnippetModal({ isOpen, onClose, onSubmit, initialData, i
               {/* Description + Folder */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-gray-400 mb-1">Description</label>
+                  <label className="block text-xs font-mono font-medium text-gh-muted mb-1">Description</label>
                   <input
                     {...register("description")}
                     placeholder="Short description…"
-                    className="w-full bg-gray-800 border border-white/10 rounded-xl px-3 py-2 text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition"
+                    className="gh-input text-sm w-full"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-400 mb-1">Folder</label>
+                  <label className="block text-xs font-mono font-medium text-gh-muted mb-1">Folder</label>
                   <input
                     {...register("folder")}
-                    placeholder="e.g. React Hooks, Utilities…"
-                    className="w-full bg-gray-800 border border-white/10 rounded-xl px-3 py-2 text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition"
+                    placeholder="e.g. React Hooks…"
+                    className="gh-input text-sm w-full"
                   />
                 </div>
               </div>
@@ -184,23 +181,21 @@ export default function SnippetModal({ isOpen, onClose, onSubmit, initialData, i
               {/* Tags + Team Scope */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-gray-400 mb-1">Tags</label>
+                  <label className="block text-xs font-mono font-medium text-gh-muted mb-1">Tags</label>
                   <div className="flex gap-2">
                     <input
                       value={tagInput}
                       onChange={(e) => setTagInput(e.target.value)}
                       onKeyDown={(e) => { if (e.key === "Enter") addTag(e); }}
                       placeholder="Add tag…"
-                      className="flex-1 bg-gray-800 border border-white/10 rounded-xl px-3 py-2 text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition"
+                      className="gh-input flex-1 text-sm font-mono"
                     />
-                    <button type="button" onClick={addTag} className="px-3 py-2 bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-300 rounded-xl text-sm transition">
-                      Add
-                    </button>
+                    <button type="button" onClick={addTag} className="btn-secondary text-xs px-3 font-mono">Add</button>
                   </div>
                   {tags.length > 0 && (
                     <div className="flex flex-wrap gap-1.5 mt-2">
                       {tags.map((tag) => (
-                        <span key={tag} className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-400 border border-indigo-500/20">
+                        <span key={tag} className="gh-badge flex items-center gap-1">
                           #{tag}
                           <button type="button" onClick={() => removeTag(tag)} className="hover:text-red-400 transition-colors">×</button>
                         </span>
@@ -210,77 +205,75 @@ export default function SnippetModal({ isOpen, onClose, onSubmit, initialData, i
                 </div>
                 
                 <div>
-                  <label className="block text-xs font-medium text-gray-400 mb-1">Workspace Scoping (Team)</label>
-                  <select
-                    {...register("teamId")}
-                    className="w-full bg-gray-800 border border-white/10 rounded-xl px-3 py-2 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition"
-                  >
-                    <option value="">Private (Personal)</option>
+                  <label className="block text-xs font-mono font-medium text-gh-muted mb-1">Workspace Scoping (Team)</label>
+                  <select {...register("teamId")} className="gh-input text-sm w-full">
+                    <option value="" className="bg-gh-surface">Private (Personal)</option>
                     {teams.map((t) => (
-                      <option key={t._id} value={t._id}>{t.name}</option>
+                      <option key={t._id} value={t._id} className="bg-gh-surface">{t.name}</option>
                     ))}
                   </select>
                 </div>
               </div>
 
-            {/* Favorite toggle */}
-            <label className="flex items-center gap-2 cursor-pointer select-none">
-              <input type="checkbox" {...register("isFavorite")} className="w-4 h-4 accent-indigo-500" />
-              <span className="text-sm text-gray-400">Mark as favorite ⭐</span>
-            </label>
-          </div>
+              {/* Favorite toggle */}
+              <label className="flex items-center gap-2 cursor-pointer select-none">
+                <input type="checkbox" {...register("isFavorite")} className="w-4 h-4 accent-emerald-500" />
+                <span className="text-xs text-gh-muted font-mono">Mark as favorite ★</span>
+              </label>
+            </div>
 
-          {/* Comments section if snippet exists */}
-          {initialData?._id && (
-            <div className="px-6 border-t border-white/5">
-              <CommentSection
-                targetType="snippet"
-                targetId={initialData._id}
-                teamId={initialData.teamId?._id || initialData.teamId}
+            {/* Comments section if snippet exists */}
+            {initialData?._id && (
+              <div className="px-5 border-t border-gh-border mt-4">
+                <CommentSection
+                  targetType="snippet"
+                  targetId={initialData._id}
+                  teamId={initialData.teamId?._id || initialData.teamId}
+                />
+              </div>
+            )}
+
+            {/* Monaco Editor */}
+            <div className="mx-5 mt-4 mb-1">
+              <label className="block text-xs font-mono font-medium text-gh-muted mb-1">
+                Code * {!code.trim() && <span className="text-red-400">(required)</span>}
+              </label>
+            </div>
+            <div className="mx-5 mb-4 rounded-md overflow-hidden border border-gh-border">
+              <Editor
+                height="200px"
+                language={selectedLang}
+                value={code}
+                onChange={(val) => setCode(val || "")}
+                theme="vs-dark"
+                options={{
+                  fontSize: 13,
+                  minimap: { enabled: false },
+                  scrollBeyondLastLine: false,
+                  lineNumbers: "on",
+                  wordWrap: "on",
+                  padding: { top: 12, bottom: 12 },
+                  renderLineHighlight: "line",
+                  scrollbar: { vertical: "auto", horizontal: "auto" },
+                  fontFamily: "JetBrains Mono, ui-monospace, monospace",
+                }}
               />
             </div>
-          )}
-
-          {/* Monaco Editor */}
-          <div className="mx-6 mt-4 mb-1">
-            <label className="block text-xs font-medium text-gray-400 mb-1">
-              Code * {!code.trim() && <span className="text-red-400">(required)</span>}
-            </label>
           </div>
-          <div className="mx-6 mb-4 rounded-xl overflow-hidden border border-white/10">
-            <Editor
-              height="200px"
-              language={selectedLang}
-              value={code}
-              onChange={(val) => setCode(val || "")}
-              theme="vs-dark"
-              options={{
-                fontSize: 13,
-                minimap: { enabled: false },
-                scrollBeyondLastLine: false,
-                lineNumbers: "on",
-                wordWrap: "on",
-                padding: { top: 12, bottom: 12 },
-                renderLineHighlight: "line",
-                scrollbar: { vertical: "auto", horizontal: "auto" },
-              }}
-            />
-          </div>
-        </div>
 
-        {/* Footer actions */}
-        <div className="flex justify-end gap-3 px-6 py-4 border-t border-white/10 shrink-0">
-          <button type="button" onClick={onClose} className="px-4 py-2 text-sm text-gray-400 hover:text-gray-200 transition">
-            Cancel
-          </button>
-          <button
-            type="submit"
-            disabled={isLoading || !code.trim()}
-            className="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-sm font-medium rounded-xl transition-colors"
-          >
-            {isLoading ? "Saving…" : initialData ? "Save Changes" : "Create Snippet"}
-          </button>
-        </div>
+          {/* Footer actions */}
+          <div className="flex justify-end gap-2 px-5 py-3.5 border-t border-gh-border shrink-0">
+            <button type="button" onClick={onClose} className="btn-ghost text-xs">
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={isLoading || !code.trim()}
+              className="btn-primary text-xs"
+            >
+              {isLoading ? "Saving…" : initialData ? "Save Changes" : "Create Snippet"}
+            </button>
+          </div>
         </form>
       </div>
     </div>

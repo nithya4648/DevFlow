@@ -49,7 +49,7 @@ function generatePalette(baseHex) {
 }
 
 export default function ColorPaletteTool() {
-  const [baseColor, setBaseColor] = useState("#6366f1");
+  const [baseColor, setBaseColor] = useState("#238636");
   const [scheme, setScheme] = useState("monochromatic");
 
   const palette = useMemo(() => generatePalette(baseColor), [baseColor]);
@@ -78,36 +78,36 @@ export default function ColorPaletteTool() {
   const activeScheme = schemes[scheme];
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-4 font-ui">
       {/* Controls */}
       <ToolCard title="Base Color">
-        <div className="flex flex-wrap items-center gap-5">
+        <div className="flex flex-wrap items-center gap-4">
           <div className="flex items-center gap-3">
             <input
               type="color"
               value={baseColor}
               onChange={(e) => setBaseColor(e.target.value)}
-              className="h-12 w-12 cursor-pointer rounded-xl border-2 border-gray-200 dark:border-gray-700"
+              className="h-9 w-9 cursor-pointer rounded-md border border-gh-border bg-transparent p-0.5"
             />
             <input
               type="text"
               value={baseColor}
               onChange={(e) => setBaseColor(e.target.value)}
-              className="w-28 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm font-mono text-gray-800 dark:border-gray-700 dark:bg-gray-950/50 dark:text-gray-200 outline-none"
+              className="w-24 gh-input text-xs font-mono"
             />
-            <span className="text-xs text-gray-400 dark:text-gray-500 font-mono">
+            <span className="text-xs text-gh-muted font-mono">
               hsl({h}°, {s}%, {l}%)
             </span>
           </div>
-          <div className="flex gap-2 ml-auto">
+          <div className="flex gap-1.5 ml-auto">
             {["monochromatic", "complementary", "analogous"].map((s) => (
               <button
                 key={s}
                 onClick={() => setScheme(s)}
-                className={`rounded-xl px-3.5 py-2 text-xs font-bold capitalize transition ${
+                className={`rounded-md px-3 py-1.5 text-xs font-mono capitalize transition-colors ${
                   scheme === s
-                    ? "bg-indigo-500 text-white"
-                    : "bg-gray-100 text-gray-500 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700"
+                    ? "bg-accent-light text-accent-fg border border-accent-border font-semibold"
+                    : "btn-secondary"
                 }`}
               >
                 {s}
@@ -120,15 +120,15 @@ export default function ColorPaletteTool() {
       {/* Palette rows */}
       {activeScheme.map((group) => (
         <ToolCard key={group.name} title={group.name}>
-          <div className="grid grid-cols-4 sm:grid-cols-8 gap-3">
+          <div className="grid grid-cols-4 sm:grid-cols-8 gap-2.5">
             {group.swatches.map((swatch) => (
-              <div key={swatch.name} className="group flex flex-col items-center gap-2">
+              <div key={swatch.name} className="group flex flex-col items-center gap-1.5">
                 <div
-                  className={`relative h-14 w-full rounded-xl transition-transform group-hover:scale-105 ${swatch.isBase ? "ring-2 ring-offset-2 ring-indigo-500 dark:ring-offset-gray-900" : ""}`}
+                  className={`relative h-12 w-full rounded-md border border-gh-border transition-transform group-hover:scale-105 ${swatch.isBase ? "ring-2 ring-accent-border" : ""}`}
                   style={{ backgroundColor: swatch.hex }}
                 />
                 <div className="text-center">
-                  <p className="text-[10px] font-bold text-gray-500 dark:text-gray-400">{swatch.name}</p>
+                  <p className="text-[10px] font-mono font-semibold text-gh-muted">{swatch.name}</p>
                   <CopyButton text={swatch.hex} label={swatch.hex} className="!px-1 !py-0.5 !text-[9px] mt-0.5" />
                 </div>
               </div>

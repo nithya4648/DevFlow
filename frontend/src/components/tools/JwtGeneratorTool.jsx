@@ -44,14 +44,14 @@ export default function JwtGeneratorTool() {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 font-ui">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <ToolCard title="Payload (JSON)">
           <textarea
             rows={8}
             value={payload}
             onChange={(e) => setPayload(e.target.value)}
-            className="w-full resize-none rounded-xl border border-gray-200 bg-gray-50 p-4 text-xs font-mono text-gray-800 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 dark:border-gray-700 dark:bg-gray-950/50 dark:text-gray-200 transition"
+            className="gh-input text-xs font-mono resize-none w-full"
           />
         </ToolCard>
         <ToolCard title="Secret Key">
@@ -61,15 +61,15 @@ export default function JwtGeneratorTool() {
               value={secret}
               onChange={(e) => setSecret(e.target.value)}
               placeholder="Enter your secret key…"
-              className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm font-mono text-gray-800 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 dark:border-gray-700 dark:bg-gray-950/50 dark:text-gray-200 transition"
+              className="gh-input text-xs font-mono w-full"
             />
-            <div className="rounded-xl bg-amber-500/5 border border-amber-500/10 px-4 py-3 text-xs text-amber-600 dark:text-amber-400">
+            <div className="rounded-md bg-amber-500/10 border border-amber-500/20 px-3 py-2 text-xs font-mono text-amber-400">
               ⚠️ This generates tokens in your browser. Never expose real secrets in production.
             </div>
             <button
               onClick={generate}
               disabled={loading}
-              className="w-full rounded-xl bg-indigo-500 py-2.5 text-sm font-bold text-white hover:bg-indigo-600 disabled:opacity-50 transition"
+              className="btn-primary text-xs font-mono w-full justify-center"
             >
               {loading ? "Generating…" : "Generate Token"}
             </button>
@@ -78,27 +78,27 @@ export default function JwtGeneratorTool() {
       </div>
 
       {error && (
-        <div className="rounded-xl border border-red-500/20 bg-red-500/5 px-4 py-3 text-xs font-medium text-red-500">
+        <div className="rounded-md border border-red-500/20 bg-red-500/10 px-3.5 py-2 text-xs font-mono text-red-400">
           {error}
         </div>
       )}
 
       {token && (
         <ToolCard title="Generated JWT" actions={<CopyButton text={token} />}>
-          <div className="rounded-xl bg-gray-50 dark:bg-gray-950/50 p-4 text-xs font-mono break-all leading-relaxed text-gray-700 dark:text-gray-300">
+          <div className="rounded-md bg-gh-bg border border-gh-border p-3 text-xs font-mono break-all leading-relaxed">
             {token.split(".").map((part, i) => (
               <span
                 key={i}
                 className={
                   i === 0
-                    ? "text-red-500"
+                    ? "text-red-400"
                     : i === 1
-                    ? "text-indigo-400"
-                    : "text-green-500"
+                    ? "text-accent-fg"
+                    : "text-green-400"
                 }
               >
                 {part}
-                {i < 2 ? <span className="text-gray-400">.</span> : null}
+                {i < 2 ? <span className="text-gh-muted">.</span> : null}
               </span>
             ))}
           </div>

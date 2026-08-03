@@ -48,29 +48,29 @@ export default function ActivityFeedPage() {
   }, [socket, selectedTeamId]);
 
   return (
-    <div className="flex-1 flex flex-col md:flex-row gap-6 max-w-7xl mx-auto w-full px-6 py-6 h-full min-h-0">
+    <div className="flex-1 flex flex-col md:flex-row gap-6 max-w-7xl mx-auto w-full px-6 py-6 h-full min-h-0 font-ui">
 
       {/* Sidebar: Teams select */}
-      <div className="w-full md:w-64 shrink-0 flex flex-col gap-4 border-r border-slate-800/20 pr-4">
+      <div className="w-full md:w-56 shrink-0 flex flex-col gap-4 border-r border-gh-border pr-4">
         <div>
-          <h2 className="text-base font-bold text-slate-100 mb-2">Team Activity</h2>
-          <p className="text-xs text-slate-400">Select a team to view event logs</p>
+          <h2 className="text-sm font-bold text-gh-heading font-mono">Team Activity</h2>
+          <p className="text-xs text-gh-muted font-mono">Select a team to view event logs</p>
         </div>
 
         <div className="flex-1 overflow-y-auto space-y-1">
           {teamsLoading ? (
-            <p className="text-xs text-slate-400">Loading teams…</p>
+            <p className="text-xs text-gh-muted font-mono">Loading teams…</p>
           ) : teams.length === 0 ? (
-            <p className="text-xs text-slate-400 italic">No teams found.</p>
+            <p className="text-xs text-gh-muted font-mono italic">No teams found.</p>
           ) : (
             teams.map((t) => (
               <button
                 key={t._id}
                 onClick={() => setSelectedTeamId(t._id)}
-                className={`w-full text-left px-3 py-2.5 rounded-xl text-xs transition-all ${
+                className={`w-full text-left px-3 py-2 rounded-md text-xs font-mono transition-colors ${
                   selectedTeamId === t._id
-                    ? "bg-emerald-500/20 text-emerald-400 font-semibold border border-emerald-500/30"
-                    : "text-slate-400 hover:text-slate-200 hover:bg-slate-700/10 border border-transparent"
+                    ? "bg-accent-light text-accent-fg border border-accent-border font-semibold"
+                    : "text-gh-text hover:text-gh-heading hover:bg-gh-subtle border border-transparent"
                 }`}
               >
                 👥 {t.name}
@@ -81,37 +81,37 @@ export default function ActivityFeedPage() {
       </div>
 
       {/* Main Panel: Activity Log */}
-      <div className="flex-1 flex flex-col min-w-0 bg-slate-950/40 border border-slate-800/20 rounded-2xl p-6 relative">
-        <h2 className="text-base font-bold text-slate-100 mb-4 border-b border-slate-800/20 pb-3">Event Activity Feed Log</h2>
+      <div className="flex-1 flex flex-col min-w-0 gh-card p-5 relative">
+        <h2 className="text-sm font-bold text-gh-heading font-mono mb-4 border-b border-gh-border pb-3">Event Activity Feed Log</h2>
 
         {activityLoading ? (
-          <p className="text-xs text-slate-400">Loading activity feed…</p>
+          <p className="text-xs text-gh-muted font-mono">Loading activity feed…</p>
         ) : !selectedTeamId ? (
-          <p className="text-xs text-slate-400 italic">Please select a team on the left.</p>
+          <p className="text-xs text-gh-muted font-mono italic">Please select a team on the left.</p>
         ) : localActivities.length === 0 ? (
-          <p className="text-xs text-slate-400 italic">No activity logged in this workspace yet.</p>
+          <p className="text-xs text-gh-muted font-mono italic">No activity logged in this workspace yet.</p>
         ) : (
-          <div className="flex-1 overflow-y-auto space-y-4 pr-2">
+          <div className="flex-1 overflow-y-auto space-y-3 pr-1">
             {localActivities.map((act) => (
-              <div key={act._id} className="flex items-start gap-3 border-b border-slate-800/20 pb-3 text-xs">
+              <div key={act._id} className="flex items-start gap-3 border-b border-gh-border pb-3 text-xs font-mono">
                 {act.user?.avatar ? (
-                  <img src={act.user.avatar} alt="avatar" className="w-6 h-6 rounded-full" />
+                  <img src={act.user.avatar} alt="avatar" className="w-6 h-6 rounded-full shrink-0" />
                 ) : (
-                  <div className="w-6 h-6 rounded-full bg-slate-700 flex items-center justify-center font-bold text-slate-200">
+                  <div className="w-6 h-6 rounded-full bg-gh-border flex items-center justify-center font-bold text-gh-heading text-[10px] shrink-0">
                     {act.user?.name ? act.user.name[0].toUpperCase() : "?"}
                   </div>
                 )}
-                <div className="flex-1">
-                  <p className="text-slate-300">
-                    <span className="font-semibold text-slate-100">{act.user?.name}</span>{" "}
+                <div className="flex-1 min-w-0">
+                  <p className="text-gh-text">
+                    <span className="font-semibold text-gh-heading">{act.user?.name}</span>{" "}
                     {act.action}{" "}
                     {act.targetName && (
-                      <span className="font-mono text-[11px] bg-slate-800 border border-slate-600 px-1 py-0.5 rounded text-emerald-300">
+                      <span className="font-mono text-[11px] bg-gh-bg border border-gh-border px-1.5 py-0.5 rounded text-accent-fg">
                         {act.targetName}
                       </span>
                     )}
                   </p>
-                  <span className="text-[10px] text-slate-500 mt-1 block">
+                  <span className="text-[10px] text-gh-muted mt-1 block">
                     {new Date(act.createdAt).toLocaleString()}
                   </span>
                 </div>

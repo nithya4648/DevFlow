@@ -86,7 +86,7 @@ export default function DocsPage() {
   }
 
   return (
-    <div className="flex h-full min-h-0 relative">
+    <div className="flex h-full min-h-0 relative font-ui text-gh-text">
       <DocSidebar
         docs={docs}
         categories={categories}
@@ -101,50 +101,50 @@ export default function DocsPage() {
         onSearch={setSearch}
       />
 
-      <div className="flex-1 flex flex-col min-w-0 px-6 pt-2 pb-6 relative">
+      <div className="flex-1 flex flex-col min-w-0 px-5 pt-1 pb-5 relative">
         {docsError ? (
-           <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+           <div className="p-3 rounded-md bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-mono">
              Failed to load documents.
            </div>
         ) : loadingDocs && !selectedDocId ? (
           <div className="flex flex-col gap-4">
-            <Skeleton className="h-10 w-1/3 rounded-xl" />
+            <Skeleton className="h-9 w-1/3 rounded-md bg-gh-surface border border-gh-border" />
             <div className="flex gap-4 flex-1">
-              <Skeleton className="h-[60vh] flex-1 rounded-2xl" />
-              <Skeleton className="h-[60vh] flex-1 rounded-2xl hidden xl:block" />
+              <Skeleton className="h-[60vh] flex-1 rounded-md bg-gh-surface border border-gh-border" />
+              <Skeleton className="h-[60vh] flex-1 rounded-md bg-gh-surface border border-gh-border hidden xl:block" />
             </div>
           </div>
         ) : !selectedDocId ? (
-          <div className="flex-1 flex flex-col items-center justify-center text-center">
-            <div className="w-20 h-20 mb-5 rounded-2xl bg-indigo-500/10 flex items-center justify-center">
-              <svg className="w-10 h-10 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          <div className="flex-1 flex flex-col items-center justify-center text-center gh-card p-8">
+            <div className="w-12 h-12 mb-4 rounded-md bg-accent-light border border-accent-border flex items-center justify-center text-accent-fg">
+              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 01-2-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold text-gray-200 mb-2">Documentation Wiki</h3>
-            <p className="text-sm text-gray-500 mb-6 max-w-sm">
-              Create and manage your project documentation, notes, and guides with full markdown support and version history.
+            <h2 className="text-base font-bold text-gh-heading mb-1">Documentation Wiki</h2>
+            <p className="text-xs text-gh-muted mb-5 max-w-sm font-mono">
+              Create and manage project docs, technical specs, and guides with full markdown support.
             </p>
             <button
               onClick={handleNewDoc}
-              className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium rounded-xl transition-colors"
+              className="btn-primary text-xs"
             >
               + Create New Document
             </button>
           </div>
         ) : loadingDetail ? (
           <div className="flex flex-col gap-4 h-full">
-            <Skeleton className="h-10 w-1/2 rounded-xl" />
+            <Skeleton className="h-9 w-1/2 rounded-md bg-gh-surface border border-gh-border" />
             <div className="flex gap-4 flex-1">
-              <Skeleton className="flex-1 rounded-2xl" />
+              <Skeleton className="flex-1 rounded-md bg-gh-surface border border-gh-border" />
             </div>
           </div>
         ) : selectedDoc ? (
           <div className="flex-1 flex flex-col min-h-0 relative">
-             <div className="absolute right-0 top-0 z-10 flex items-center gap-3">
+             <div className="absolute right-0 top-0 z-10 flex items-center gap-2">
                <button
                  onClick={() => setShowHistory(true)}
-                 className="flex items-center gap-1.5 px-3 py-1.5 bg-white/5 hover:bg-white/10 text-gray-400 hover:text-gray-200 border border-white/10 rounded-xl text-xs font-medium transition-all"
+                 className="btn-secondary text-xs py-1 px-2.5"
                >
                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -155,12 +155,12 @@ export default function DocsPage() {
 
              {/* Viewer read-only banner */}
              {!canEdit && selectedDoc.teamId && (
-               <div className="mb-3 px-3 py-2 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs flex items-center gap-2">
+               <div className="mb-3 px-3 py-1.5 rounded-md bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-mono flex items-center gap-2">
                  <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                  </svg>
-                 You have <strong>viewer</strong> access — this document is read-only.
+                 You have <strong className="font-semibold">viewer</strong> access — this document is read-only.
                </div>
              )}
              

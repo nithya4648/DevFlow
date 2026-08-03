@@ -2,9 +2,9 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
 const PRIORITY_CONFIG = {
-  high:   { label: "High",   cls: "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20" },
-  medium: { label: "Medium", cls: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20" },
-  low:    { label: "Low",    cls: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20" },
+  high:   { label: "High",   cls: "border-red-500/30 bg-red-500/10 text-red-400" },
+  medium: { label: "Medium", cls: "border-amber-500/30 bg-amber-500/10 text-amber-400" },
+  low:    { label: "Low",    cls: "border-accent-border bg-accent-light text-accent-fg" },
 };
 
 function formatDeadline(date) {
@@ -36,29 +36,29 @@ export default function KanbanCard({ project, onEdit, onDelete, canEdit = true, 
       style={style}
       {...attributes}
       {...listeners}
-      className="group bg-slate-50 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700/60 rounded-lg p-3 cursor-grab active:cursor-grabbing hover:border-emerald-500/40 hover:bg-white dark:hover:bg-slate-800 transition-all duration-150 select-none shadow-2xs hover:shadow-xs"
+      className="group bg-gh-bg border border-gh-border rounded-md p-2.5 cursor-grab active:cursor-grabbing hover:border-accent-border hover:bg-gh-subtle transition-colors duration-150 select-none font-ui"
     >
       {/* Header: title + actions */}
       <div className="flex items-start justify-between gap-2 mb-1.5">
         <div className="flex-1 min-w-0">
-          <h3 className="text-xs font-semibold text-slate-900 dark:text-slate-100 leading-snug line-clamp-2">
+          <h3 className="text-xs font-semibold text-gh-heading leading-snug line-clamp-2">
             {project.title}
           </h3>
           {project.teamId && (
-            <span className="inline-flex items-center mt-1 font-mono text-[9px] font-semibold text-teal-600 dark:text-teal-400 bg-teal-500/10 px-1.5 py-0.5 rounded border border-teal-500/20">
+            <span className="inline-flex items-center mt-0.5 font-mono text-[9px] font-semibold text-sky-400 bg-sky-400/10 px-1.5 py-0.5 rounded border border-sky-400/20">
               👥 {project.teamId.name || "Team"}
             </span>
           )}
         </div>
         {/* Action buttons */}
         <div
-          className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
+          className="flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
           onPointerDown={(e) => e.stopPropagation()}
         >
           {canEdit && (
             <button
               onClick={() => onEdit(project)}
-              className="p-1 rounded text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-500/10 transition"
+              className="p-1 rounded text-gh-muted hover:text-accent-fg hover:bg-accent-light transition"
               title="Edit"
             >
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -69,7 +69,7 @@ export default function KanbanCard({ project, onEdit, onDelete, canEdit = true, 
           {canDelete && (
             <button
               onClick={() => onDelete(project._id)}
-              className="p-1 rounded text-slate-400 hover:text-rose-600 hover:bg-rose-500/10 transition"
+              className="p-1 rounded text-gh-muted hover:text-red-400 hover:bg-red-500/10 transition"
               title="Delete"
             >
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -82,7 +82,7 @@ export default function KanbanCard({ project, onEdit, onDelete, canEdit = true, 
 
       {/* Description snippet */}
       {project.description && (
-        <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2 mb-2">{project.description}</p>
+        <p className="text-[11px] text-gh-muted line-clamp-2 mb-2 font-mono">{project.description}</p>
       )}
 
       {/* Labels */}
@@ -91,13 +91,13 @@ export default function KanbanCard({ project, onEdit, onDelete, canEdit = true, 
           {project.labels.slice(0, 3).map((label) => (
             <span
               key={label}
-              className="font-mono text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20 font-medium"
+              className="gh-badge text-[9px]"
             >
               {label}
             </span>
           ))}
           {project.labels.length > 3 && (
-            <span className="font-mono text-[9px] px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
+            <span className="font-mono text-[9px] px-1.5 py-0.5 rounded-md bg-gh-subtle border border-gh-border text-gh-muted">
               +{project.labels.length - 3}
             </span>
           )}
@@ -112,7 +112,7 @@ export default function KanbanCard({ project, onEdit, onDelete, canEdit = true, 
           </span>
           <button
             onClick={() => onEdit(project)}
-            className="p-1 rounded text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition"
+            className="p-1 rounded text-gh-muted hover:text-accent-fg transition"
             title="Comments & Details"
             onPointerDown={(e) => e.stopPropagation()}
           >
@@ -122,7 +122,7 @@ export default function KanbanCard({ project, onEdit, onDelete, canEdit = true, 
           </button>
         </div>
         {deadline && (
-          <span className={`font-mono text-[10px] flex items-center gap-1 ${deadline.isOverdue ? "text-rose-500 font-semibold" : "text-slate-400 dark:text-slate-500"}`}>
+          <span className={`font-mono text-[10px] flex items-center gap-1 ${deadline.isOverdue ? "text-red-400 font-semibold" : "text-gh-muted"}`}>
             <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>

@@ -82,44 +82,44 @@ export const DashboardLayout = () => {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 transition-colors duration-300">
+    <div className="flex h-screen overflow-hidden bg-gh-bg text-gh-text font-ui antialiased">
       
       {/* 1. Mobile Hamburger Backdrop */}
       {mobileOpen && (
         <div
           onClick={() => setMobileOpen(false)}
-          className="fixed inset-0 z-40 bg-slate-950/60 backdrop-blur-xs lg:hidden"
+          className="fixed inset-0 z-40 bg-black/60 lg:hidden"
         />
       )}
 
       {/* 2. Sidebar Navigation */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex flex-col border-r border-slate-200/80 bg-white/95 dark:border-slate-800/80 dark:bg-slate-900/90 backdrop-blur-md transition-all duration-300 lg:static ${
+        className={`fixed inset-y-0 left-0 z-50 flex flex-col border-r border-gh-border bg-gh-surface transition-all duration-200 lg:static ${
           mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
-        } ${collapsed ? "w-20" : "w-64"}`}
+        } ${collapsed ? "w-16" : "w-60"}`}
       >
         {/* Brand Header */}
-        <div className="flex h-16 items-center justify-between px-5 border-b border-slate-200/80 dark:border-slate-800/80 shrink-0">
+        <div className="flex h-14 items-center justify-between px-4 border-b border-gh-border shrink-0">
           <Link to="/" className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 font-mono font-bold text-sm">
+            <div className="flex h-7 w-7 items-center justify-center rounded-md bg-accent-light text-accent-fg border border-accent-border font-mono font-bold text-xs">
               &gt;_
             </div>
             {!collapsed && (
-              <span className="font-display text-xl font-bold tracking-tight text-slate-900 dark:text-white">
+              <span className="font-mono text-base font-bold tracking-tight text-gh-heading">
                 DevFlow
               </span>
             )}
           </Link>
           <button
             onClick={() => setMobileOpen(false)}
-            className="rounded-lg p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 lg:hidden text-slate-400"
+            className="rounded-md p-1 hover:bg-gh-subtle lg:hidden text-gh-muted hover:text-gh-heading"
           >
             <FaTimes className="h-4 w-4" />
           </button>
         </div>
 
         {/* Menu Links */}
-        <nav className="flex-1 overflow-y-auto py-5 space-y-1 px-3">
+        <nav className="flex-1 overflow-y-auto py-3 space-y-1 px-2">
           {menuItems.map((item) => {
             const Icon = item.icon;
             return (
@@ -127,17 +127,17 @@ export const DashboardLayout = () => {
                 key={item.name}
                 to={item.path}
                 className={({ isActive }) =>
-                  `flex items-center gap-3.5 rounded-lg px-3.5 py-2.5 text-xs font-medium transition-all duration-150 group relative ${
+                  `flex items-center gap-3 rounded-md px-3 py-2 text-xs font-medium transition-colors group relative ${
                     isActive
-                      ? "bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400 border border-emerald-500/20 font-semibold"
-                      : "text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800/60 dark:hover:text-slate-100 border border-transparent"
+                      ? "bg-accent-light text-accent-fg border border-accent-border font-semibold"
+                      : "text-gh-text hover:bg-gh-subtle hover:text-gh-heading border border-transparent"
                   }`
                 }
               >
-                <Icon className="h-4 w-4 shrink-0 transition-transform group-hover:scale-105" />
+                <Icon className="h-4 w-4 shrink-0" />
                 {!collapsed && <span>{item.name}</span>}
                 {collapsed && (
-                  <span className="absolute left-20 z-50 rounded-md bg-slate-900 px-2 py-1 text-[11px] font-medium text-white opacity-0 pointer-events-none group-hover:opacity-100 transition shadow-md whitespace-nowrap dark:bg-slate-800">
+                  <span className="absolute left-16 z-50 rounded-md bg-gh-surface border border-gh-border px-2 py-1 text-xs font-mono text-gh-heading opacity-0 pointer-events-none group-hover:opacity-100 transition whitespace-nowrap shadow-md">
                     {item.name}
                   </span>
                 )}
@@ -147,12 +147,12 @@ export const DashboardLayout = () => {
         </nav>
 
         {/* Collapse Sidebar Button - Desktop Only */}
-        <div className="hidden lg:block p-3 border-t border-slate-200/80 dark:border-slate-800/80 shrink-0">
+        <div className="hidden lg:block p-2 border-t border-gh-border shrink-0">
           <button
             onClick={() => setCollapsed(!collapsed)}
-            className="flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200/80 bg-slate-50 dark:border-slate-800/80 dark:bg-slate-900/40 py-2 text-xs font-semibold text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition"
+            className="flex w-full items-center justify-center gap-2 rounded-md border border-gh-border bg-gh-subtle py-1.5 text-xs font-mono font-medium text-gh-muted hover:text-gh-heading transition"
           >
-            {collapsed ? <FaChevronRight className="h-3.5 w-3.5" /> : <><FaChevronLeft className="h-3.5 w-3.5" /> Collapse</>}
+            {collapsed ? <FaChevronRight className="h-3 w-3" /> : <><FaChevronLeft className="h-3 w-3" /> Collapse</>}
           </button>
         </div>
       </aside>
@@ -160,26 +160,26 @@ export const DashboardLayout = () => {
       {/* 3. Main Workspace Area */}
       <div className="flex-1 flex flex-col h-full overflow-hidden">
         {/* Top Header */}
-        <header className="flex h-16 items-center justify-between px-6 border-b border-slate-200/80 bg-white/70 dark:border-slate-800/80 dark:bg-slate-900/40 backdrop-blur-md shrink-0">
+        <header className="flex h-14 items-center justify-between px-5 border-b border-gh-border bg-gh-surface shrink-0">
           
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             {/* Hamburger Button */}
             <button
               onClick={() => setMobileOpen(true)}
-              className="rounded-lg p-2 text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800 lg:hidden"
+              className="rounded-md p-1.5 text-gh-muted hover:bg-gh-subtle hover:text-gh-heading lg:hidden"
             >
-              <FaBars className="h-5 w-5" />
+              <FaBars className="h-4 w-4" />
             </button>
-            <h2 className="font-display text-base font-bold text-slate-900 dark:text-white tracking-tight hidden sm:block w-36 shrink-0">
+            <h1 className="text-sm font-semibold text-gh-heading hidden sm:block w-36 shrink-0 font-ui">
               {getPageTitle()}
-            </h2>
+            </h1>
           </div>
 
           <div className="flex-1 flex justify-center px-4 max-w-xl mx-auto hidden sm:flex">
             <GlobalSearch />
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5">
             {/* Search for mobile */}
             <div className="sm:hidden flex-1">
               <GlobalSearch />
@@ -187,10 +187,10 @@ export const DashboardLayout = () => {
             {/* Dark Mode Toggle */}
             <button
               onClick={toggleTheme}
-              className="rounded-lg border border-slate-200/80 bg-slate-50 dark:border-slate-800/80 dark:bg-slate-900/40 p-2 text-slate-500 hover:text-emerald-600 dark:text-slate-400 dark:hover:text-emerald-400 transition"
+              className="btn-secondary p-1.5"
               title="Toggle Theme"
             >
-              {theme === "dark" ? <FaSun className="h-4 w-4" /> : <FaMoon className="h-4 w-4" />}
+              {theme === "dark" ? <FaSun className="h-3.5 w-3.5 text-amber-400" /> : <FaMoon className="h-3.5 w-3.5" />}
             </button>
 
             {/* Notifications Dropdown */}
@@ -201,11 +201,11 @@ export const DashboardLayout = () => {
                     setNotifDropdownOpen(!notifDropdownOpen);
                     setProfileDropdownOpen(false);
                   }}
-                  className="relative rounded-lg border border-slate-200/80 bg-slate-50 dark:border-slate-800/80 dark:bg-slate-900/40 p-2 text-slate-500 hover:text-emerald-600 dark:text-slate-400 dark:hover:text-emerald-400 transition"
+                  className="btn-secondary p-1.5 relative"
                 >
-                  <FaBell className="h-4 w-4" />
+                  <FaBell className="h-3.5 w-3.5" />
                   {unreadCount > 0 && (
-                    <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-emerald-500 text-[9px] font-bold text-white shadow-xs ring-2 ring-white dark:ring-slate-900">
+                    <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-accent text-[9px] font-mono font-bold text-white">
                       {unreadCount > 99 ? '99+' : unreadCount}
                     </span>
                   )}
@@ -217,14 +217,14 @@ export const DashboardLayout = () => {
                       onClick={() => setNotifDropdownOpen(false)}
                       className="fixed inset-0 z-40"
                     />
-                    <div className="absolute right-0 mt-2 w-80 origin-top-right rounded-xl border border-slate-200 bg-white shadow-xl dark:border-slate-800 dark:bg-slate-900 z-50 flex flex-col max-h-[400px]">
+                    <div className="absolute right-0 mt-2 w-80 rounded-md border border-gh-border bg-gh-surface z-50 flex flex-col max-h-[400px] shadow-lg">
                       {/* Header */}
-                      <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-slate-800">
-                        <h3 className="font-display text-xs font-semibold text-slate-900 dark:text-white">Notifications</h3>
+                      <div className="flex items-center justify-between px-3 py-2 border-b border-gh-border">
+                        <h2 className="text-xs font-mono font-bold text-gh-heading">Notifications</h2>
                         {unreadCount > 0 && (
                           <button
                             onClick={markAllAsRead}
-                            className="text-xs text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 font-medium"
+                            className="text-xs text-accent-blue hover:underline font-mono"
                           >
                             Mark all read
                           </button>
@@ -232,9 +232,9 @@ export const DashboardLayout = () => {
                       </div>
 
                       {/* List */}
-                      <div className="flex-1 overflow-y-auto p-2 space-y-1">
+                      <div className="flex-1 overflow-y-auto p-1.5 space-y-1">
                         {notifications.length === 0 ? (
-                          <div className="py-6 text-center text-xs text-slate-500">
+                          <div className="py-6 text-center text-xs text-gh-muted font-mono">
                             No notifications yet.
                           </div>
                         ) : (
@@ -244,19 +244,19 @@ export const DashboardLayout = () => {
                               onClick={() => {
                                 if (!n.isRead) markAsRead(n._id);
                               }}
-                              className={`p-2.5 rounded-lg flex flex-col gap-1 cursor-pointer transition ${
+                              className={`p-2 rounded-md flex flex-col gap-1 cursor-pointer transition ${
                                 n.isRead
-                                  ? "bg-transparent hover:bg-slate-50 dark:hover:bg-slate-800/50 opacity-70"
-                                  : "bg-emerald-500/10 dark:bg-emerald-500/10 hover:bg-emerald-500/15"
+                                  ? "bg-transparent hover:bg-gh-subtle text-gh-muted"
+                                  : "bg-accent-light border border-accent-border text-gh-heading"
                               }`}
                             >
                               <div className="flex items-start justify-between gap-2">
-                                <p className={`text-xs ${n.isRead ? "text-slate-600 dark:text-slate-400" : "text-slate-900 dark:text-slate-100 font-medium"}`}>
+                                <p className={`text-xs ${n.isRead ? "text-gh-muted" : "text-gh-text font-medium"}`}>
                                   {n.message}
                                 </p>
-                                {!n.isRead && <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0 mt-1" />}
+                                {!n.isRead && <span className="w-2 h-2 rounded-full bg-accent shrink-0 mt-1" />}
                               </div>
-                              <span className="font-mono text-[10px] text-slate-400">
+                              <span className="font-mono text-[10px] text-gh-muted">
                                 {new Date(n.createdAt).toLocaleString()}
                               </span>
                             </div>
@@ -277,16 +277,16 @@ export const DashboardLayout = () => {
                     setProfileDropdownOpen(!profileDropdownOpen);
                     setNotifDropdownOpen(false);
                   }}
-                  className="flex items-center gap-2 outline-none group"
+                  className="flex items-center gap-2 outline-none"
                 >
                   {user.avatar ? (
                     <img
                       src={user.avatar}
                       alt={user.name}
-                      className="h-8 w-8 rounded-full border border-emerald-500/30 group-hover:border-emerald-500 transition"
+                      className="h-7 w-7 rounded-full border border-gh-border object-cover"
                     />
                   ) : (
-                    <FaUserCircle className="h-8 w-8 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300" />
+                    <FaUserCircle className="h-7 w-7 text-gh-muted hover:text-gh-heading" />
                   )}
                 </button>
 
@@ -296,26 +296,24 @@ export const DashboardLayout = () => {
                       onClick={() => setProfileDropdownOpen(false)}
                       className="fixed inset-0 z-40"
                     />
-                    <div className="absolute right-0 mt-2 w-56 origin-top-right rounded-xl border border-slate-200 bg-white p-2 shadow-xl dark:border-slate-800 dark:bg-slate-900 z-50">
-                      <div className="px-3 py-2.5 border-b border-slate-100 dark:border-slate-800">
-                        <p className="font-display text-xs font-semibold text-slate-900 dark:text-white">{user.name}</p>
-                        <p className="font-mono text-[11px] text-slate-400 dark:text-slate-500 truncate">{user.email}</p>
+                    <div className="absolute right-0 mt-2 w-52 rounded-md border border-gh-border bg-gh-surface p-1.5 shadow-lg z-50 space-y-1">
+                      <div className="px-2.5 py-2 border-b border-gh-border">
+                        <p className="text-xs font-bold text-gh-heading">{user.name}</p>
+                        <p className="font-mono text-[11px] text-gh-muted truncate">{user.email}</p>
                       </div>
-                      <div className="mt-1 space-y-0.5">
-                        <Link
-                          to="/settings"
-                          onClick={() => setProfileDropdownOpen(false)}
-                          className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white transition"
-                        >
-                          <FaCog className="h-3.5 w-3.5" /> Settings
-                        </Link>
-                        <button
-                          onClick={handleLogout}
-                          className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition"
-                        >
-                          <FaSignOutAlt className="h-3.5 w-3.5" /> Log Out
-                        </button>
-                      </div>
+                      <Link
+                        to="/settings"
+                        onClick={() => setProfileDropdownOpen(false)}
+                        className="flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 text-xs font-medium text-gh-text hover:bg-gh-subtle hover:text-gh-heading transition"
+                      >
+                        <FaCog className="h-3.5 w-3.5 text-gh-muted" /> Settings
+                      </Link>
+                      <button
+                        onClick={handleLogout}
+                        className="flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 text-xs font-medium text-red-400 hover:bg-red-500/10 transition"
+                      >
+                        <FaSignOutAlt className="h-3.5 w-3.5" /> Log Out
+                      </button>
                     </div>
                   </>
                 )}
@@ -325,7 +323,7 @@ export const DashboardLayout = () => {
         </header>
 
         {/* Content Container */}
-        <main className="flex-1 overflow-y-auto p-6 md:p-8 bg-slate-50 dark:bg-slate-950">
+        <main className="flex-1 overflow-y-auto p-5 md:p-6 bg-gh-bg">
           <Outlet />
         </main>
       </div>

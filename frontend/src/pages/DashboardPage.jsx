@@ -19,21 +19,28 @@ export const DashboardPage = () => {
   });
 
   return (
-    <div className="space-y-6">
-      {/* Welcome Banner */}
-      <div className="rounded-3xl border border-indigo-500/10 bg-gradient-to-r from-indigo-500/5 via-purple-500/5 to-pink-500/5 p-6 dark:border-indigo-500/20">
-        <h1 className="text-xl md:text-2xl font-black text-gray-900 dark:text-white">
-          Welcome back, <span className="bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">{user?.name}</span> 👋
-        </h1>
-        <p className="mt-1 text-xs md:text-sm text-gray-400 dark:text-gray-500">
-          Here is what is happening across your developer utilities today.
-        </p>
+    <div className="space-y-5 font-ui">
+      {/* Welcome Header */}
+      <div className="gh-card flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <h1 className="text-xl font-bold text-gh-heading">
+            Welcome back, <span className="text-accent-fg font-mono">{user?.name}</span>
+          </h1>
+          <p className="mt-0.5 text-xs text-gh-muted font-mono">
+            Developer workstation & workspace analytics
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="gh-badge-accent">
+            <span className="h-1.5 w-1.5 rounded-full bg-accent animate-pulse" /> Live Metrics
+          </span>
+        </div>
       </div>
 
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {Array.from({ length: 4 }).map((_, idx) => (
-            <div key={idx} className="h-28 animate-pulse rounded-2xl bg-gray-250 dark:bg-gray-800" />
+            <div key={idx} className="h-24 animate-pulse rounded-md bg-gh-surface border border-gh-border" />
           ))}
         </div>
       ) : (
@@ -44,18 +51,18 @@ export const DashboardPage = () => {
       )}
 
       {/* Grid Content */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         
         {/* Left Columns - Projects & Pinned Tools */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="lg:col-span-2 space-y-5">
           {loading ? (
-            <div className="h-80 animate-pulse rounded-2xl bg-gray-250 dark:bg-gray-800" />
+            <div className="h-80 animate-pulse rounded-md bg-gh-surface border border-gh-border" />
           ) : (
             <RecentProjects />
           )}
 
           {loading ? (
-            <div className="h-64 animate-pulse rounded-2xl bg-gray-250 dark:bg-gray-800" />
+            <div className="h-64 animate-pulse rounded-md bg-gh-surface border border-gh-border" />
           ) : (
             <PinnedTools />
           )}

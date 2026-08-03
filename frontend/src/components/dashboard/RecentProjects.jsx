@@ -32,54 +32,54 @@ export const RecentProjects = ({ projects }) => {
   const list = projects || defaultProjects;
 
   return (
-    <div className="rounded-2xl border border-gray-150 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900/40">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-base font-bold text-gray-900 dark:text-white">Recent Projects</h3>
-        <span className="text-xs text-indigo-500 font-semibold cursor-pointer hover:underline">View All</span>
+    <div className="gh-card p-4 font-ui">
+      <div className="flex items-center justify-between mb-3 pb-2 border-b border-gh-border">
+        <h2 className="text-sm font-bold text-gh-heading font-mono">Recent Projects</h2>
+        <span className="text-xs text-accent-blue font-mono cursor-pointer hover:underline">View All</span>
       </div>
-      <div className="space-y-4">
+      <div className="space-y-3">
         {list.map((proj) => (
           <div
             key={proj.id}
-            className="group flex flex-col justify-between gap-2 rounded-xl border border-gray-100 bg-gray-50/50 p-4 transition-all duration-300 hover:border-indigo-500/30 hover:bg-indigo-50/5 dark:border-gray-800/60 dark:bg-gray-950/20 dark:hover:border-indigo-500/20 dark:hover:bg-indigo-500/5"
+            className="group flex flex-col justify-between gap-2 rounded-md border border-gh-border bg-gh-bg p-3 transition-colors hover:border-accent-border hover:bg-gh-subtle"
           >
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-2.5">
-                <span className="rounded-lg bg-indigo-500/10 p-2 text-indigo-500 dark:bg-indigo-500/20">
-                  <FaCode className="h-4 w-4" />
+                <span className="rounded-md bg-accent-light p-1.5 text-accent-fg border border-accent-border shrink-0">
+                  <FaCode className="h-3.5 w-3.5" />
                 </span>
                 <div>
-                  <h4 className="text-sm font-semibold text-gray-900 dark:text-white group-hover:text-indigo-400 transition">
+                  <h3 className="text-xs font-bold text-gh-heading group-hover:text-accent-fg transition font-mono">
                     {proj.name}
-                  </h4>
-                  <span className="text-[10px] uppercase font-bold tracking-wider text-gray-400 dark:text-gray-500">
+                  </h3>
+                  <span className="text-[10px] uppercase font-mono font-medium text-gh-muted">
                     {proj.language}
                   </span>
                 </div>
               </div>
-              <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition duration-300">
-                <button className="text-gray-400 hover:text-white">
+              <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition">
+                <button className="text-gh-muted hover:text-gh-heading">
                   <FaGithub className="h-3.5 w-3.5" />
                 </button>
-                <button className="text-gray-400 hover:text-white">
+                <button className="text-gh-muted hover:text-gh-heading">
                   <FaExternalLinkAlt className="h-3 w-3" />
                 </button>
               </div>
             </div>
-            <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2">
+            <p className="text-xs text-gh-muted line-clamp-2 font-mono">
               {proj.description}
             </p>
             <div className="flex items-center justify-between mt-1">
-              <div className="flex items-center gap-1 text-[11px] text-gray-400">
+              <div className="flex items-center gap-1 text-xs font-mono text-gh-muted">
                 <span>★ {proj.stars}</span>
               </div>
               <span
-                className={`rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ${
+                className={`gh-badge text-[10px] ${
                   proj.status === "active"
-                    ? "bg-green-500/10 text-green-500 border border-green-500/25"
+                    ? "border-accent-border bg-accent-light text-accent-fg"
                     : proj.status === "completed"
-                    ? "bg-blue-500/10 text-blue-500 border border-blue-500/25"
-                    : "bg-yellow-500/10 text-yellow-500 border border-yellow-500/25"
+                    ? "border-blue-500/30 bg-blue-500/10 text-blue-400"
+                    : "border-amber-500/30 bg-amber-500/10 text-amber-400"
                 }`}
               >
                 {proj.status}

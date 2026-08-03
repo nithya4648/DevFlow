@@ -36,10 +36,10 @@ export const PinnedTools = ({ tools }) => {
   const list = tools || defaultTools;
 
   return (
-    <div className="rounded-2xl border border-gray-150 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900/40">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-base font-bold text-gray-900 dark:text-white">Pinned Dev Tools</h3>
-        <span className="text-xs text-indigo-500 font-semibold cursor-pointer hover:underline">Customize</span>
+    <div className="gh-card p-4 font-ui">
+      <div className="flex items-center justify-between mb-3 pb-2 border-b border-gh-border">
+        <h2 className="text-sm font-bold text-gh-heading font-mono">Pinned Dev Tools</h2>
+        <span className="text-xs text-accent-blue font-mono cursor-pointer hover:underline">Customize</span>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {list.map((tool) => {
@@ -47,22 +47,22 @@ export const PinnedTools = ({ tools }) => {
           return (
             <div
               key={tool.id}
-              className="group cursor-pointer rounded-xl border border-gray-100 bg-gray-50/50 p-4 transition-all duration-300 hover:border-indigo-500/30 hover:bg-indigo-50/5 dark:border-gray-800/60 dark:bg-gray-950/20 dark:hover:border-indigo-500/20 dark:hover:bg-indigo-500/5"
+              className="group cursor-pointer rounded-md border border-gh-border bg-gh-bg p-3 transition-colors hover:border-accent-border hover:bg-gh-subtle"
             >
-              <div className="flex items-center gap-3">
-                <span className="rounded-lg bg-indigo-500/10 p-2 text-indigo-500 transition group-hover:bg-indigo-500/20 group-hover:scale-110">
-                  <Icon className="h-4 w-4" />
+              <div className="flex items-center gap-2.5">
+                <span className="rounded-md bg-accent-light p-1.5 text-accent-fg border border-accent-border shrink-0">
+                  <Icon className="h-3.5 w-3.5" />
                 </span>
-                <div>
-                  <h4 className="text-sm font-semibold text-gray-900 dark:text-white group-hover:text-indigo-400 transition">
+                <div className="min-w-0">
+                  <h3 className="text-xs font-bold text-gh-heading group-hover:text-accent-fg transition truncate font-mono">
                     {tool.name}
-                  </h4>
-                  <span className="text-[10px] text-indigo-500 dark:text-indigo-400/80 font-bold uppercase tracking-wider">
+                  </h3>
+                  <span className="text-[10px] text-gh-muted font-mono font-medium uppercase">
                     {tool.category}
                   </span>
                 </div>
               </div>
-              <p className="mt-2 text-xs text-gray-500 dark:text-gray-400 line-clamp-2">
+              <p className="mt-2 text-xs text-gh-muted line-clamp-2 font-mono">
                 {tool.description}
               </p>
             </div>

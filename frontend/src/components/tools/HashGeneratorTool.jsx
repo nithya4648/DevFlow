@@ -31,7 +31,7 @@ export default function HashGeneratorTool() {
   const fmt = (h) => (uppercase ? h.toUpperCase() : h);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 font-ui">
       <ToolCard title="Input String">
         <div className="space-y-3">
           <textarea
@@ -39,16 +39,16 @@ export default function HashGeneratorTool() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Enter any text to hash…"
-            className="w-full resize-none rounded-xl border border-gray-200 bg-gray-50 p-4 text-sm font-mono text-gray-800 placeholder-gray-400 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 dark:border-gray-700 dark:bg-gray-950/50 dark:text-gray-200 dark:placeholder-gray-600 transition"
+            className="gh-input text-xs font-mono resize-none w-full"
           />
-          <label className="flex items-center gap-2 cursor-pointer w-fit">
-            <div
-              onClick={() => setUppercase(!uppercase)}
-              className={`relative h-5 w-10 rounded-full transition-colors ${uppercase ? "bg-indigo-500" : "bg-gray-300 dark:bg-gray-700"}`}
-            >
-              <div className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform ${uppercase ? "translate-x-5" : "translate-x-0.5"}`} />
-            </div>
-            <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Uppercase output</span>
+          <label className="flex items-center gap-2 cursor-pointer w-fit select-none">
+            <input
+              type="checkbox"
+              checked={uppercase}
+              onChange={(e) => setUppercase(e.target.checked)}
+              className="rounded border-gh-border text-accent-fg focus:ring-accent-border"
+            />
+            <span className="text-xs font-mono text-gh-muted">Uppercase output</span>
           </label>
         </div>
       </ToolCard>
@@ -56,8 +56,8 @@ export default function HashGeneratorTool() {
       <div className="space-y-3">
         {ALGOS.map(({ key, label }) => (
           <ToolCard key={key} title={label} actions={hashes[key] ? <CopyButton text={fmt(hashes[key])} /> : null}>
-            <code className="block text-xs font-mono text-gray-700 dark:text-gray-300 break-all leading-relaxed">
-              {hashes[key] ? fmt(hashes[key]) : <span className="text-gray-300 dark:text-gray-600">—</span>}
+            <code className="block text-xs font-mono text-gh-text break-all leading-relaxed bg-gh-bg p-2 rounded border border-gh-border">
+              {hashes[key] ? fmt(hashes[key]) : <span className="text-gh-muted">—</span>}
             </code>
           </ToolCard>
         ))}

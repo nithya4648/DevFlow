@@ -33,41 +33,41 @@ function ForgotPasswordPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-950 px-4 py-12">
-      <div className="w-full max-w-md rounded-xl border border-slate-800 bg-slate-900/90 p-8 shadow-2xl backdrop-blur-md">
-        <div className="mb-6">
+    <div className="flex min-h-screen items-center justify-center bg-gh-bg px-4 py-12 font-ui text-gh-text">
+      <div className="w-full max-w-md gh-card p-8">
+        <div className="mb-5">
           <Link
             to="/login"
-            className="inline-flex items-center gap-2 text-xs font-mono font-semibold uppercase tracking-wider text-slate-400 hover:text-white transition"
+            className="inline-flex items-center gap-2 text-xs font-mono font-medium text-gh-muted hover:text-gh-heading transition"
           >
             <FaArrowLeft /> Back to Login
           </Link>
         </div>
 
         <div className="text-center">
-          <h2 className="font-display text-2xl font-bold text-white tracking-tight">
+          <h2 className="text-xl font-bold text-gh-heading">
             Forgot Password
           </h2>
-          <p className="mt-1 text-xs text-slate-400">
+          <p className="mt-1 text-xs text-gh-muted font-mono">
             Enter your email to receive a password reset link.
           </p>
         </div>
 
         {submitted ? (
-          <div className="mt-8 rounded-lg border border-emerald-500/20 bg-emerald-500/10 p-4 text-center">
-            <p className="text-xs text-emerald-300">
+          <div className="mt-6 rounded-md border border-accent-border bg-accent-light p-4 text-center">
+            <p className="text-xs text-accent-fg font-mono">
               We've sent an email with instructions on how to reset your password. Please check your inbox (and spam folder).
             </p>
           </div>
         ) : (
-          <form className="mt-8 space-y-5" onSubmit={handleSubmit(onSubmit)}>
+          <form className="mt-6 space-y-4" onSubmit={handleSubmit(onSubmit)}>
             {/* Email Field */}
             <div>
-              <label className="block text-[11px] font-mono font-semibold uppercase tracking-wider text-slate-400 mb-1">
+              <label className="block text-xs font-mono font-medium text-gh-muted mb-1">
                 Email Address
               </label>
               <div className="relative">
-                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gh-muted">
                   <FaEnvelope className="h-3.5 w-3.5" />
                 </span>
                 <input
@@ -80,11 +80,11 @@ function ForgotPasswordPage() {
                     },
                   })}
                   placeholder="you@example.com"
-                  className="w-full rounded-lg border border-slate-800 bg-slate-950/60 py-2.5 pl-9 pr-4 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition"
+                  className="gh-input pl-9"
                 />
               </div>
               {errors.email && (
-                <p className="mt-1 text-xs text-rose-500">{errors.email.message}</p>
+                <p className="mt-1 text-xs text-red-400 font-mono">{errors.email.message}</p>
               )}
             </div>
 
@@ -92,7 +92,7 @@ function ForgotPasswordPage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 py-2.5 text-sm font-semibold text-white shadow-xs transition hover:bg-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="btn-primary w-full py-2 text-xs"
             >
               {isSubmitting ? <FaSpinner className="animate-spin" /> : "Send Reset Link"}
             </button>

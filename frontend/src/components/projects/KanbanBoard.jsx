@@ -66,7 +66,7 @@ export default function KanbanBoard({ projects, onStatusChange, onEdit, onDelete
       onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
     >
-      <div className="flex gap-5 overflow-x-auto pb-4">
+      <div className="flex gap-4 overflow-x-auto pb-4">
         {STATUSES.map((status) => (
           <KanbanColumn
             key={status}
@@ -83,7 +83,7 @@ export default function KanbanBoard({ projects, onStatusChange, onEdit, onDelete
       {/* Drag ghost overlay */}
       <DragOverlay>
         {activeProject ? (
-          <div className="rotate-2 shadow-2xl ring-2 ring-indigo-500/50 rounded-xl">
+          <div className="rotate-1 ring-1 ring-accent-border rounded-md opacity-90">
             <KanbanCard
               project={activeProject}
               onEdit={() => {}}

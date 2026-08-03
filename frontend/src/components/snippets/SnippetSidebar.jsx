@@ -14,10 +14,10 @@ export default function SnippetSidebar({ folders, tags, activeFilter, onFilterCh
       <button
         key={`${type}-${value}`}
         onClick={() => onFilterChange({ type, value })}
-        className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-sm transition-all ${
+        className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-md text-xs font-mono transition-colors ${
           active
-            ? "bg-indigo-600/25 text-indigo-300 font-medium"
-            : "text-gray-400 hover:text-gray-200 hover:bg-white/5"
+            ? "bg-accent-light text-accent-fg border border-accent-border font-semibold"
+            : "text-gh-text hover:text-gh-heading hover:bg-gh-subtle border border-transparent"
         }`}
       >
         <span className="flex items-center gap-2 truncate">
@@ -25,7 +25,7 @@ export default function SnippetSidebar({ folders, tags, activeFilter, onFilterCh
           <span className="truncate">{label}</span>
         </span>
         {count !== undefined && (
-          <span className={`text-xs px-1.5 py-0.5 rounded-full ${active ? "bg-indigo-500/30 text-indigo-300" : "bg-white/8 text-gray-500"}`}>
+          <span className={`text-[10px] px-1.5 py-0.5 rounded font-mono ${active ? "bg-accent-border text-accent-fg" : "text-gh-muted"}`}>
             {count}
           </span>
         )}
@@ -34,17 +34,17 @@ export default function SnippetSidebar({ folders, tags, activeFilter, onFilterCh
   }
 
   return (
-    <aside className="w-52 shrink-0 flex flex-col gap-1 pr-2">
+    <aside className="w-48 shrink-0 flex flex-col gap-1 pr-2 border-r border-gh-border font-ui">
       {/* All + Favorites */}
       <div className="mb-1">
         {navItem("All Snippets", "⚡", "all", ALL, totalCount)}
-        {navItem("Favorites", "⭐", "favorite", FAV, favCount)}
+        {navItem("Favorites", "★", "favorite", FAV, favCount)}
       </div>
 
       {/* Folders */}
       {folders.length > 0 && (
         <div className="mt-3">
-          <p className="text-[10px] uppercase font-semibold text-gray-600 px-3 mb-1 tracking-wider">Folders</p>
+          <p className="text-[10px] uppercase font-mono font-semibold text-gh-muted px-2.5 mb-1 tracking-wider">Folders</p>
           {folders.map((folder) =>
             navItem(folder, "📁", "folder", folder)
           )}
@@ -54,16 +54,16 @@ export default function SnippetSidebar({ folders, tags, activeFilter, onFilterCh
       {/* Tags */}
       {tags.length > 0 && (
         <div className="mt-3">
-          <p className="text-[10px] uppercase font-semibold text-gray-600 px-3 mb-1 tracking-wider">Tags</p>
-          <div className="flex flex-wrap gap-1.5 px-3">
+          <p className="text-[10px] uppercase font-mono font-semibold text-gh-muted px-2.5 mb-1.5 tracking-wider">Tags</p>
+          <div className="flex flex-wrap gap-1.5 px-2.5">
             {tags.map((tag) => (
               <button
                 key={tag}
                 onClick={() => onFilterChange({ type: "tag", value: tag })}
-                className={`text-xs px-2 py-0.5 rounded-full border transition-all ${
+                className={`text-[10px] px-1.5 py-0.5 rounded-md border font-mono transition-colors ${
                   isActive("tag", tag)
-                    ? "bg-indigo-500/20 text-indigo-300 border-indigo-500/40"
-                    : "bg-white/5 text-gray-400 border-white/10 hover:border-indigo-500/30 hover:text-gray-200"
+                    ? "bg-accent-light text-accent-fg border-accent-border"
+                    : "bg-gh-subtle text-gh-muted border-gh-border hover:border-accent-border hover:text-gh-heading"
                 }`}
               >
                 #{tag}

@@ -1,15 +1,15 @@
 import { useState } from "react";
 
 const STATUS_DOT = {
-  "todo":        "bg-slate-400",
-  "in-progress": "bg-teal-500",
-  "done":        "bg-emerald-500",
+  "todo":        "bg-gh-muted",
+  "in-progress": "bg-accent-blue",
+  "done":        "bg-accent-fg",
 };
 
-const PRIORITY_COLOR = {
-  high:   "border-l-rose-500",
+const PRIORITY_BORDER = {
+  high:   "border-l-red-500",
   medium: "border-l-amber-500",
-  low:    "border-l-emerald-500",
+  low:    "border-l-accent-fg",
 };
 
 function getDaysInMonth(year, month) {
@@ -60,43 +60,43 @@ export default function CalendarView({ projects, onEdit }) {
   const todayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 
   return (
-    <div className="bg-white dark:bg-slate-900/60 rounded-xl border border-slate-200/80 dark:border-slate-800 p-5 shadow-xs">
+    <div className="gh-card p-4 font-ui">
       {/* Header */}
-      <div className="flex items-center justify-between mb-5">
+      <div className="flex items-center justify-between mb-4">
         <button
           onClick={prevMonth}
-          className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700/80 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition"
+          className="btn-secondary p-1.5"
         >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </button>
-        <h2 className="font-display text-base font-bold text-slate-900 dark:text-slate-100">
+        <h2 className="text-sm font-mono font-bold text-gh-heading">
           {monthName} {year}
         </h2>
         <button
           onClick={nextMonth}
-          className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700/80 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition"
+          className="btn-secondary p-1.5"
         >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
         </button>
       </div>
 
       {/* Day headers */}
-      <div className="grid grid-cols-7 mb-1">
+      <div className="grid grid-cols-7 mb-1 border-b border-gh-border pb-1">
         {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
-          <div key={d} className="text-center font-display text-[11px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 py-1">
+          <div key={d} className="text-center font-mono text-[10px] font-semibold uppercase tracking-wider text-gh-muted py-1">
             {d}
           </div>
         ))}
       </div>
 
       {/* Calendar grid */}
-      <div className="grid grid-cols-7 gap-px bg-slate-200 dark:bg-slate-800 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-800">
+      <div className="grid grid-cols-7 gap-px bg-gh-border rounded-md overflow-hidden border border-gh-border">
         {cells.map((day, idx) => {
-          if (!day) return <div key={`empty-${idx}`} className="bg-slate-50 dark:bg-slate-950/60 h-24" />;
+          if (!day) return <div key={`empty-${idx}`} className="bg-gh-bg min-h-[84px]" />;
 
           const dayStr = String(day).padStart(2, "0");
           const monthStr = String(month + 1).padStart(2, "0");
@@ -107,40 +107,40 @@ export default function CalendarView({ projects, onEdit }) {
           return (
             <div
               key={dateKey}
-              className={`bg-white dark:bg-slate-900 min-h-[96px] p-1.5 flex flex-col transition ${
-                isToday ? "ring-2 ring-emerald-500/60 inset-0 z-10" : ""
+              className={`bg-gh-surface min-h-[84px] p-1.5 flex flex-col transition ${
+                isToday ? "ring-1 ring-inset ring-accent-border bg-accent-light" : ""
               }`}
             >
               <div className="flex items-center justify-between mb-1">
                 <span
                   className={`font-mono text-xs font-semibold rounded-full w-5 h-5 flex items-center justify-center ${
                     isToday
-                      ? "bg-emerald-600 text-white"
-                      : "text-slate-700 dark:text-slate-300"
+                      ? "bg-accent text-white"
+                      : "text-gh-muted"
                   }`}
                 >
                   {day}
                 </span>
                 {dayProjects.length > 0 && (
-                  <span className="font-mono text-[9px] font-bold text-slate-400 dark:text-slate-500">
+                  <span className="font-mono text-[9px] font-bold text-gh-muted">
                     {dayProjects.length}
                   </span>
                 )}
               </div>
 
-              <div className="flex-1 space-y-1 overflow-y-auto max-h-[70px]">
+              <div className="flex-1 space-y-0.5 overflow-y-auto max-h-[60px]">
                 {dayProjects.map((p) => {
-                  const borderCls = PRIORITY_COLOR[p.priority] || "border-l-slate-400";
-                  const dotCls = STATUS_DOT[p.status] || "bg-slate-400";
+                  const borderCls = PRIORITY_BORDER[p.priority] || "border-l-gh-muted";
+                  const dotCls = STATUS_DOT[p.status] || "bg-gh-muted";
                   return (
                     <button
                       key={p._id}
                       onClick={() => onEdit(p)}
-                      className={`w-full text-left p-1 rounded text-[11px] bg-slate-50 dark:bg-slate-800/80 border-l-2 ${borderCls} hover:bg-slate-100 dark:hover:bg-slate-800 transition truncate flex items-center gap-1.5`}
+                      className={`w-full text-left p-1 rounded text-[10px] bg-gh-bg border-l-2 ${borderCls} hover:bg-gh-subtle transition truncate flex items-center gap-1.5 font-mono`}
                       title={p.title}
                     >
                       <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${dotCls}`} />
-                      <span className="truncate text-slate-800 dark:text-slate-200 font-medium">
+                      <span className="truncate text-gh-text font-medium">
                         {p.title}
                       </span>
                     </button>

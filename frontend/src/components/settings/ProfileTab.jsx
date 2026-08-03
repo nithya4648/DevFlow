@@ -53,30 +53,30 @@ const ProfileTab = () => {
   };
 
   return (
-    <div className="space-y-6 max-w-2xl">
+    <div className="space-y-5 max-w-2xl font-ui">
       <div>
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Profile Information</h2>
-        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+        <h2 className="text-base font-bold text-gh-heading font-mono">Profile Information</h2>
+        <p className="mt-0.5 text-xs text-gh-muted font-mono">
           Update your account's profile information and avatar.
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="flex items-center space-x-6">
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <div className="flex items-center gap-4">
           <div className="shrink-0 relative group">
             {avatarPreview ? (
               <img
-                className="h-24 w-24 object-cover rounded-full border border-gray-200 dark:border-gray-700"
+                className="h-20 w-20 object-cover rounded-full border border-gh-border"
                 src={avatarPreview}
                 alt="Avatar preview"
               />
             ) : (
-              <div className="h-24 w-24 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center border border-gray-200 dark:border-gray-700">
-                <User className="h-10 w-10 text-gray-400" />
+              <div className="h-20 w-20 rounded-full bg-gh-subtle flex items-center justify-center border border-gh-border">
+                <User className="h-8 w-8 text-gh-muted" />
               </div>
             )}
-            <label className="absolute inset-0 flex items-center justify-center bg-black/50 text-white opacity-0 group-hover:opacity-100 rounded-full cursor-pointer transition-opacity">
-              <Upload className="h-6 w-6" />
+            <label className="absolute inset-0 flex items-center justify-center bg-black/60 text-white opacity-0 group-hover:opacity-100 rounded-full cursor-pointer transition-opacity">
+              <Upload className="h-5 w-5" />
               <input
                 type="file"
                 className="hidden"
@@ -86,11 +86,11 @@ const ProfileTab = () => {
             </label>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            <label className="block text-xs font-mono font-medium text-gh-heading">
               Avatar
             </label>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 mb-3">
-              Click the image to upload a new avatar. JPG, GIF or PNG. Max size of 5MB.
+            <p className="text-xs text-gh-muted font-mono mt-0.5 mb-2">
+              Click to upload a new avatar. JPG, GIF or PNG. Max size 5MB.
             </p>
             {avatar && (
               <button
@@ -99,7 +99,7 @@ const ProfileTab = () => {
                   setAvatar(null);
                   setAvatarPreview(user?.avatar || "");
                 }}
-                className="text-sm text-red-600 hover:text-red-500 dark:text-red-400 dark:hover:text-red-300"
+                className="text-xs font-mono text-red-400 hover:text-red-300"
               >
                 Remove selected image
               </button>
@@ -108,7 +108,7 @@ const ProfileTab = () => {
         </div>
 
         <div>
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <label htmlFor="name" className="block text-xs font-mono font-medium text-gh-muted mb-1">
             Display Name
           </label>
           <input
@@ -117,34 +117,34 @@ const ProfileTab = () => {
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
-            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            className="gh-input text-xs font-mono w-full"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <label className="block text-xs font-mono font-medium text-gh-muted mb-1">
             Email Address
           </label>
           <input
             type="email"
             value={user?.email || ""}
             disabled
-            className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 cursor-not-allowed"
+            className="gh-input text-xs font-mono w-full bg-gh-bg cursor-not-allowed opacity-70"
           />
-          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+          <p className="mt-1 text-[11px] text-gh-muted font-mono">
             Email address cannot be changed.
           </p>
         </div>
 
-        <div className="pt-4 flex justify-end">
+        <div className="pt-2 flex justify-end">
           <button
             type="submit"
             disabled={isLoading}
-            className="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="btn-primary text-xs font-mono"
           >
             {isLoading ? (
               <>
-                <Loader className="animate-spin -ml-1 mr-2 h-4 w-4" />
+                <Loader className="animate-spin -ml-1 mr-2 h-3.5 w-3.5" />
                 Saving...
               </>
             ) : (

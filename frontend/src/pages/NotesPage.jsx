@@ -10,8 +10,6 @@ export default function NotesPage() {
   const [search, setSearch] = useState("");
   const [selectedNoteId, setSelectedNoteId] = useState(null);
 
-  // Fetch all notes (we filter client-side for immediate folder switching)
-  // But we still pass search to backend so text index is used properly
   const { data: notesData, isLoading, isError } = useNotes({ search });
   const allNotes = notesData?.data || [];
   const folders = notesData?.meta?.folders || [];
@@ -42,10 +40,10 @@ export default function NotesPage() {
 
   function handleNewNote() {
     createMutation.mutate(
-      { 
-        title: "", 
-        content: "", 
-        folder: activeFolder || "Unfiled" 
+      {
+        title: "",
+        content: "",
+        folder: activeFolder || "Unfiled"
       },
       {
         onSuccess: (res) => {
@@ -67,7 +65,7 @@ export default function NotesPage() {
   }
 
   return (
-    <div className="flex gap-4 h-full min-h-0 pl-1 pr-6 pt-2 pb-6">
+    <div className="flex gap-4 h-full min-h-0 pl-1 pr-6 pt-2 pb-6 font-ui">
       {/* Panel 1: Folders & Search */}
       <NoteSidebar
         folders={folders}
@@ -90,9 +88,9 @@ export default function NotesPage() {
       {/* Panel 3: Editor */}
       <div className="flex-1 flex flex-col min-w-0 relative">
         {isError && (
-           <div className="mb-4 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
-             Failed to load notes.
-           </div>
+          <div className="mb-4 p-3 rounded-md bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-mono">
+            Failed to load notes.
+          </div>
         )}
         <NoteEditor
           note={selectedNote}

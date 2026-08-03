@@ -1,5 +1,5 @@
 // frontend/src/pages/EnvVaultPage.jsx
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { useEnvVars, useCreateEnvVar, useUpdateEnvVar, useDeleteEnvVar } from "../hooks/useEnv";
 import EnvTable from "../components/env/EnvTable";
 import EnvModal from "../components/env/EnvModal";
@@ -36,10 +36,9 @@ export default function EnvVaultPage() {
         { onSuccess: () => setModalOpen(false) }
       );
     } else {
-      createMutation.mutate(formData, { 
+      createMutation.mutate(formData, {
         onSuccess: () => setModalOpen(false),
         onError: (err) => {
-          // If duplicate key error, alert user (backend sends 400)
           const msg = err.response?.data?.message || err.message;
           alert(`Error: ${msg}`);
         }
@@ -54,47 +53,44 @@ export default function EnvVaultPage() {
   }
 
   return (
-    <div className="flex-1 flex flex-col min-w-0 max-w-5xl mx-auto w-full px-6 py-6">
+    <div className="flex-1 flex flex-col min-w-0 max-w-5xl mx-auto w-full px-6 py-6 font-ui">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-100 flex items-center gap-2">
+          <h1 className="text-xl font-bold text-gh-heading font-mono flex items-center gap-2">
             Env Vault 🔐
           </h1>
-          <p className="text-sm text-gray-400 mt-1 max-w-lg">
+          <p className="text-xs text-gh-muted font-mono mt-1 max-w-lg">
             Store environment variables and secrets securely. Values are encrypted at rest using AES-256-GCM.
             <br />
-            <span className="text-amber-400/80 text-xs mt-1 inline-block">
+            <span className="text-amber-400 text-[11px] mt-1 inline-block">
               ⚠️ For convenience only. Do not use as a replacement for AWS Secrets Manager or HashiCorp Vault in production.
             </span>
           </p>
         </div>
-        
-        <div className="flex items-center gap-3">
+
+        <div className="flex items-center gap-2.5">
           {/* Scope Selector */}
           <div className="relative">
             <select
               value={selectedProjectId}
               onChange={(e) => setSelectedProjectId(e.target.value)}
-              className="appearance-none pl-4 pr-10 py-2.5 bg-gray-900 border border-white/10 rounded-xl text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-rose-500/50 transition cursor-pointer w-48"
+              className="gh-input text-xs font-mono w-44"
             >
-              <option value="global">Global (Unscoped)</option>
-              <optgroup label="Projects">
+              <option value="global" className="bg-gh-surface">Global (Unscoped)</option>
+              <optgroup label="Projects" className="bg-gh-surface">
                 {projects.map((p) => (
-                  <option key={p._id} value={p._id}>{p.title}</option>
+                  <option key={p._id} value={p._id} className="bg-gh-surface">{p.title}</option>
                 ))}
               </optgroup>
             </select>
-            <svg className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
           </div>
 
           <button
             onClick={openCreate}
-            className="flex items-center gap-2 px-4 py-2.5 bg-rose-600 hover:bg-rose-500 text-white text-sm font-medium rounded-xl transition-colors shadow-lg shadow-rose-900/20"
+            className="btn-primary flex items-center gap-1.5 text-xs font-mono"
           >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
             Add Variable
@@ -103,7 +99,7 @@ export default function EnvVaultPage() {
       </div>
 
       {isError && (
-        <div className="mb-4 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+        <div className="mb-4 p-3 rounded-md bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-mono">
           Failed to load environment variables. {error?.response?.data?.message || error?.message}
         </div>
       )}
@@ -111,10 +107,10 @@ export default function EnvVaultPage() {
       {/* Content */}
       <div className="flex-1 min-h-0">
         {isLoading ? (
-          <div className="space-y-3">
-            <Skeleton className="h-12 rounded-xl w-full" />
-            <Skeleton className="h-12 rounded-xl w-full" />
-            <Skeleton className="h-12 rounded-xl w-full" />
+          <div className="space-y-2">
+            <Skeleton className="h-10 rounded-md w-full" />
+            <Skeleton className="h-10 rounded-md w-full" />
+            <Skeleton className="h-10 rounded-md w-full" />
           </div>
         ) : (
           <EnvTable

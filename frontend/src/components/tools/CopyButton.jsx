@@ -9,10 +9,10 @@ export default function CopyButton({ text, className = "", label = "" }) {
   return (
     <button
       onClick={() => copy(text)}
-      className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition-all duration-200 ${
+      className={`inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-mono font-semibold transition-colors ${
         copied
-          ? "bg-green-500/10 text-green-500"
-          : "bg-gray-100 text-gray-500 hover:bg-indigo-500/10 hover:text-indigo-500 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-indigo-500/20 dark:hover:text-indigo-400"
+          ? "bg-accent-light text-accent-fg border border-accent-border"
+          : "bg-gh-subtle text-gh-muted border border-gh-border hover:bg-accent-light hover:text-accent-fg hover:border-accent-border"
       } ${className}`}
     >
       {copied ? <FaCheck className="h-3 w-3" /> : <FaCopy className="h-3 w-3" />}

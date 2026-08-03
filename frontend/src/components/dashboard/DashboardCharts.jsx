@@ -33,7 +33,7 @@ export const DashboardCharts = ({ overview }) => {
       {
         label: "Activities",
         data: weeklyActivity.map((d) => d.count),
-        backgroundColor: "rgba(99, 102, 241, 0.8)", // indigo-500
+        backgroundColor: "#238636", // GitHub primary green
         borderRadius: 4,
       },
     ],
@@ -47,7 +47,8 @@ export const DashboardCharts = ({ overview }) => {
       title: { display: false },
     },
     scales: {
-      y: { beginAtZero: true, ticks: { precision: 0 } },
+      x: { grid: { color: "#21262d" }, ticks: { color: "#8b949e", font: { family: "JetBrains Mono", size: 10 } } },
+      y: { beginAtZero: true, ticks: { precision: 0, color: "#8b949e", font: { family: "JetBrains Mono", size: 10 } }, grid: { color: "#21262d" } },
     },
   };
 
@@ -56,10 +57,10 @@ export const DashboardCharts = ({ overview }) => {
   const projectCounts = projectsByStatus.map((p) => p.count);
   
   const statusColors = {
-    "active": "rgba(99, 102, 241, 0.8)", // indigo
-    "completed": "rgba(34, 197, 94, 0.8)", // green
-    "archived": "rgba(107, 114, 128, 0.8)", // gray
-    "planning": "rgba(234, 179, 8, 0.8)", // yellow
+    "active": "#238636", // green
+    "completed": "#58a6ff", // blue
+    "archived": "#8b949e", // gray
+    "planning": "#d29922", // yellow
   };
 
   const projectData = {
@@ -67,8 +68,9 @@ export const DashboardCharts = ({ overview }) => {
     datasets: [
       {
         data: projectCounts,
-        backgroundColor: projectsByStatus.map(p => statusColors[p._id.toLowerCase()] || "rgba(148, 163, 184, 0.8)"),
-        borderWidth: 1,
+        backgroundColor: projectsByStatus.map(p => statusColors[p._id.toLowerCase()] || "#8b949e"),
+        borderColor: "#161b22",
+        borderWidth: 2,
       },
     ],
   };
@@ -77,7 +79,7 @@ export const DashboardCharts = ({ overview }) => {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-      legend: { position: "right" },
+      legend: { position: "right", labels: { color: "#c9d1d9", font: { family: "Inter", size: 11 } } },
     },
     cutout: "70%",
   };
@@ -103,7 +105,7 @@ export const DashboardCharts = ({ overview }) => {
       {
         label: "Usage Count",
         data: topTools.map((t) => t.count),
-        backgroundColor: "rgba(168, 85, 247, 0.8)", // purple-500
+        backgroundColor: "#58a6ff", // accent-blue
         borderRadius: 4,
       },
     ],
@@ -117,42 +119,43 @@ export const DashboardCharts = ({ overview }) => {
       legend: { display: false },
     },
     scales: {
-      x: { beginAtZero: true, ticks: { precision: 0 } },
+      x: { beginAtZero: true, ticks: { precision: 0, color: "#8b949e", font: { family: "JetBrains Mono", size: 10 } }, grid: { color: "#21262d" } },
+      y: { ticks: { color: "#c9d1d9", font: { family: "Inter", size: 11 } }, grid: { color: "#21262d" } },
     },
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-      <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Weekly Activity</h3>
-        <div className="h-64">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mt-4 font-ui">
+      <div className="gh-card p-4">
+        <h2 className="text-xs font-mono font-bold text-gh-heading mb-3 pb-2 border-b border-gh-border">Weekly Activity</h2>
+        <div className="h-56">
           {weeklyActivity.length > 0 && weeklyActivity.some(d => d.count > 0) ? (
             <Bar data={activityData} options={activityOptions} />
           ) : (
-            <div className="h-full flex items-center justify-center text-sm text-gray-400">No activity in the last 7 days.</div>
+            <div className="h-full flex items-center justify-center text-xs font-mono text-gh-muted">No activity recorded in the last 7 days.</div>
           )}
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Projects</h3>
-          <div className="h-48">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div className="gh-card p-4">
+          <h2 className="text-xs font-mono font-bold text-gh-heading mb-3 pb-2 border-b border-gh-border">Projects Status</h2>
+          <div className="h-44">
             {projectsByStatus.length > 0 ? (
               <Doughnut data={projectData} options={projectOptions} />
             ) : (
-              <div className="h-full flex items-center justify-center text-sm text-gray-400">No projects found.</div>
+              <div className="h-full flex items-center justify-center text-xs font-mono text-gh-muted">No projects found.</div>
             )}
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Top Tools</h3>
-          <div className="h-48">
+        <div className="gh-card p-4">
+          <h2 className="text-xs font-mono font-bold text-gh-heading mb-3 pb-2 border-b border-gh-border">Top Tools</h2>
+          <div className="h-44">
             {topTools.length > 0 ? (
               <Bar data={topToolData} options={topToolOptions} />
             ) : (
-              <div className="h-full flex items-center justify-center text-sm text-gray-400">No tools used yet.</div>
+              <div className="h-full flex items-center justify-center text-xs font-mono text-gh-muted">No tools used yet.</div>
             )}
           </div>
         </div>

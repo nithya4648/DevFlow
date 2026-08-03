@@ -9,7 +9,7 @@ export const ActivityFeed = ({ activities }) => {
       message: "Git push to repository devflow-backend",
       time: "10 mins ago",
       icon: FaGitAlt,
-      color: "text-orange-500 bg-orange-500/10 dark:bg-orange-500/20",
+      color: "text-amber-400 bg-amber-400/10 border border-amber-400/20",
     },
     {
       id: 2,
@@ -17,7 +17,7 @@ export const ActivityFeed = ({ activities }) => {
       message: "Saved environment variable changes to vault",
       time: "2 hours ago",
       icon: FaKey,
-      color: "text-emerald-500 bg-emerald-500/10 dark:bg-emerald-500/20",
+      color: "text-accent-fg bg-accent-light border border-accent-border",
     },
     {
       id: 3,
@@ -25,7 +25,7 @@ export const ActivityFeed = ({ activities }) => {
       message: "Created React useDebounce hook snippet",
       time: "Yesterday",
       icon: FaCode,
-      color: "text-indigo-500 bg-indigo-500/10 dark:bg-indigo-500/20",
+      color: "text-sky-400 bg-sky-400/10 border border-sky-400/20",
     },
     {
       id: 4,
@@ -33,35 +33,35 @@ export const ActivityFeed = ({ activities }) => {
       message: "Updated Docker Compose notes in Workspace",
       time: "3 days ago",
       icon: FaRegStickyNote,
-      color: "text-sky-500 bg-sky-500/10 dark:bg-sky-500/20",
+      color: "text-emerald-400 bg-emerald-400/10 border border-emerald-400/20",
     },
   ];
 
   const list = activities || defaultActivities;
 
   return (
-    <div className="rounded-2xl border border-gray-150 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900/40">
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="text-base font-bold text-gray-900 dark:text-white">Activity Feed</h3>
-        <span className="text-xs text-indigo-500 font-semibold cursor-pointer hover:underline">Clear</span>
+    <div className="gh-card p-4 font-ui">
+      <div className="flex items-center justify-between mb-4 pb-2 border-b border-gh-border">
+        <h2 className="text-sm font-bold text-gh-heading font-mono">Activity Feed</h2>
+        <span className="text-xs text-accent-blue font-mono cursor-pointer hover:underline">Clear</span>
       </div>
-      <div className="space-y-4">
+      <div className="space-y-3">
         {list.map((act, index) => {
           const Icon = act.icon || FaCode;
           return (
-            <div key={act.id} className="flex gap-4 items-start relative group">
+            <div key={act.id} className="flex gap-3 items-start relative group">
               {/* Timeline Connector Line */}
               {index !== list.length - 1 && (
-                <span className="absolute left-[18px] top-9 bottom-0 w-0.5 bg-gray-100 dark:bg-gray-800 group-hover:bg-indigo-500/20 transition duration-300" />
+                <span className="absolute left-[15px] top-7 bottom-0 w-0.5 bg-gh-border" />
               )}
-              <span className={`rounded-full p-2.5 ${act.color} transition duration-300 group-hover:scale-110`}>
-                <Icon className="h-4 w-4" />
+              <span className={`rounded-md p-1.5 ${act.color} text-xs shrink-0`}>
+                <Icon className="h-3.5 w-3.5" />
               </span>
-              <div className="flex-1 space-y-1">
-                <p className="text-xs font-medium text-gray-800 dark:text-gray-250 group-hover:text-indigo-400 transition">
+              <div className="flex-1 space-y-0.5 min-w-0">
+                <p className="text-xs font-medium text-gh-text group-hover:text-gh-heading transition truncate">
                   {act.message}
                 </p>
-                <span className="text-[10px] font-semibold text-gray-400 dark:text-gray-500 block">
+                <span className="text-[10px] font-mono text-gh-muted block">
                   {act.time}
                 </span>
               </div>
