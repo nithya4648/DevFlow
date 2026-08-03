@@ -37,7 +37,7 @@ export const RecentProjects = () => {
           {list.map((proj) => (
             <Link
               key={proj._id}
-              to="/projects"
+              to={`/projects?open=${proj._id}`}
               className="group flex flex-col justify-between gap-2 rounded-md border border-gh-border bg-gh-bg p-3 transition-colors hover:border-accent-border hover:bg-gh-subtle block"
             >
               <div className="flex items-start justify-between">

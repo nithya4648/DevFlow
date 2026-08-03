@@ -1,4 +1,5 @@
-import { useContext, useState, useCallback } from "react";
+import { useContext, useState, useCallback, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useProjects, useCreateProject, useUpdateProject, useDeleteProject } from "../hooks/useProjects";
 import KanbanBoard from "../components/projects/KanbanBoard";
 import CalendarView from "../components/projects/CalendarView";
@@ -52,6 +53,7 @@ export default function ProjectsPage() {
   const { user } = useContext(AuthContext);
   const { data: teamsData } = useTeams();
   const teams = teamsData?.data || [];
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const [view, setView] = useState(VIEW_KANBAN);
   const [filters, setFilters] = useState({ search: "", status: "", priority: "" });
@@ -83,6 +85,20 @@ export default function ProjectsPage() {
   const deleteMutation = useDeleteProject();
 
   const projects = data?.data || [];
+
+  // Deep-link: if ?open=<id> is present, auto-open that project's modal
+  useEffect(() => {
+    const openId = searchParams.get("open");
+    if (openId && projects.length > 0 && !modalOpen) {
+      const target = projects.find((p) => p._id === openId);
+      if (target) {
+        setEditProject(target);
+        setModalOpen(true);
+        searchParams.delete("open");
+        setSearchParams(searchParams, { replace: true });
+      }
+    }
+  }, [searchParams, projects]);
 
   function openCreateModal(status = "todo") {
     setEditProject(null);

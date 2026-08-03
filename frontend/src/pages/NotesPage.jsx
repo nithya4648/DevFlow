@@ -1,11 +1,13 @@
 // frontend/src/pages/NotesPage.jsx
 import { useState, useMemo, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useNotes, useCreateNote, useUpdateNote, useDeleteNote } from "../hooks/useNotes";
 import NoteSidebar from "../components/notes/NoteSidebar";
 import NoteList from "../components/notes/NoteList";
 import NoteEditor from "../components/notes/NoteEditor";
 
 export default function NotesPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [activeFolder, setActiveFolder] = useState(null);
   const [search, setSearch] = useState("");
   const [selectedNoteId, setSelectedNoteId] = useState(null);
@@ -17,6 +19,22 @@ export default function NotesPage() {
   const createMutation = useCreateNote();
   const updateMutation = useUpdateNote();
   const deleteMutation = useDeleteNote();
+
+  // Deep-link: if ?open=<id> is in URL, auto-select that note
+  useEffect(() => {
+    const openId = searchParams.get("open");
+    if (openId && allNotes.length > 0) {
+      const target = allNotes.find((n) => n._id === openId);
+      if (target) {
+        setSelectedNoteId(target._id);
+        if (target.folder && target.folder !== "Unfiled") {
+          setActiveFolder(target.folder);
+        }
+        searchParams.delete("open");
+        setSearchParams(searchParams, { replace: true });
+      }
+    }
+  }, [searchParams, allNotes]);
 
   // Filter notes by active folder
   const displayedNotes = useMemo(() => {

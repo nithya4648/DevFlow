@@ -1,11 +1,13 @@
 // frontend/src/pages/BookmarksPage.jsx
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useBookmarks, useCreateBookmark, useUpdateBookmark, useDeleteBookmark } from "../hooks/useBookmarks";
 import BookmarkCard from "../components/bookmarks/BookmarkCard";
 import BookmarkModal from "../components/bookmarks/BookmarkModal";
 import { Skeleton } from "../components/ui/Skeleton";
 
 export default function BookmarksPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [category, setCategory] = useState("all");
   const [search, setSearch] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
@@ -22,6 +24,20 @@ export default function BookmarksPage() {
   const createMutation = useCreateBookmark();
   const updateMutation = useUpdateBookmark();
   const deleteMutation = useDeleteBookmark();
+
+  // Deep-link: if ?open=<id> is present, auto-open that bookmark's modal
+  useEffect(() => {
+    const openId = searchParams.get("open");
+    if (openId && bookmarks.length > 0 && !modalOpen) {
+      const target = bookmarks.find((b) => b._id === openId);
+      if (target) {
+        setEditBookmark(target);
+        setModalOpen(true);
+        searchParams.delete("open");
+        setSearchParams(searchParams, { replace: true });
+      }
+    }
+  }, [searchParams, bookmarks]);
 
   // Handle Search Input (simple debounce)
   let searchTimeout;

@@ -5,6 +5,9 @@ import { analyticsService } from "../services/analytics.service";
 import QuickLaunch from "../components/dashboard/QuickLaunch";
 import UsageStats from "../components/dashboard/UsageStats";
 import RecentProjects from "../components/dashboard/RecentProjects";
+import RecentBookmarks from "../components/dashboard/RecentBookmarks";
+import RecentSnippets from "../components/dashboard/RecentSnippets";
+import RecentNotes from "../components/dashboard/RecentNotes";
 import ActivityFeed from "../components/dashboard/ActivityFeed";
 import PinnedTools from "../components/dashboard/PinnedTools";
 import DashboardCharts from "../components/dashboard/DashboardCharts";
@@ -55,21 +58,31 @@ export const DashboardPage = () => {
         </>
       )}
 
-      {/* 4. Grid Content - Recent Projects, Pinned Tools & Activity */}
+      {/* 4. Grid Content - Widgets & Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         
-        {/* Left Columns - Projects & Pinned Tools */}
+        {/* Left Columns - Workstation Widgets */}
         <div className="lg:col-span-2 space-y-5">
           {loading ? (
-            <div className="h-80 animate-pulse rounded-md bg-gh-surface border border-gh-border" />
+            <div className="space-y-5">
+              <div className="h-48 animate-pulse rounded-md bg-gh-surface border border-gh-border" />
+              <div className="h-48 animate-pulse rounded-md bg-gh-surface border border-gh-border" />
+              <div className="h-48 animate-pulse rounded-md bg-gh-surface border border-gh-border" />
+            </div>
           ) : (
-            <RecentProjects />
-          )}
+            <>
+              <RecentProjects />
 
-          {loading ? (
-            <div className="h-64 animate-pulse rounded-md bg-gh-surface border border-gh-border" />
-          ) : (
-            <PinnedTools />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <RecentBookmarks />
+                <RecentSnippets />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <RecentNotes />
+                <PinnedTools />
+              </div>
+            </>
           )}
         </div>
 

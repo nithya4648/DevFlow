@@ -1,4 +1,5 @@
-import { useContext, useRef, useState, useCallback } from "react";
+import { useContext, useRef, useState, useCallback, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useSnippets, useCreateSnippet, useUpdateSnippet, useDeleteSnippet } from "../hooks/useSnippets";
 import SnippetSidebar from "../components/snippets/SnippetSidebar";
 import SnippetCard from "../components/snippets/SnippetCard";
@@ -53,6 +54,7 @@ export default function SnippetsPage() {
   const { user } = useContext(AuthContext);
   const { data: teamsData } = useTeams();
   const teams = teamsData?.data || [];
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const [activeFilter, setActiveFilter] = useState(ALL_FILTER);
   const [search, setSearch] = useState("");
@@ -83,6 +85,20 @@ export default function SnippetsPage() {
   const snippets = data?.data || [];
   const meta = data?.meta || { folders: [], tags: [], total: 0 };
   const favCount = snippets.filter((s) => s.isFavorite).length;
+
+  // Deep-link: if ?open=<id> is present, auto-open that snippet's modal
+  useEffect(() => {
+    const openId = searchParams.get("open");
+    if (openId && snippets.length > 0 && !modalOpen) {
+      const target = snippets.find((s) => s._id === openId);
+      if (target) {
+        setEditSnippet(target);
+        setModalOpen(true);
+        searchParams.delete("open");
+        setSearchParams(searchParams, { replace: true });
+      }
+    }
+  }, [searchParams, snippets]);
 
   function handleSearch(e) {
     const val = e.target.value;
