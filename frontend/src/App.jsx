@@ -13,6 +13,7 @@ import VerifyEmailPage from "./pages/VerifyEmailPage";
 // Layout + Guard
 import ProtectedRoute from "./components/ProtectedRoute";
 import DashboardLayout from "./layouts/DashboardLayout";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 // Dashboard
 import DashboardPage from "./pages/DashboardPage";
@@ -53,34 +54,34 @@ function App() {
           <Routes>
             {/* Protected Dashboard Shell */}
             <Route element={<ProtectedRoute />}>
-              <Route element={<DashboardLayout />}>
-                <Route path="/" element={<DashboardPage />} />
-                <Route path="/dashboard" element={<DashboardPage />} />
-                <Route path="/dev-tools" element={<DevToolsPage />} />
-                <Route path="/projects" element={<ProjectsPage />} />
-                <Route path="/snippets" element={<SnippetsPage />} />
-                <Route path="/docs" element={<DocsPage />} />
-                <Route path="/notes" element={<NotesPage />} />
-                <Route path="/env-vault" element={<EnvVaultPage />} />
-                <Route path="/bookmarks" element={<BookmarksPage />} />
-                <Route path="/teams" element={<TeamSettingsPage />} />
-                <Route path="/activity" element={<ActivityFeedPage />} />
-                <Route path="/settings" element={<SettingsPage />} />
+              <Route element={<ErrorBoundary><DashboardLayout /></ErrorBoundary>}>
+                <Route path="/" element={<ErrorBoundary><DashboardPage /></ErrorBoundary>} />
+                <Route path="/dashboard" element={<ErrorBoundary><DashboardPage /></ErrorBoundary>} />
+                <Route path="/dev-tools" element={<ErrorBoundary><DevToolsPage /></ErrorBoundary>} />
+                <Route path="/projects" element={<ErrorBoundary><ProjectsPage /></ErrorBoundary>} />
+                <Route path="/snippets" element={<ErrorBoundary><SnippetsPage /></ErrorBoundary>} />
+                <Route path="/docs" element={<ErrorBoundary><DocsPage /></ErrorBoundary>} />
+                <Route path="/notes" element={<ErrorBoundary><NotesPage /></ErrorBoundary>} />
+                <Route path="/env-vault" element={<ErrorBoundary><EnvVaultPage /></ErrorBoundary>} />
+                <Route path="/bookmarks" element={<ErrorBoundary><BookmarksPage /></ErrorBoundary>} />
+                <Route path="/teams" element={<ErrorBoundary><TeamSettingsPage /></ErrorBoundary>} />
+                <Route path="/activity" element={<ErrorBoundary><ActivityFeedPage /></ErrorBoundary>} />
+                <Route path="/settings" element={<ErrorBoundary><SettingsPage /></ErrorBoundary>} />
 
                 {/* Dev Tools sub-routes */}
-                <Route path="/tools" element={<ToolsIndex />} />
+                <Route path="/tools" element={<ErrorBoundary><ToolsIndex /></ErrorBoundary>} />
                 <Route element={<ToolLayout />}>
-                  <Route path="/tools/json-formatter" element={<JsonFormatterTool />} />
-                  <Route path="/tools/jwt-decoder" element={<JwtDecoderTool />} />
-                  <Route path="/tools/jwt-generator" element={<JwtGeneratorTool />} />
-                  <Route path="/tools/base64" element={<Base64Tool />} />
-                  <Route path="/tools/uuid-generator" element={<UuidGeneratorTool />} />
-                  <Route path="/tools/timestamp" element={<TimestampTool />} />
-                  <Route path="/tools/hash-generator" element={<HashGeneratorTool />} />
-                  <Route path="/tools/regex-playground" element={<RegexPlaygroundTool />} />
-                  <Route path="/tools/color-palette" element={<ColorPaletteTool />} />
-                  <Route path="/tools/url-encoder" element={<UrlEncoderTool />} />
-                  <Route path="/tools/text-diff" element={<TextDiffTool />} />
+                  <Route path="/tools/json-formatter" element={<ErrorBoundary><JsonFormatterTool /></ErrorBoundary>} />
+                  <Route path="/tools/jwt-decoder" element={<ErrorBoundary><JwtDecoderTool /></ErrorBoundary>} />
+                  <Route path="/tools/jwt-generator" element={<ErrorBoundary><JwtGeneratorTool /></ErrorBoundary>} />
+                  <Route path="/tools/base64" element={<ErrorBoundary><Base64Tool /></ErrorBoundary>} />
+                  <Route path="/tools/uuid-generator" element={<ErrorBoundary><UuidGeneratorTool /></ErrorBoundary>} />
+                  <Route path="/tools/timestamp" element={<ErrorBoundary><TimestampTool /></ErrorBoundary>} />
+                  <Route path="/tools/hash-generator" element={<ErrorBoundary><HashGeneratorTool /></ErrorBoundary>} />
+                  <Route path="/tools/regex-playground" element={<ErrorBoundary><RegexPlaygroundTool /></ErrorBoundary>} />
+                  <Route path="/tools/color-palette" element={<ErrorBoundary><ColorPaletteTool /></ErrorBoundary>} />
+                  <Route path="/tools/url-encoder" element={<ErrorBoundary><UrlEncoderTool /></ErrorBoundary>} />
+                  <Route path="/tools/text-diff" element={<ErrorBoundary><TextDiffTool /></ErrorBoundary>} />
                 </Route>
               </Route>
             </Route>

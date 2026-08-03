@@ -82,7 +82,7 @@ export const DashboardLayout = () => {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden bg-gh-bg text-gh-text font-ui antialiased">
+    <div className="flex h-screen overflow-hidden bg-gh-bg text-gh-text font-ui antialiased transition-colors duration-150">
       
       {/* 1. Mobile Hamburger Backdrop */}
       {mobileOpen && (
@@ -160,7 +160,7 @@ export const DashboardLayout = () => {
       {/* 3. Main Workspace Area */}
       <div className="flex-1 flex flex-col h-full overflow-hidden">
         {/* Top Header */}
-        <header className="flex h-14 items-center justify-between px-5 border-b border-gh-border bg-gh-surface shrink-0">
+        <header className="flex h-14 items-center justify-between px-5 border-b border-gh-border bg-gh-surface shrink-0 transition-colors duration-150">
           
           <div className="flex items-center gap-3">
             {/* Hamburger Button */}
@@ -323,7 +323,7 @@ export const DashboardLayout = () => {
         </header>
 
         {/* Content Container */}
-        <main className="flex-1 overflow-y-auto p-5 md:p-6 bg-gh-bg">
+        <main className="flex-1 overflow-y-auto p-5 md:p-6 bg-gh-bg transition-colors duration-150">
           <Outlet />
         </main>
       </div>

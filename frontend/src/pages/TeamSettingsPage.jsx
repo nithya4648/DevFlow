@@ -1,5 +1,5 @@
 // frontend/src/pages/TeamSettingsPage.jsx
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTeams, useCreateTeam, useTeamDetails, useInviteMember, useChangeRole, useRemoveMember, useDeleteTeam } from "../hooks/useTeams";
 import useAuth from "../hooks/useAuth";
 
@@ -23,10 +23,12 @@ export default function TeamSettingsPage() {
   const removeMemberMutation = useRemoveMember();
   const deleteTeamMutation = useDeleteTeam();
 
-  // Pick first team automatically if none selected
-  if (teams.length > 0 && !selectedTeamId) {
-    setSelectedTeamId(teams[0]._id);
-  }
+  // Auto-select first team after teams load, if none is already selected
+  useEffect(() => {
+    if (teams.length > 0 && !selectedTeamId) {
+      setSelectedTeamId(teams[0]._id);
+    }
+  }, [teams, selectedTeamId]);
 
   function handleCreateTeam(e) {
     e.preventDefault();

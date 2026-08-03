@@ -4,24 +4,48 @@
 
 @layer base {
   :root {
-    --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-ui:   'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Consolas, monospace;
+
+    /* ─── LIGHT THEME: GitHub-style flat, clean whites / cool grays ─── */
+    --gh-bg:           #f6f8fa;   /* GitHub light page background */
+    --gh-surface:      #ffffff;   /* Card surface */
+    --gh-subtle:       #eaeef2;   /* Subtle hover / input fill */
+    --gh-border:       #d0d7de;   /* Standard border */
+    --gh-border-muted: #eaeef2;   /* Muted divider */
+    --gh-muted:        #656d76;   /* Secondary text / labels */
+    --gh-text:         #24292f;   /* Primary body text */
+    --gh-heading:      #1f2328;   /* Headings */
+  }
+
+  /* ─── DARK THEME: classic GitHub dark ─── */
+  .dark {
+    --gh-bg:           #0d1117;
+    --gh-surface:      #161b22;
+    --gh-subtle:       #21262d;
+    --gh-border:       #30363d;
+    --gh-border-muted: #21262d;
+    --gh-muted:        #8b949e;
+    --gh-text:         #c9d1d9;
+    --gh-heading:      #f0f6fc;
   }
 
   html, body, #root {
     height: 100%;
-    background-color: #0d1117;
-    color: #c9d1d9;
     font-family: var(--font-ui);
   }
 
   body {
-    @apply bg-gh-bg text-gh-text antialiased selection:bg-accent/20 selection:text-accent-fg;
+    background-color: var(--gh-bg);
+    color: var(--gh-text);
+    transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    @apply antialiased selection:bg-accent/20 selection:text-accent-fg;
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-ui);
-    @apply tracking-tight font-semibold text-gh-heading;
+    @apply tracking-tight font-semibold;
+    color: var(--gh-heading);
   }
 
   code, pre, kbd, samp, .font-mono {
@@ -30,7 +54,7 @@
 }
 
 @layer components {
-  /* Flat GitHub-style card surface: 1px border, small radius (4-8px), no shadow at rest */
+  /* Flat GitHub-style card surface */
   .gh-card {
     @apply bg-gh-surface border border-gh-border rounded-md p-4 transition-colors;
   }
@@ -40,7 +64,7 @@
     @apply inline-flex items-center justify-center gap-2 px-3 py-1.5 rounded-md bg-accent hover:bg-accent-hover text-white text-sm font-medium border border-white/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
-  /* Secondary Action Button (Outlined / Subtle Dark) */
+  /* Secondary Action Button */
   .btn-secondary {
     @apply inline-flex items-center justify-center gap-2 px-3 py-1.5 rounded-md bg-gh-subtle hover:bg-gh-border text-gh-text hover:text-gh-heading text-sm font-medium border border-gh-border transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
   }
@@ -55,7 +79,7 @@
     @apply inline-flex items-center justify-center gap-2 px-2.5 py-1.5 rounded-md text-gh-muted hover:text-gh-heading hover:bg-gh-subtle text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
-  /* Bordered Badges/Tags (no glow) */
+  /* Bordered Badges/Tags */
   .gh-badge {
     @apply inline-flex items-center gap-1 px-2 py-0.5 text-xs font-mono font-medium rounded-md border border-gh-border bg-gh-subtle text-gh-text;
   }
