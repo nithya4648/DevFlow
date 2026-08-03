@@ -81,28 +81,28 @@ function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-950 px-4 py-12">
-      <div className="w-full max-w-md rounded-xl border border-slate-800 bg-slate-900/90 p-8 shadow-2xl backdrop-blur-md">
+    <div className="flex min-h-screen items-center justify-center bg-gh-bg px-4 py-12 font-ui text-gh-text">
+      <div className="w-full max-w-md gh-card p-8">
         <div className="text-center">
-          <div className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono font-bold text-lg mb-3">
+          <div className="inline-flex h-9 w-9 items-center justify-center rounded-md bg-accent-light text-accent-fg border border-accent-border font-mono font-bold text-base mb-3">
             &gt;_
           </div>
-          <h2 className="font-display text-2xl font-bold text-white tracking-tight">
-            Welcome Back
+          <h2 className="text-xl font-bold text-gh-heading">
+            Sign in to DevFlow
           </h2>
-          <p className="mt-1 text-xs text-slate-400">
-            Sign in to manage your developer workspace.
+          <p className="mt-1 text-xs text-gh-muted font-mono">
+            Access your developer workstation
           </p>
         </div>
 
-        <form className="mt-8 space-y-5" onSubmit={handleSubmit(onSubmit)}>
+        <form className="mt-6 space-y-4" onSubmit={handleSubmit(onSubmit)}>
           {/* Email Field */}
           <div>
-            <label className="block text-[11px] font-mono font-semibold uppercase tracking-wider text-slate-400 mb-1">
+            <label className="block text-xs font-mono font-medium text-gh-muted mb-1">
               Email Address
             </label>
             <div className="relative">
-              <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">
+              <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gh-muted">
                 <FaEnvelope className="h-3.5 w-3.5" />
               </span>
               <input
@@ -115,29 +115,29 @@ function LoginPage() {
                   },
                 })}
                 placeholder="you@example.com"
-                className="w-full rounded-lg border border-slate-800 bg-slate-950/60 py-2.5 pl-9 pr-4 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition"
+                className="gh-input pl-9"
               />
             </div>
             {errors.email && (
-              <p className="mt-1 text-xs text-rose-500">{errors.email.message}</p>
+              <p className="mt-1 text-xs text-red-400 font-mono">{errors.email.message}</p>
             )}
           </div>
 
           {/* Password Field */}
           <div>
             <div className="flex items-center justify-between mb-1">
-              <label className="block text-[11px] font-mono font-semibold uppercase tracking-wider text-slate-400">
+              <label className="block text-xs font-mono font-medium text-gh-muted">
                 Password
               </label>
               <Link
                 to="/forgot-password"
-                className="text-xs text-emerald-400 hover:text-emerald-300 font-medium"
+                className="text-xs text-accent-blue hover:underline font-medium"
               >
                 Forgot password?
               </Link>
             </div>
             <div className="relative">
-              <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">
+              <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gh-muted">
                 <FaLock className="h-3.5 w-3.5" />
               </span>
               <input
@@ -146,30 +146,30 @@ function LoginPage() {
                   required: "Password is required",
                 })}
                 placeholder="••••••••"
-                className="w-full rounded-lg border border-slate-800 bg-slate-950/60 py-2.5 pl-9 pr-10 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition"
+                className="gh-input pl-9 pr-10"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-500 hover:text-slate-300 transition focus:outline-none"
+                className="absolute inset-y-0 right-0 flex items-center pr-3 text-gh-muted hover:text-gh-heading transition focus:outline-none"
                 aria-label={showPassword ? "Hide password" : "Show password"}
               >
                 {showPassword ? <FaEyeSlash className="h-3.5 w-3.5" /> : <FaEye className="h-3.5 w-3.5" />}
               </button>
             </div>
             {errors.password && (
-              <p className="mt-1 text-xs text-rose-500">{errors.password.message}</p>
+              <p className="mt-1 text-xs text-red-400 font-mono">{errors.password.message}</p>
             )}
           </div>
 
           {unverifiedEmail && (
-            <div className="rounded-lg bg-emerald-500/10 border border-emerald-500/30 p-3.5 text-xs text-emerald-200">
-              <p className="mb-2 text-center text-xs">Didn't receive the verification email?</p>
+            <div className="rounded-md bg-accent-light border border-accent-border p-3 text-xs text-gh-text space-y-2">
+              <p className="text-center">Didn't receive the verification email?</p>
               <button
                 type="button"
                 onClick={handleResendVerification}
                 disabled={isResending}
-                className="w-full flex items-center justify-center gap-2 rounded-lg bg-emerald-600 py-1.5 text-xs font-semibold text-white transition hover:bg-emerald-500 disabled:opacity-50"
+                className="btn-primary w-full text-xs"
               >
                 {isResending ? <FaSpinner className="animate-spin" /> : "Resend Verification Email"}
               </button>
@@ -180,33 +180,33 @@ function LoginPage() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 py-2.5 text-sm font-semibold text-white shadow-xs transition hover:bg-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-slate-900 disabled:opacity-50"
+            className="btn-primary w-full py-2"
           >
             {isSubmitting ? <FaSpinner className="animate-spin" /> : "Sign In"}
           </button>
         </form>
 
         {/* Divider */}
-        <div className="relative my-6 flex items-center">
-          <div className="flex-grow border-t border-slate-800"></div>
-          <span className="mx-4 flex-shrink text-xs text-slate-500 font-mono">or</span>
-          <div className="flex-grow border-t border-slate-800"></div>
+        <div className="relative my-5 flex items-center">
+          <div className="flex-grow border-t border-gh-border"></div>
+          <span className="mx-3 flex-shrink text-xs text-gh-muted font-mono">or</span>
+          <div className="flex-grow border-t border-gh-border"></div>
         </div>
 
         {/* Google OAuth Button */}
         <button
           type="button"
           onClick={handleGoogleLogin}
-          className="flex w-full items-center justify-center gap-2 rounded-lg border border-slate-800 bg-slate-950/40 py-2.5 text-xs font-semibold text-slate-300 transition hover:bg-slate-800 hover:text-white"
+          className="btn-secondary w-full py-2"
         >
-          <FaGoogle className="text-rose-500" />
+          <FaGoogle className="text-red-400" />
           Continue with Google
         </button>
 
-        <p className="mt-6 text-center text-xs text-slate-400">
-          Don't have an account?{" "}
-          <Link to="/register" className="font-semibold text-emerald-400 hover:text-emerald-300">
-            Sign Up
+        <p className="mt-5 text-center text-xs text-gh-muted">
+          New to DevFlow?{" "}
+          <Link to="/register" className="font-medium text-accent-blue hover:underline">
+            Create an account
           </Link>
         </p>
       </div>

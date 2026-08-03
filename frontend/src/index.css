@@ -4,53 +4,68 @@
 
 @layer base {
   :root {
-    --font-display: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
-    --font-sans: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-    --font-mono: 'JetBrains Mono', monospace;
-
-    /* Palette HSL variables */
-    --primary-50: 152 81% 96%;
-    --primary-100: 149 80% 90%;
-    --primary-200: 152 76% 80%;
-    --primary-300: 156 72% 67%;
-    --primary-400: 158 64% 52%;
-    --primary-500: 160 84% 39%;
-    --primary-600: 161 94% 30%;
-    --primary-700: 163 94% 24%;
-    --primary-800: 163 88% 20%;
-    --primary-900: 164 86% 16%;
-
-    --accent-500: 38 92% 50%;
-    --accent-600: 36 100% 45%;
-
-    --bg-page: 210 40% 98%;
-    --bg-surface: 0 0% 100%;
-    --bg-card: 0 0% 100%;
-    --border-color: 214 32% 91%;
-  }
-
-  .dark {
-    --bg-page: 222 47% 7%;
-    --bg-surface: 222 47% 11%;
-    --bg-card: 217 33% 13%;
-    --border-color: 217 33% 20%;
+    --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Consolas, monospace;
   }
 
   html, body, #root {
     height: 100%;
+    background-color: #0d1117;
+    color: #c9d1d9;
+    font-family: var(--font-ui);
   }
 
   body {
-    font-family: var(--font-sans);
-    @apply bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 antialiased selection:bg-emerald-500/20 selection:text-emerald-700 dark:selection:text-emerald-300;
+    @apply bg-gh-bg text-gh-text antialiased selection:bg-accent/20 selection:text-accent-fg;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-display);
-    @apply tracking-tight font-semibold;
+    font-family: var(--font-ui);
+    @apply tracking-tight font-semibold text-gh-heading;
   }
 
-  code, pre, kbd, samp {
+  code, pre, kbd, samp, .font-mono {
     font-family: var(--font-mono);
+  }
+}
+
+@layer components {
+  /* Flat GitHub-style card surface: 1px border, small radius (4-8px), no shadow at rest */
+  .gh-card {
+    @apply bg-gh-surface border border-gh-border rounded-md p-4 transition-colors;
+  }
+
+  /* Primary Action Button (Solid GitHub Action Green) */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-3 py-1.5 rounded-md bg-accent hover:bg-accent-hover text-white text-sm font-medium border border-white/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  /* Secondary Action Button (Outlined / Subtle Dark) */
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 px-3 py-1.5 rounded-md bg-gh-subtle hover:bg-gh-border text-gh-text hover:text-gh-heading text-sm font-medium border border-gh-border transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  /* Danger Button */
+  .btn-danger {
+    @apply inline-flex items-center justify-center gap-2 px-3 py-1.5 rounded-md bg-[#da3633] hover:bg-[#b62324] text-white text-sm font-medium border border-white/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  /* Ghost Button */
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 px-2.5 py-1.5 rounded-md text-gh-muted hover:text-gh-heading hover:bg-gh-subtle text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  /* Bordered Badges/Tags (no glow) */
+  .gh-badge {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 text-xs font-mono font-medium rounded-md border border-gh-border bg-gh-subtle text-gh-text;
+  }
+
+  .gh-badge-accent {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 text-xs font-mono font-medium rounded-md border border-accent-border bg-accent-light text-accent-fg;
+  }
+
+  /* Text Inputs & Selects */
+  .gh-input {
+    @apply w-full rounded-md border border-gh-border bg-gh-bg px-3 py-1.5 text-sm text-gh-text placeholder-gh-muted focus:border-accent-blue focus:outline-none focus:ring-1 focus:ring-accent-blue transition-colors;
   }
 }

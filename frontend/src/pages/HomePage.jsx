@@ -1,6 +1,6 @@
 import useAuth from "../hooks/useAuth";
 import { useToast } from "../context/ToastContext";
-import { FaSignOutAlt, FaUserCircle } from "react-icons/fa";
+import { FaSignOutAlt, FaUserCircle, FaCheckCircle, FaExclamationCircle } from "react-icons/fa";
 
 function HomePage() {
   const { user, logout } = useAuth();
@@ -12,34 +12,36 @@ function HomePage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-gray-950 text-white">
-      {/* Header */}
-      <header className="border-b border-gray-800 bg-gray-900/50 px-6 py-4 backdrop-blur-md">
+    <div className="flex min-h-screen flex-col bg-gh-bg text-gh-text font-ui">
+      {/* Header Bar */}
+      <header className="border-b border-gh-border bg-gh-surface px-6 py-3">
         <div className="mx-auto flex max-w-6xl items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-2xl font-black bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+          <div className="flex items-center gap-3">
+            <span className="text-xl font-bold font-mono tracking-tight text-gh-heading">
               DevFlow
             </span>
+            <span className="gh-badge-accent">v1.0</span>
           </div>
+
           {user && (
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
               <div className="flex items-center gap-2">
                 {user.avatar ? (
                   <img
                     src={user.avatar}
                     alt={user.name}
-                    className="h-8 w-8 rounded-full border border-indigo-500/30"
+                    className="h-7 w-7 rounded-full border border-gh-border object-cover"
                   />
                 ) : (
-                  <FaUserCircle className="h-8 w-8 text-gray-400" />
+                  <FaUserCircle className="h-6 w-6 text-gh-muted" />
                 )}
-                <span className="text-sm font-medium text-gray-300">{user.name}</span>
+                <span className="text-sm font-medium text-gh-text">{user.name}</span>
               </div>
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-2 rounded-lg bg-gray-850 px-3.5 py-1.5 text-xs font-semibold text-gray-350 hover:bg-gray-800 hover:text-white transition"
+                className="btn-secondary text-xs py-1 px-2.5"
               >
-                <FaSignOutAlt />
+                <FaSignOutAlt className="text-xs" />
                 Log Out
               </button>
             </div>
@@ -47,34 +49,44 @@ function HomePage() {
         </div>
       </header>
 
-      {/* Main Panel */}
-      <main className="mx-auto flex flex-grow max-w-4xl flex-col items-center justify-center px-4 py-12 text-center">
-        <div className="rounded-3xl border border-gray-800 bg-gray-900/30 p-10 shadow-2xl backdrop-blur-xl max-w-lg">
-          <h1 className="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-4xl font-extrabold text-transparent">
-            Welcome to DevFlow
-          </h1>
-          <p className="mt-4 text-gray-400">
-            The Operating System for Developers
-          </p>
+      {/* Main Container */}
+      <main className="mx-auto flex flex-grow max-w-3xl flex-col items-center justify-center px-4 py-12">
+        <div className="w-full gh-card max-w-lg space-y-6">
+          <div>
+            <h1 className="text-2xl font-bold text-gh-heading">
+              Welcome to DevFlow
+            </h1>
+            <p className="mt-1 text-sm text-gh-muted font-mono">
+              Developer Workstation & Operations OS
+            </p>
+          </div>
 
-          <div className="mt-8 rounded-2xl bg-gray-950/60 p-6 border border-gray-850 text-left space-y-4">
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-indigo-400">User Session Details</h3>
-            <div className="grid grid-cols-3 gap-2 text-sm text-gray-400">
-              <span className="font-medium text-gray-500">Name:</span>
-              <span className="col-span-2 text-white">{user?.name}</span>
+          {/* User Session Details */}
+          <div className="rounded-md bg-gh-bg p-4 border border-gh-border space-y-3">
+            <h2 className="text-xs font-mono font-semibold uppercase tracking-wider text-gh-muted">
+              User Session Details
+            </h2>
+            
+            <div className="grid grid-cols-3 gap-y-2 text-sm">
+              <span className="font-mono text-xs text-gh-muted">Name:</span>
+              <span className="col-span-2 font-medium text-gh-heading">{user?.name || "N/A"}</span>
               
-              <span className="font-medium text-gray-500">Email:</span>
-              <span className="col-span-2 text-white">{user?.email}</span>
+              <span className="font-mono text-xs text-gh-muted">Email:</span>
+              <span className="col-span-2 font-mono text-xs text-gh-text">{user?.email || "N/A"}</span>
               
-              <span className="font-medium text-gray-500">Role:</span>
-              <span className="col-span-2 text-white capitalize">{user?.role}</span>
+              <span className="font-mono text-xs text-gh-muted">Role:</span>
+              <span className="col-span-2 capitalize font-medium text-gh-text">{user?.role || "user"}</span>
               
-              <span className="font-medium text-gray-500">Verified:</span>
+              <span className="font-mono text-xs text-gh-muted">Status:</span>
               <span className="col-span-2">
                 {user?.isVerified ? (
-                  <span className="rounded bg-green-500/10 px-2 py-0.5 text-xs font-semibold text-green-400 border border-green-500/20">Verified</span>
+                  <span className="gh-badge-accent">
+                    <FaCheckCircle className="text-[10px]" /> Verified
+                  </span>
                 ) : (
-                  <span className="rounded bg-yellow-500/10 px-2 py-0.5 text-xs font-semibold text-yellow-400 border border-yellow-500/20">Unverified</span>
+                  <span className="gh-badge">
+                    <FaExclamationCircle className="text-[10px] text-amber-400" /> Unverified
+                  </span>
                 )}
               </span>
             </div>
