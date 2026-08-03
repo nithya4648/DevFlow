@@ -36,24 +36,24 @@ function VerifyEmailPage() {
   }, [token, addToast]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-900 via-gray-950 to-indigo-950 px-4 py-12">
-      <div className="w-full max-w-md rounded-2xl border border-gray-800 bg-gray-900/60 p-8 shadow-2xl backdrop-blur-xl text-center">
+    <div className="flex min-h-screen items-center justify-center bg-slate-950 px-4 py-12">
+      <div className="w-full max-w-md rounded-xl border border-slate-800 bg-slate-900/90 p-8 shadow-2xl backdrop-blur-md text-center">
         {status === "verifying" && (
           <div className="flex flex-col items-center gap-4 py-8">
-            <FaSpinner className="h-12 w-12 animate-spin text-indigo-400" />
-            <h2 className="text-xl font-bold text-white">Verifying Email Address</h2>
-            <p className="text-sm text-gray-400">Please wait while we verify your account credentials.</p>
+            <FaSpinner className="h-10 w-10 animate-spin text-emerald-400" />
+            <h2 className="font-display text-xl font-bold text-white">Verifying Email Address</h2>
+            <p className="text-xs text-slate-400">Please wait while we verify your account credentials.</p>
           </div>
         )}
 
         {status === "success" && (
           <div className="flex flex-col items-center gap-4 py-4">
-            <FaCheckCircle className="h-16 w-16 text-green-500" />
-            <h2 className="text-2xl font-bold text-white">Verified!</h2>
-            <p className="text-sm text-gray-300">{message}</p>
+            <FaCheckCircle className="h-14 w-14 text-emerald-500" />
+            <h2 className="font-display text-2xl font-bold text-white">Verified!</h2>
+            <p className="text-xs text-slate-300">{message}</p>
             <Link
               to="/login"
-              className="mt-6 inline-block w-full rounded-lg bg-indigo-650 py-2.5 text-sm font-semibold text-white shadow-lg transition hover:bg-indigo-600"
+              className="mt-4 inline-block w-full rounded-lg bg-emerald-600 py-2.5 text-xs font-semibold text-white shadow-xs transition hover:bg-emerald-500"
             >
               Sign In to Your Account
             </Link>
@@ -62,13 +62,13 @@ function VerifyEmailPage() {
 
         {status === "error" && (
           <div className="flex flex-col items-center gap-4 py-4">
-            <FaExclamationCircle className="h-16 w-16 text-red-500" />
-            <h2 className="text-2xl font-bold text-white">Verification Failed</h2>
-            <p className="text-sm text-gray-300">{message}</p>
-            <p className="text-xs text-gray-400">The link may have expired or is invalid. Please try registering again.</p>
+            <FaExclamationCircle className="h-14 w-14 text-rose-500" />
+            <h2 className="font-display text-2xl font-bold text-white">Verification Failed</h2>
+            <p className="text-xs text-slate-300">{message}</p>
+            <p className="text-xs text-slate-400">The link may have expired or is invalid. Please try registering again.</p>
             <Link
               to="/register"
-              className="mt-6 inline-block w-full rounded-lg border border-gray-800 bg-gray-950/40 py-2.5 text-sm font-semibold text-gray-300 transition hover:bg-gray-800 hover:text-white"
+              className="mt-4 inline-block w-full rounded-lg border border-slate-800 bg-slate-950/40 py-2.5 text-xs font-semibold text-slate-300 transition hover:bg-slate-800 hover:text-white"
             >
               Back to Sign Up
             </Link>

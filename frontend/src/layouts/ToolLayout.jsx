@@ -1,5 +1,3 @@
-// src/layouts/ToolLayout.jsx
-// Wraps each individual tool page with a back button and breadcrumb
 import { Outlet, useLocation, Link } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
 import { useEffect } from "react";
@@ -33,16 +31,16 @@ export default function ToolLayout() {
   return (
     <div className="space-y-4">
       {/* Breadcrumb */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2">
         <Link
           to="/tools"
-          className="inline-flex items-center gap-2 rounded-xl px-3 py-1.5 text-xs font-bold text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white transition"
+          className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-semibold text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white transition"
         >
           <FaArrowLeft className="h-3 w-3" />
           Dev Tools
         </Link>
-        <span className="text-gray-300 dark:text-gray-700">/</span>
-        <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">{toolName}</span>
+        <span className="text-slate-300 dark:text-slate-700">/</span>
+        <span className="font-display text-xs font-semibold text-slate-800 dark:text-slate-200">{toolName}</span>
       </div>
 
       <Outlet />

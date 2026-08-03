@@ -33,42 +33,42 @@ function ForgotPasswordPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-900 via-gray-950 to-indigo-950 px-4 py-12">
-      <div className="w-full max-w-md rounded-2xl border border-gray-800 bg-gray-900/60 p-8 shadow-2xl backdrop-blur-xl">
+    <div className="flex min-h-screen items-center justify-center bg-slate-950 px-4 py-12">
+      <div className="w-full max-w-md rounded-xl border border-slate-800 bg-slate-900/90 p-8 shadow-2xl backdrop-blur-md">
         <div className="mb-6">
           <Link
             to="/login"
-            className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-gray-400 hover:text-white transition"
+            className="inline-flex items-center gap-2 text-xs font-mono font-semibold uppercase tracking-wider text-slate-400 hover:text-white transition"
           >
             <FaArrowLeft /> Back to Login
           </Link>
         </div>
 
         <div className="text-center">
-          <h2 className="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-3xl font-extrabold text-transparent">
+          <h2 className="font-display text-2xl font-bold text-white tracking-tight">
             Forgot Password
           </h2>
-          <p className="mt-2 text-sm text-gray-400">
+          <p className="mt-1 text-xs text-slate-400">
             Enter your email to receive a password reset link.
           </p>
         </div>
 
         {submitted ? (
-          <div className="mt-8 rounded-lg border border-indigo-500/20 bg-indigo-950/20 p-4 text-center">
-            <p className="text-sm text-indigo-200">
+          <div className="mt-8 rounded-lg border border-emerald-500/20 bg-emerald-500/10 p-4 text-center">
+            <p className="text-xs text-emerald-300">
               We've sent an email with instructions on how to reset your password. Please check your inbox (and spam folder).
             </p>
           </div>
         ) : (
-          <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
+          <form className="mt-8 space-y-5" onSubmit={handleSubmit(onSubmit)}>
             {/* Email Field */}
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-gray-400">
+              <label className="block text-[11px] font-mono font-semibold uppercase tracking-wider text-slate-400 mb-1">
                 Email Address
               </label>
-              <div className="relative mt-1">
-                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                  <FaEnvelope />
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">
+                  <FaEnvelope className="h-3.5 w-3.5" />
                 </span>
                 <input
                   type="email"
@@ -80,11 +80,11 @@ function ForgotPasswordPage() {
                     },
                   })}
                   placeholder="you@example.com"
-                  className="w-full rounded-lg border border-gray-850 bg-gray-950/50 py-2.5 pl-10 pr-4 text-sm text-white placeholder-gray-600 outline-none ring-primary/40 transition focus:border-primary focus:ring-2"
+                  className="w-full rounded-lg border border-slate-800 bg-slate-950/60 py-2.5 pl-9 pr-4 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition"
                 />
               </div>
               {errors.email && (
-                <p className="mt-1 text-xs text-red-500">{errors.email.message}</p>
+                <p className="mt-1 text-xs text-rose-500">{errors.email.message}</p>
               )}
             </div>
 
@@ -92,7 +92,7 @@ function ForgotPasswordPage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex w-full items-center justify-center gap-2 rounded-lg bg-indigo-650 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-650/30 transition hover:bg-indigo-600 hover:shadow-indigo-600/40 focus:outline-none focus:ring-2 focus:ring-primary"
+              className="flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 py-2.5 text-sm font-semibold text-white shadow-xs transition hover:bg-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
             >
               {isSubmitting ? <FaSpinner className="animate-spin" /> : "Send Reset Link"}
             </button>

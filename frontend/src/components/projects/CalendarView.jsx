@@ -1,16 +1,15 @@
-// frontend/src/components/projects/CalendarView.jsx
 import { useState } from "react";
 
 const STATUS_DOT = {
-  "todo":        "bg-gray-400",
-  "in-progress": "bg-indigo-400",
-  "done":        "bg-emerald-400",
+  "todo":        "bg-slate-400",
+  "in-progress": "bg-teal-500",
+  "done":        "bg-emerald-500",
 };
 
 const PRIORITY_COLOR = {
-  high:   "border-l-red-400",
-  medium: "border-l-amber-400",
-  low:    "border-l-emerald-400",
+  high:   "border-l-rose-500",
+  medium: "border-l-amber-500",
+  low:    "border-l-emerald-500",
 };
 
 function getDaysInMonth(year, month) {
@@ -61,23 +60,23 @@ export default function CalendarView({ projects, onEdit }) {
   const todayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 
   return (
-    <div className="bg-white/3 dark:bg-gray-900/40 rounded-2xl border border-white/10 p-5">
+    <div className="bg-white dark:bg-slate-900/60 rounded-xl border border-slate-200/80 dark:border-slate-800 p-5 shadow-xs">
       {/* Header */}
       <div className="flex items-center justify-between mb-5">
         <button
           onClick={prevMonth}
-          className="p-2 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+          className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700/80 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </button>
-        <h2 className="text-base font-semibold text-gray-100">
+        <h2 className="font-display text-base font-bold text-slate-900 dark:text-slate-100">
           {monthName} {year}
         </h2>
         <button
           onClick={nextMonth}
-          className="p-2 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+          className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700/80 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -88,67 +87,69 @@ export default function CalendarView({ projects, onEdit }) {
       {/* Day headers */}
       <div className="grid grid-cols-7 mb-1">
         {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
-          <div key={d} className="text-center text-xs font-medium text-gray-500 py-1">
+          <div key={d} className="text-center font-display text-[11px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 py-1">
             {d}
           </div>
         ))}
       </div>
 
       {/* Calendar grid */}
-      <div className="grid grid-cols-7 gap-px bg-white/5 rounded-xl overflow-hidden border border-white/5">
+      <div className="grid grid-cols-7 gap-px bg-slate-200 dark:bg-slate-800 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-800">
         {cells.map((day, idx) => {
-          if (!day) return <div key={`empty-${idx}`} className="bg-gray-950/40 h-24" />;
+          if (!day) return <div key={`empty-${idx}`} className="bg-slate-50 dark:bg-slate-950/60 h-24" />;
 
-          const dateKey = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+          const dayStr = String(day).padStart(2, "0");
+          const monthStr = String(month + 1).padStart(2, "0");
+          const dateKey = `${year}-${monthStr}-${dayStr}`;
           const dayProjects = byDate[dateKey] || [];
           const isToday = dateKey === todayKey;
 
           return (
             <div
               key={dateKey}
-              className={`bg-gray-950/40 dark:bg-gray-900/60 h-24 p-1.5 flex flex-col ${
-                isToday ? "ring-1 ring-inset ring-indigo-500/60" : ""
+              className={`bg-white dark:bg-slate-900 min-h-[96px] p-1.5 flex flex-col transition ${
+                isToday ? "ring-2 ring-emerald-500/60 inset-0 z-10" : ""
               }`}
             >
-              <span
-                className={`text-xs font-medium w-5 h-5 flex items-center justify-center rounded-full mb-1 ${
-                  isToday
-                    ? "bg-indigo-500 text-white"
-                    : "text-gray-400"
-                }`}
-              >
-                {day}
-              </span>
-              <div className="flex flex-col gap-0.5 overflow-hidden">
-                {dayProjects.slice(0, 2).map((p) => (
-                  <button
-                    key={p._id}
-                    onClick={() => onEdit(p)}
-                    className={`text-[10px] text-left px-1.5 py-0.5 rounded bg-indigo-500/15 hover:bg-indigo-500/30 text-indigo-300 border-l-2 ${PRIORITY_COLOR[p.priority] || "border-l-gray-400"} truncate transition-colors`}
-                    title={p.title}
-                  >
-                    {p.title}
-                  </button>
-                ))}
-                {dayProjects.length > 2 && (
-                  <span className="text-[9px] text-gray-500 px-1">
-                    +{dayProjects.length - 2} more
+              <div className="flex items-center justify-between mb-1">
+                <span
+                  className={`font-mono text-xs font-semibold rounded-full w-5 h-5 flex items-center justify-center ${
+                    isToday
+                      ? "bg-emerald-600 text-white"
+                      : "text-slate-700 dark:text-slate-300"
+                  }`}
+                >
+                  {day}
+                </span>
+                {dayProjects.length > 0 && (
+                  <span className="font-mono text-[9px] font-bold text-slate-400 dark:text-slate-500">
+                    {dayProjects.length}
                   </span>
                 )}
+              </div>
+
+              <div className="flex-1 space-y-1 overflow-y-auto max-h-[70px]">
+                {dayProjects.map((p) => {
+                  const borderCls = PRIORITY_COLOR[p.priority] || "border-l-slate-400";
+                  const dotCls = STATUS_DOT[p.status] || "bg-slate-400";
+                  return (
+                    <button
+                      key={p._id}
+                      onClick={() => onEdit(p)}
+                      className={`w-full text-left p-1 rounded text-[11px] bg-slate-50 dark:bg-slate-800/80 border-l-2 ${borderCls} hover:bg-slate-100 dark:hover:bg-slate-800 transition truncate flex items-center gap-1.5`}
+                      title={p.title}
+                    >
+                      <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${dotCls}`} />
+                      <span className="truncate text-slate-800 dark:text-slate-200 font-medium">
+                        {p.title}
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
           );
         })}
-      </div>
-
-      {/* Legend */}
-      <div className="flex items-center gap-4 mt-4 justify-end">
-        {Object.entries(STATUS_DOT).map(([status, cls]) => (
-          <div key={status} className="flex items-center gap-1.5">
-            <span className={`w-2 h-2 rounded-full ${cls}`} />
-            <span className="text-xs text-gray-500 capitalize">{status.replace("-", " ")}</span>
-          </div>
-        ))}
       </div>
     </div>
   );

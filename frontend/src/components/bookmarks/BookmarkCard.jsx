@@ -1,4 +1,3 @@
-// frontend/src/components/bookmarks/BookmarkCard.jsx
 import { useState } from "react";
 
 export default function BookmarkCard({ bookmark, onEdit, onDelete }) {
@@ -14,14 +13,14 @@ export default function BookmarkCard({ bookmark, onEdit, onDelete }) {
   const faviconUrl = domain ? `https://www.google.com/s2/favicons?domain=${domain}&sz=64` : "";
 
   return (
-    <div className="group flex flex-col bg-gray-900/40 hover:bg-gray-900/60 border border-white/5 hover:border-cyan-500/30 rounded-2xl p-4 transition-all h-full">
+    <div className="group flex flex-col bg-white dark:bg-slate-900/60 hover:bg-slate-50 dark:hover:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-emerald-500/40 rounded-xl p-4 transition-all h-full shadow-xs">
       
       {/* Header: Favicon + Title */}
       <div className="flex items-start gap-3 mb-3">
         {faviconUrl ? (
-          <img src={faviconUrl} alt="favicon" className="w-8 h-8 rounded-lg bg-white/10 p-1 shrink-0" />
+          <img src={faviconUrl} alt="favicon" className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 p-1 shrink-0 border border-slate-200/60 dark:border-slate-700/60" />
         ) : (
-          <div className="w-8 h-8 rounded-lg bg-gray-800 flex items-center justify-center shrink-0">
+          <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0 border border-slate-200/60 dark:border-slate-700/60">
             <span className="text-xs">🌐</span>
           </div>
         )}
@@ -31,11 +30,11 @@ export default function BookmarkCard({ bookmark, onEdit, onDelete }) {
             href={bookmark.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-sm font-semibold text-gray-100 hover:text-cyan-400 truncate block transition-colors leading-tight mb-1"
+            className="text-sm font-semibold text-slate-900 dark:text-slate-100 hover:text-emerald-600 dark:hover:text-emerald-400 truncate block transition-colors leading-tight mb-1"
           >
             {bookmark.title}
           </a>
-          <p className="text-xs text-gray-500 truncate" title={bookmark.url}>
+          <p className="font-mono text-[11px] text-slate-500 dark:text-slate-400 truncate" title={bookmark.url}>
             {domain || bookmark.url}
           </p>
         </div>
@@ -44,24 +43,24 @@ export default function BookmarkCard({ bookmark, onEdit, onDelete }) {
       {/* Notes */}
       <div className="flex-1 min-h-0 mb-4">
         {bookmark.notes ? (
-          <p className="text-xs text-gray-400 line-clamp-3 leading-relaxed">
+          <p className="text-xs text-slate-600 dark:text-slate-300 line-clamp-3 leading-relaxed">
             {bookmark.notes}
           </p>
         ) : (
-          <p className="text-xs text-gray-600 italic">No notes.</p>
+          <p className="text-xs text-slate-400 dark:text-slate-500 italic">No notes.</p>
         )}
       </div>
 
       {/* Footer: Category badge & Actions */}
-      <div className="flex items-center justify-between mt-auto pt-3 border-t border-white/5">
-        <span className="px-2 py-1 text-[10px] uppercase font-bold tracking-wider text-cyan-400 bg-cyan-400/10 rounded-md">
+      <div className="flex items-center justify-between mt-auto pt-3 border-t border-slate-100 dark:border-slate-800">
+        <span className="px-2 py-0.5 text-[10px] uppercase font-mono font-semibold tracking-wider text-emerald-700 dark:text-emerald-400 bg-emerald-500/10 rounded-md border border-emerald-500/20">
           {bookmark.category}
         </span>
 
         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
           <button
             onClick={() => onEdit(bookmark)}
-            className="p-1.5 rounded-lg text-gray-400 hover:text-cyan-400 hover:bg-cyan-400/10 transition"
+            className="p-1.5 rounded-md text-slate-400 hover:text-emerald-600 hover:bg-emerald-500/10 transition"
             title="Edit"
           >
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -70,7 +69,7 @@ export default function BookmarkCard({ bookmark, onEdit, onDelete }) {
           </button>
           <button
             onClick={() => onDelete(bookmark._id)}
-            className="p-1.5 rounded-lg text-gray-400 hover:text-red-400 hover:bg-red-400/10 transition"
+            className="p-1.5 rounded-md text-slate-400 hover:text-rose-600 hover:bg-rose-500/10 transition"
             title="Delete"
           >
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

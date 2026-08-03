@@ -1,4 +1,3 @@
-// frontend/src/pages/ProjectsPage.jsx
 import { useContext, useState, useCallback } from "react";
 import { useProjects, useCreateProject, useUpdateProject, useDeleteProject } from "../hooks/useProjects";
 import KanbanBoard from "../components/projects/KanbanBoard";
@@ -14,19 +13,19 @@ const VIEW_CALENDAR = "calendar";
 
 function EmptyState({ onAdd }) {
   return (
-    <div className="flex flex-col items-center justify-center py-24 text-center">
-      <div className="w-20 h-20 mb-5 rounded-2xl bg-indigo-500/10 flex items-center justify-center">
-        <svg className="w-10 h-10 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <div className="flex flex-col items-center justify-center py-20 text-center bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200/80 dark:border-slate-800 p-8 shadow-xs">
+      <div className="w-16 h-16 mb-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+        <svg className="w-8 h-8 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
         </svg>
       </div>
-      <h3 className="text-lg font-semibold text-gray-200 mb-2">No projects yet</h3>
-      <p className="text-sm text-gray-500 mb-6 max-w-xs">
+      <h3 className="font-display text-base font-bold text-slate-900 dark:text-slate-100 mb-1">No projects yet</h3>
+      <p className="text-xs text-slate-500 dark:text-slate-400 mb-5 max-w-xs leading-relaxed">
         Create your first project to start tracking progress with Kanban or Calendar views.
       </p>
       <button
         onClick={onAdd}
-        className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium rounded-xl transition-colors"
+        className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded-lg transition-colors shadow-xs"
       >
         + New Project
       </button>
@@ -36,12 +35,12 @@ function EmptyState({ onAdd }) {
 
 function ProjectsSkeleton() {
   return (
-    <div className="flex gap-5 overflow-x-hidden">
+    <div className="flex gap-4 overflow-x-hidden">
       {[1, 2, 3].map((col) => (
         <div key={col} className="flex flex-col gap-3 w-72 shrink-0">
           <Skeleton className="h-8 w-32 rounded-lg" />
           {[1, 2, 3].map((i) => (
-            <Skeleton key={i} className="h-24 rounded-xl" />
+            <Skeleton key={i} className="h-24 rounded-lg" />
           ))}
         </div>
       ))}
@@ -127,21 +126,21 @@ export default function ProjectsPage() {
       {/* Page header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-100">Projects</h1>
-          <p className="text-sm text-gray-500 mt-0.5">
+          <h1 className="font-display text-2xl font-bold text-slate-900 dark:text-slate-100">Projects</h1>
+          <p className="font-mono text-xs text-slate-500 mt-0.5">
             {projects.length} project{projects.length !== 1 ? "s" : ""}
           </p>
         </div>
 
         <div className="flex items-center gap-3">
           {/* View toggle */}
-          <div className="flex items-center bg-white/5 border border-white/10 rounded-xl p-1 gap-1">
+          <div className="flex items-center bg-slate-200/60 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 rounded-lg p-0.5 gap-0.5">
             <button
               onClick={() => setView(VIEW_KANBAN)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
                 view === VIEW_KANBAN
-                  ? "bg-indigo-600 text-white shadow"
-                  : "text-gray-400 hover:text-gray-200"
+                  ? "bg-white dark:bg-slate-900 text-emerald-700 dark:text-emerald-400 shadow-2xs border border-slate-200/60 dark:border-slate-800"
+                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
               }`}
             >
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -151,10 +150,10 @@ export default function ProjectsPage() {
             </button>
             <button
               onClick={() => setView(VIEW_CALENDAR)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
                 view === VIEW_CALENDAR
-                  ? "bg-indigo-600 text-white shadow"
-                  : "text-gray-400 hover:text-gray-200"
+                  ? "bg-white dark:bg-slate-900 text-emerald-700 dark:text-emerald-400 shadow-2xs border border-slate-200/60 dark:border-slate-800"
+                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
               }`}
             >
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -167,7 +166,7 @@ export default function ProjectsPage() {
           {/* New project button */}
           <button
             onClick={() => openCreateModal()}
-            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium rounded-xl transition-colors shadow-lg shadow-indigo-900/30"
+            className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded-lg transition-colors shadow-xs"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -184,7 +183,7 @@ export default function ProjectsPage() {
 
       {/* Error */}
       {isError && (
-        <div className="mb-4 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+        <div className="mb-4 p-4 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 text-xs font-mono">
           Failed to load projects. Make sure the backend is running.
         </div>
       )}
@@ -211,10 +210,10 @@ export default function ProjectsPage() {
         {/* Filtered empty state */}
         {!isLoading && projects.length === 0 && (activeFilters.search || activeFilters.status || activeFilters.priority) && (
           <div className="flex flex-col items-center py-16 text-center">
-            <p className="text-gray-500 text-sm">No projects match your filters.</p>
+            <p className="text-slate-500 dark:text-slate-400 text-xs">No projects match your filters.</p>
             <button
               onClick={() => setFilters({ search: "", status: "", priority: "" })}
-              className="mt-3 text-indigo-400 hover:text-indigo-300 text-sm transition"
+              className="mt-2 text-emerald-600 dark:text-emerald-400 hover:underline text-xs font-semibold transition"
             >
               Clear filters
             </button>

@@ -2,10 +2,55 @@
 @tailwind components;
 @tailwind utilities;
 
-html, body, #root {
-  height: 100%;
-}
+@layer base {
+  :root {
+    --font-display: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-sans: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
 
-body {
-  @apply bg-white text-gray-900 dark:bg-gray-950 dark:text-gray-100;
+    /* Palette HSL variables */
+    --primary-50: 152 81% 96%;
+    --primary-100: 149 80% 90%;
+    --primary-200: 152 76% 80%;
+    --primary-300: 156 72% 67%;
+    --primary-400: 158 64% 52%;
+    --primary-500: 160 84% 39%;
+    --primary-600: 161 94% 30%;
+    --primary-700: 163 94% 24%;
+    --primary-800: 163 88% 20%;
+    --primary-900: 164 86% 16%;
+
+    --accent-500: 38 92% 50%;
+    --accent-600: 36 100% 45%;
+
+    --bg-page: 210 40% 98%;
+    --bg-surface: 0 0% 100%;
+    --bg-card: 0 0% 100%;
+    --border-color: 214 32% 91%;
+  }
+
+  .dark {
+    --bg-page: 222 47% 7%;
+    --bg-surface: 222 47% 11%;
+    --bg-card: 217 33% 13%;
+    --border-color: 217 33% 20%;
+  }
+
+  html, body, #root {
+    height: 100%;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    @apply bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 antialiased selection:bg-emerald-500/20 selection:text-emerald-700 dark:selection:text-emerald-300;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    @apply tracking-tight font-semibold;
+  }
+
+  code, pre, kbd, samp {
+    font-family: var(--font-mono);
+  }
 }

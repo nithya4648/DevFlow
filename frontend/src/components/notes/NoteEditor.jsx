@@ -1,4 +1,3 @@
-// frontend/src/components/notes/NoteEditor.jsx
 import { useState, useEffect, useRef } from "react";
 
 export default function NoteEditor({ note, onSave, isSaving }) {
@@ -61,50 +60,50 @@ export default function NoteEditor({ note, onSave, isSaving }) {
 
   if (!note) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center text-center px-4">
-        <div className="w-16 h-16 mb-4 rounded-2xl bg-amber-500/10 flex items-center justify-center">
-          <svg className="w-8 h-8 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <div className="flex-1 flex flex-col items-center justify-center text-center px-4 bg-white dark:bg-slate-900/40 rounded-xl border border-slate-200/80 dark:border-slate-800 p-8 shadow-xs">
+        <div className="w-14 h-14 mb-4 rounded-xl bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
+          <svg className="w-7 h-7 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
           </svg>
         </div>
-        <h3 className="text-base font-semibold text-gray-200 mb-1">Select a Note</h3>
-        <p className="text-sm text-gray-500">Choose a note from the list or create a new one.</p>
+        <h3 className="font-display text-base font-bold text-slate-900 dark:text-slate-100 mb-1">Select a Note</h3>
+        <p className="text-xs text-slate-500 dark:text-slate-400">Choose a note from the sidebar or create a new one.</p>
       </div>
     );
   }
 
   return (
-    <div className="flex-1 flex flex-col min-h-0 bg-gray-950/40 rounded-2xl border border-white/5 relative">
+    <div className="flex-1 flex flex-col min-h-0 bg-white dark:bg-slate-900/60 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs relative">
       {/* Header */}
-      <div className="flex items-center gap-3 px-6 py-4 border-b border-white/5 shrink-0">
+      <div className="flex items-center gap-3 px-6 py-4 border-b border-slate-200/80 dark:border-slate-800 shrink-0">
         <div className="flex-1 min-w-0">
           <input
             value={localTitle}
             onChange={(e) => setLocalTitle(e.target.value)}
             placeholder="Note title..."
-            className="w-full bg-transparent text-lg font-bold text-gray-100 placeholder-gray-600 focus:outline-none transition-colors mb-1"
+            className="w-full bg-transparent font-display text-lg font-bold text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none transition-colors mb-1"
           />
           <div className="flex items-center gap-3">
             <input
               value={localFolder}
               onChange={(e) => setLocalFolder(e.target.value)}
               placeholder="Folder (e.g. Ideas)"
-              className="text-xs bg-transparent text-gray-400 placeholder-gray-600 focus:outline-none w-32 border-b border-transparent focus:border-amber-500/50 transition-colors"
+              className="font-mono text-xs bg-transparent text-slate-500 dark:text-slate-400 placeholder-slate-400 focus:outline-none w-32 border-b border-transparent focus:border-emerald-500/50 transition-colors"
             />
-            <span className="text-[10px] text-gray-600 border-l border-white/10 pl-3">
+            <span className="font-mono text-[10px] text-slate-400 dark:text-slate-500 border-l border-slate-200 dark:border-slate-800 pl-3">
               {new Date(note.createdAt).toLocaleString()}
             </span>
           </div>
         </div>
 
         {/* Save Status Indicator */}
-        <div className="shrink-0 flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-medium bg-white/5 border border-white/10">
+        <div className="shrink-0 flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-mono font-semibold bg-slate-100 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80">
           {saveStatus === "saving" ? (
-            <><span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" /> Saving...</>
+            <><span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" /> Saving...</>
           ) : saveStatus === "unsaved" ? (
-            <><span className="w-1.5 h-1.5 rounded-full bg-gray-400" /> Unsaved</>
+            <><span className="w-1.5 h-1.5 rounded-full bg-slate-400" /> Unsaved</>
           ) : (
-            <><span className="w-1.5 h-1.5 rounded-full bg-emerald-400" /> Saved</>
+            <><span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> Saved</>
           )}
         </div>
       </div>
@@ -114,7 +113,7 @@ export default function NoteEditor({ note, onSave, isSaving }) {
         value={localContent}
         onChange={(e) => setLocalContent(e.target.value)}
         placeholder="Start typing..."
-        className="flex-1 w-full bg-transparent px-6 py-5 text-sm text-gray-300 leading-relaxed placeholder-gray-600 focus:outline-none resize-none"
+        className="flex-1 w-full bg-transparent px-6 py-5 text-sm text-slate-800 dark:text-slate-200 leading-relaxed placeholder-slate-400 focus:outline-none resize-none font-sans"
         spellCheck={false}
       />
     </div>
