@@ -1,74 +1,68 @@
 import React from "react";
-import { FaGitAlt, FaRegStickyNote, FaCode, FaKey } from "react-icons/fa";
+import { Link } from "react-router-dom";
+import { FaCode } from "react-icons/fa";
+import { useTeams, useTeamActivity } from "../../hooks/useTeams";
 
-export const ActivityFeed = ({ activities }) => {
-  const defaultActivities = [
-    {
-      id: 1,
-      type: "git",
-      message: "Git push to repository devflow-backend",
-      time: "10 mins ago",
-      icon: FaGitAlt,
-      color: "text-amber-400 bg-amber-400/10 border border-amber-400/20",
-    },
-    {
-      id: 2,
-      type: "notes",
-      message: "Saved environment variable changes to vault",
-      time: "2 hours ago",
-      icon: FaKey,
-      color: "text-accent-fg bg-accent-light border border-accent-border",
-    },
-    {
-      id: 3,
-      type: "snippets",
-      message: "Created React useDebounce hook snippet",
-      time: "Yesterday",
-      icon: FaCode,
-      color: "text-sky-400 bg-sky-400/10 border border-sky-400/20",
-    },
-    {
-      id: 4,
-      type: "notes",
-      message: "Updated Docker Compose notes in Workspace",
-      time: "3 days ago",
-      icon: FaRegStickyNote,
-      color: "text-emerald-400 bg-emerald-400/10 border border-emerald-400/20",
-    },
-  ];
+export const ActivityFeed = () => {
+  const { data: teamsRes, isLoading: teamsLoading } = useTeams();
+  const teams = teamsRes?.data || [];
+  const selectedTeamId = teams[0]?._id || null;
 
-  const list = activities || defaultActivities;
+  const { data: activityRes, isLoading: activityLoading } = useTeamActivity(selectedTeamId);
+  const activities = activityRes?.data || [];
+
+  const isLoading = teamsLoading || activityLoading;
 
   return (
     <div className="gh-card p-4 font-ui">
       <div className="flex items-center justify-between mb-4 pb-2 border-b border-gh-border">
         <h2 className="text-sm font-bold text-gh-heading font-mono">Activity Feed</h2>
-        <span className="text-xs text-accent-blue font-mono cursor-pointer hover:underline">Clear</span>
+        <Link to="/activity" className="text-xs text-accent-blue font-mono hover:underline">
+          View All
+        </Link>
       </div>
-      <div className="space-y-3">
-        {list.map((act, index) => {
-          const Icon = act.icon || FaCode;
-          return (
-            <div key={act.id} className="flex gap-3 items-start relative group">
-              {/* Timeline Connector Line */}
-              {index !== list.length - 1 && (
-                <span className="absolute left-[15px] top-7 bottom-0 w-0.5 bg-gh-border" />
+
+      {isLoading ? (
+        <div className="space-y-3">
+          <div className="h-10 animate-pulse rounded-md bg-gh-surface border border-gh-border" />
+          <div className="h-10 animate-pulse rounded-md bg-gh-surface border border-gh-border" />
+        </div>
+      ) : activities.length === 0 ? (
+        <div className="py-6 text-center">
+          <p className="text-xs text-gh-muted font-mono">No team activity logged yet.</p>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {activities.slice(0, 5).map((act, index) => (
+            <div key={act._id || index} className="flex gap-2.5 items-start relative group">
+              {index !== Math.min(activities.length, 5) - 1 && (
+                <span className="absolute left-[11px] top-6 bottom-0 w-0.5 bg-gh-border" />
               )}
-              <span className={`rounded-md p-1.5 ${act.color} text-xs shrink-0`}>
-                <Icon className="h-3.5 w-3.5" />
-              </span>
+              {act.user?.avatar ? (
+                <img src={act.user.avatar} alt="avatar" className="w-6 h-6 rounded-full shrink-0 border border-gh-border" />
+              ) : (
+                <span className="w-6 h-6 rounded-full bg-gh-subtle border border-gh-border flex items-center justify-center font-bold text-gh-heading text-[10px] shrink-0 font-mono">
+                  {act.user?.name ? act.user.name[0].toUpperCase() : "?"}
+                </span>
+              )}
               <div className="flex-1 space-y-0.5 min-w-0">
-                <p className="text-xs font-medium text-gh-text group-hover:text-gh-heading transition truncate">
-                  {act.message}
+                <p className="text-xs font-medium text-gh-text group-hover:text-gh-heading transition truncate font-mono">
+                  <span className="font-semibold text-gh-heading">{act.user?.name}</span>{" "}
+                  {act.action}{" "}
+                  {act.targetName && (
+                    <span className="text-accent-fg font-mono">
+                      {act.targetName}
+                    </span>
+                  )}
                 </p>
                 <span className="text-[10px] font-mono text-gh-muted block">
-                  {act.time}
+                  {new Date(act.createdAt).toLocaleString()}
                 </span>
               </div>
             </div>
-          );
-        })}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

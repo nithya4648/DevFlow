@@ -2,6 +2,7 @@ import React from "react";
 import useAuth from "../hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { analyticsService } from "../services/analytics.service";
+import QuickLaunch from "../components/dashboard/QuickLaunch";
 import UsageStats from "../components/dashboard/UsageStats";
 import RecentProjects from "../components/dashboard/RecentProjects";
 import ActivityFeed from "../components/dashboard/ActivityFeed";
@@ -20,7 +21,7 @@ export const DashboardPage = () => {
 
   return (
     <div className="space-y-5 font-ui">
-      {/* Welcome Header */}
+      {/* 1. Welcome Header */}
       <div className="gh-card flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-bold text-gh-heading">
@@ -37,6 +38,10 @@ export const DashboardPage = () => {
         </div>
       </div>
 
+      {/* 2. Quick Launch Shortcuts (Always at top) */}
+      <QuickLaunch />
+
+      {/* 3. Analytics Overview & Charts */}
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {Array.from({ length: 4 }).map((_, idx) => (
@@ -50,7 +55,7 @@ export const DashboardPage = () => {
         </>
       )}
 
-      {/* Grid Content */}
+      {/* 4. Grid Content - Recent Projects, Pinned Tools & Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         
         {/* Left Columns - Projects & Pinned Tools */}

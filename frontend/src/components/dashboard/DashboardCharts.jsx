@@ -128,7 +128,7 @@ export const DashboardCharts = ({ overview }) => {
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mt-4 font-ui">
       <div className="gh-card p-4">
         <h2 className="text-xs font-mono font-bold text-gh-heading mb-3 pb-2 border-b border-gh-border">Weekly Activity</h2>
-        <div className="h-56">
+        <div className="h-36">
           {weeklyActivity.length > 0 && weeklyActivity.some(d => d.count > 0) ? (
             <Bar data={activityData} options={activityOptions} />
           ) : (

@@ -57,7 +57,12 @@ export default function SnippetCard({ snippet, onEdit, onDelete, onToggleFavorit
               </span>
             )}
           </div>
-          <h3 className="text-sm font-semibold text-gh-heading truncate">{snippet.title}</h3>
+          <h3
+            onClick={() => canEdit && onEdit && onEdit(snippet)}
+            className={`text-sm font-semibold text-gh-heading truncate ${canEdit && onEdit ? "cursor-pointer hover:text-accent-fg transition-colors" : ""}`}
+          >
+            {snippet.title}
+          </h3>
           {snippet.description && (
             <p className="text-xs text-gh-muted line-clamp-1 mt-0.5 font-mono">{snippet.description}</p>
           )}

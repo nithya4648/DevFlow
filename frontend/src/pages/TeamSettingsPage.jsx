@@ -9,6 +9,7 @@ export default function TeamSettingsPage() {
   const [teamNameInput, setTeamNameInput] = useState("");
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState("viewer");
+  const [inviteMessage, setInviteMessage] = useState(null);
 
   const { data: teamsRes, isLoading: teamsLoading } = useTeams();
   const teams = teamsRes?.data || [];
@@ -40,15 +41,25 @@ export default function TeamSettingsPage() {
   function handleInvite(e) {
     e.preventDefault();
     if (!inviteEmail.trim()) return;
+    setInviteMessage(null);
     inviteMutation.mutate(
       { id: selectedTeamId, email: inviteEmail, role: inviteRole },
       {
         onSuccess: () => {
           setInviteEmail("");
-          alert("Member invited successfully!");
+          setInviteMessage({ type: "success", text: "Member invited successfully!" });
         },
         onError: (err) => {
-          alert(`Error: ${err.response?.data?.message || err.message}`);
+          const status = err.response?.status;
+          const msg = err.response?.data?.message || err.message || "";
+          if (status === 404 || msg.toLowerCase().includes("not found")) {
+            setInviteMessage({
+              type: "error",
+              text: "This email hasn't signed up for DevFlow yet. They need to create an account before you can add them to a team.",
+            });
+          } else {
+            setInviteMessage({ type: "error", text: msg || "Failed to send invitation." });
+          }
         },
       }
     );
@@ -105,7 +116,10 @@ export default function TeamSettingsPage() {
             teams.map((t) => (
               <button
                 key={t._id}
-                onClick={() => setSelectedTeamId(t._id)}
+                onClick={() => {
+                  setSelectedTeamId(t._id);
+                  setInviteMessage(null);
+                }}
                 className={`w-full text-left px-3 py-2 rounded-md text-xs font-mono transition-colors ${
                   selectedTeamId === t._id
                     ? "bg-accent-light text-accent-fg border border-accent-border font-semibold"
@@ -142,8 +156,8 @@ export default function TeamSettingsPage() {
 
             {/* Invite Form (Admins only) */}
             {isAdmin && (
-              <div className="bg-gh-subtle border border-gh-border p-4 rounded-md">
-                <h3 className="text-xs font-mono font-semibold text-gh-heading mb-2.5">Invite Team Member</h3>
+              <div className="bg-gh-subtle border border-gh-border p-4 rounded-md space-y-3">
+                <h3 className="text-xs font-mono font-semibold text-gh-heading">Invite Team Member</h3>
                 <form onSubmit={handleInvite} className="flex flex-col sm:flex-row gap-2">
                   <input
                     type="email"
@@ -167,9 +181,21 @@ export default function TeamSettingsPage() {
                     disabled={inviteMutation.isPending}
                     className="btn-primary text-xs font-mono shrink-0"
                   >
-                    Invite
+                    {inviteMutation.isPending ? "Inviting..." : "Invite"}
                   </button>
                 </form>
+
+                {inviteMessage && (
+                  <div
+                    className={`p-2.5 rounded-md text-xs font-mono border ${
+                      inviteMessage.type === "success"
+                        ? "bg-accent-light border-accent-border text-accent-fg"
+                        : "bg-red-500/10 border-red-500/20 text-red-400"
+                    }`}
+                  >
+                    {inviteMessage.text}
+                  </div>
+                )}
               </div>
             )}
 
