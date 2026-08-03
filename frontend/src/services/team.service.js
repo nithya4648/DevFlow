@@ -8,5 +8,6 @@ export const teamService = {
   inviteMember: (id, email, role) => api.post(`/teams/${id}/invite`, { email, role }).then((r) => r.data),
   changeRole: (id, userId, role) => api.patch(`/teams/${id}/members/${userId}`, { role }).then((r) => r.data),
   removeMember: (id, userId) => api.delete(`/teams/${id}/members/${userId}`).then((r) => r.data),
+  deleteTeam: (id) => api.delete(`/teams/${id}`).then((r) => r.data),
   getActivity: (id) => api.get(`/teams/${id}/activity`).then((r) => r.data),
 };

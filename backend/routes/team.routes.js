@@ -9,13 +9,14 @@ const {
   inviteMember,
   changeMemberRole,
   removeMember,
+  deleteTeam,
 } = require("../controllers/team.controller");
 const { getTeamActivity } = require("../controllers/activity.controller");
 
 router.use(protect);
 
 router.route("/").get(getTeams).post(createTeam);
-router.route("/:id").get(getTeamById);
+router.route("/:id").get(getTeamById).delete(deleteTeam);
 router.route("/:id/invite").post(inviteMember);
 router.route("/:id/activity").get(getTeamActivity);
 router.route("/:id/members/:userId").patch(changeMemberRole).delete(removeMember);

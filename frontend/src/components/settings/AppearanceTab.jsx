@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import useAuth from "../../hooks/useAuth";
+import useDarkMode from "../../hooks/useDarkMode";
 import { useToast } from "../../context/ToastContext";
 import { userService } from "../../services/user.service";
 import { Loader, Moon, Sun, Monitor } from "lucide-react";
@@ -7,14 +8,13 @@ import { Loader, Moon, Sun, Monitor } from "lucide-react";
 const AppearanceTab = () => {
   const { user, setUser } = useAuth();
   const { addToast } = useToast();
+  const [theme, toggleTheme, setTheme] = useDarkMode();
 
-  const [theme, setTheme] = useState("dark");
   const [defaultLandingPage, setDefaultLandingPage] = useState("/dashboard");
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (user?.preferences) {
-      setTheme(user.preferences.theme || "dark");
       setDefaultLandingPage(user.preferences.defaultLandingPage || "/dashboard");
     }
   }, [user]);
@@ -26,14 +26,6 @@ const AppearanceTab = () => {
     try {
       const data = await userService.updatePreferences({ theme, defaultLandingPage });
       setUser({ ...user, preferences: data.preferences });
-
-      // Apply theme to document
-      if (theme === "dark" || (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
-        document.documentElement.classList.add("dark");
-      } else {
-        document.documentElement.classList.remove("dark");
-      }
-
       addToast("Appearance preferences updated", "success");
     } catch (error) {
       addToast(error.response?.data?.message || "Failed to update preferences", "error");
@@ -60,7 +52,7 @@ const AppearanceTab = () => {
               onClick={() => setTheme("light")}
               className={`flex flex-col items-center justify-center p-3.5 border rounded-md transition-colors font-mono ${
                 theme === "light"
-                  ? "border-accent-border bg-accent-light text-accent-fg"
+                  ? "border-accent-border bg-accent-light text-accent-fg font-semibold"
                   : "border-gh-border bg-gh-surface text-gh-text hover:bg-gh-subtle"
               }`}
             >
@@ -72,7 +64,7 @@ const AppearanceTab = () => {
               onClick={() => setTheme("dark")}
               className={`flex flex-col items-center justify-center p-3.5 border rounded-md transition-colors font-mono ${
                 theme === "dark"
-                  ? "border-accent-border bg-accent-light text-accent-fg"
+                  ? "border-accent-border bg-accent-light text-accent-fg font-semibold"
                   : "border-gh-border bg-gh-surface text-gh-text hover:bg-gh-subtle"
               }`}
             >
@@ -84,7 +76,7 @@ const AppearanceTab = () => {
               onClick={() => setTheme("system")}
               className={`flex flex-col items-center justify-center p-3.5 border rounded-md transition-colors font-mono ${
                 theme === "system"
-                  ? "border-accent-border bg-accent-light text-accent-fg"
+                  ? "border-accent-border bg-accent-light text-accent-fg font-semibold"
                   : "border-gh-border bg-gh-surface text-gh-text hover:bg-gh-subtle"
               }`}
             >

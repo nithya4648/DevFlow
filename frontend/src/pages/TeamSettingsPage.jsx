@@ -1,6 +1,6 @@
 // frontend/src/pages/TeamSettingsPage.jsx
 import { useState } from "react";
-import { useTeams, useCreateTeam, useTeamDetails, useInviteMember, useChangeRole, useRemoveMember } from "../hooks/useTeams";
+import { useTeams, useCreateTeam, useTeamDetails, useInviteMember, useChangeRole, useRemoveMember, useDeleteTeam } from "../hooks/useTeams";
 import useAuth from "../hooks/useAuth";
 
 export default function TeamSettingsPage() {
@@ -21,6 +21,7 @@ export default function TeamSettingsPage() {
   const inviteMutation = useInviteMember();
   const changeRoleMutation = useChangeRole();
   const removeMemberMutation = useRemoveMember();
+  const deleteTeamMutation = useDeleteTeam();
 
   // Pick first team automatically if none selected
   if (teams.length > 0 && !selectedTeamId) {
@@ -75,8 +76,29 @@ export default function TeamSettingsPage() {
     }
   }
 
+  function handleDeleteTeam() {
+    if (!activeTeam) return;
+    const promptVal = window.prompt(
+      `To confirm deletion of team "${activeTeam.name}", please type "${activeTeam.name}" below:`
+    );
+    if (promptVal === activeTeam.name) {
+      deleteTeamMutation.mutate(selectedTeamId, {
+        onSuccess: () => {
+          setSelectedTeamId(null);
+          setInviteMessage(null);
+        },
+        onError: (err) => {
+          alert(`Error deleting team: ${err.response?.data?.message || err.message}`);
+        },
+      });
+    } else if (promptVal !== null) {
+      alert("Team name mismatch. Deletion cancelled.");
+    }
+  }
+
   const currentUserRole = activeTeam?.members?.find(m => m.user?._id === user?._id)?.role || "viewer";
   const isAdmin = currentUserRole === "admin";
+  const isOwner = (activeTeam?.owner?._id || activeTeam?.owner) === user?._id;
 
   return (
     <div className="flex-1 flex flex-col md:flex-row gap-6 max-w-7xl mx-auto w-full px-6 py-6 h-full min-h-0 font-ui">
@@ -147,11 +169,28 @@ export default function TeamSettingsPage() {
           <div className="flex flex-col h-full min-h-0 space-y-5">
 
             {/* Header */}
-            <div className="border-b border-gh-border pb-3">
-              <h1 className="text-lg font-bold text-gh-heading font-mono">{activeTeam.name}</h1>
-              <p className="text-xs text-gh-muted font-mono mt-0.5">
-                Role: <span className="uppercase font-semibold text-accent-fg">{currentUserRole}</span>
-              </p>
+            <div className="border-b border-gh-border pb-3 flex items-center justify-between gap-4">
+              <div>
+                <h1 className="text-lg font-bold text-gh-heading font-mono">{activeTeam.name}</h1>
+                <p className="text-xs text-gh-muted font-mono mt-0.5">
+                  Role: <span className="uppercase font-semibold text-accent-fg">{currentUserRole}</span>
+                  {isOwner && <span className="ml-2 text-[10px] bg-amber-500/10 border border-amber-500/20 text-amber-400 px-1.5 py-0.5 rounded uppercase">Owner</span>}
+                </p>
+              </div>
+
+              {isOwner && (
+                <button
+                  onClick={handleDeleteTeam}
+                  disabled={deleteTeamMutation.isPending}
+                  className="px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 rounded text-xs font-mono transition-colors shrink-0 flex items-center gap-1.5"
+                  title="Delete Team"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                  {deleteTeamMutation.isPending ? "Deleting..." : "Delete Team"}
+                </button>
+              )}
             </div>
 
             {/* Invite Form (Admins only) */}

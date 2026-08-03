@@ -78,3 +78,11 @@ export function useRemoveMember() {
     onSuccess: (_, { id }) => qc.invalidateQueries({ queryKey: [TEAM_KEY, "detail", id] }),
   });
 }
+
+export function useDeleteTeam() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id) => teamService.deleteTeam(id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: [TEAM_KEY] }),
+  });
+}
