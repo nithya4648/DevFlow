@@ -1,41 +1,12 @@
-const nodemailer = require("nodemailer");
 const logger = require("./logger");
-
-// Nodemailer transporter instance
-let smtpTransporter = null;
-
-const getTransporter = () => {
-  const smtpUser = process.env.EMAIL_USER || process.env.GMAIL_USER;
-  const smtpPass = process.env.EMAIL_APP_PASSWORD || process.env.EMAIL_PASS || process.env.GMAIL_PASS;
-
-  if (process.env.NODE_ENV === "test") {
-    return null;
-  }
-
-  if (smtpUser && smtpPass) {
-    if (!smtpTransporter) {
-      smtpTransporter = nodemailer.createTransport({
-        service: "gmail",
-        auth: {
-          user: smtpUser,
-          pass: smtpPass,
-        },
-      });
-      logger.info("Nodemailer Gmail SMTP transporter initialized");
-    }
-    return smtpTransporter;
-  }
-
-  return null;
-};
 
 const checkEmailConfig = () => {
   const missing = [];
-  if (!process.env.EMAIL_USER && !process.env.GMAIL_USER) {
-    missing.push("EMAIL_USER (or GMAIL_USER)");
+  if (!process.env.RESEND_API_KEY) {
+    missing.push("RESEND_API_KEY");
   }
-  if (!process.env.EMAIL_APP_PASSWORD && !process.env.EMAIL_PASS && !process.env.GMAIL_PASS) {
-    missing.push("EMAIL_APP_PASSWORD (or EMAIL_PASS/GMAIL_PASS)");
+  if (!process.env.EMAIL_FROM) {
+    missing.push("EMAIL_FROM");
   }
   if (!process.env.CLIENT_URL) {
     missing.push("CLIENT_URL");
@@ -66,42 +37,53 @@ const sendEmail = async ({ to, subject, html, text }) => {
   }
   logger.info({ to, subject }, "Email sending triggered");
 
-  const smtpUser = process.env.EMAIL_USER || process.env.GMAIL_USER;
-  const smtpPass = process.env.EMAIL_APP_PASSWORD || process.env.EMAIL_PASS || process.env.GMAIL_PASS;
-
-  if (!smtpUser || !smtpPass) {
+  if (!process.env.RESEND_API_KEY || !process.env.EMAIL_FROM) {
     logger.warn(
       { to, subject },
-      "No Gmail SMTP credentials (EMAIL_USER / EMAIL_APP_PASSWORD) configured. Email dispatch skipped."
+      "Missing RESEND_API_KEY or EMAIL_FROM configuration. Email dispatch skipped."
     );
-    const err = new Error("Missing SMTP credentials: EMAIL_USER or EMAIL_APP_PASSWORD/EMAIL_PASS environment variables are not set");
+    const err = new Error("RESEND_API_KEY and EMAIL_FROM environment variables are required");
     err.code = "MISSING_CONFIG";
     throw err;
   }
 
-  const transporter = getTransporter();
-  const fromEmail = `DevFlow <${smtpUser}>`;
-
-  if (transporter) {
-    try {
-      const info = await transporter.sendMail({
-        from: fromEmail,
+  try {
+    const response = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${process.env.RESEND_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: process.env.EMAIL_FROM,
         to,
         subject,
         html,
         text,
-      });
-      logger.info({ to, messageId: info.messageId }, "Email sent successfully via Nodemailer (Gmail SMTP)");
-      return info;
-    } catch (error) {
-      logger.error({ err: error, to, subject }, "Failed to send email via Nodemailer SMTP");
+      }),
+    });
+
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      const errorMessage = data?.message || data?.error?.message || `Resend API returned status ${response.status}`;
+      logger.error({ status: response.status, data, to, subject }, "Resend API returned non-OK status");
+      const err = new Error(errorMessage);
+      err.code = "SMTP_ERROR";
+      throw err;
+    }
+
+    logger.info({ to, id: data.id }, "Email sent successfully via Resend HTTP API");
+    return data;
+  } catch (error) {
+    if (error.code === "MISSING_CONFIG" || error.code === "SMTP_ERROR") {
       throw error;
     }
+    logger.error({ err: error, to, subject }, "Failed to send email via Resend API");
+    const err = new Error(error.message || "Failed to send email via Resend API");
+    err.code = "SMTP_ERROR";
+    throw err;
   }
-
-  const err = new Error("Failed to initialize Nodemailer SMTP transporter");
-  err.code = "SMTP_INIT_ERROR";
-  throw err;
 };
 
 const sendVerificationEmail = async (email, token) => {
@@ -170,4 +152,3 @@ module.exports = {
   sendPasswordResetEmail,
   checkEmailConfig,
 };
-

@@ -13,20 +13,20 @@ describe('Email Configuration and Utility Tests', () => {
   });
 
   test('checkEmailConfig detects missing environment variables', () => {
-    delete process.env.EMAIL_USER;
-    delete process.env.GMAIL_USER;
-    delete process.env.EMAIL_APP_PASSWORD;
-    delete process.env.EMAIL_PASS;
+    delete process.env.RESEND_API_KEY;
+    delete process.env.EMAIL_FROM;
     delete process.env.CLIENT_URL;
 
     const result = checkEmailConfig();
     expect(result.valid).toBe(false);
-    expect(result.missing.length).toBeGreaterThan(0);
+    expect(result.missing).toContain('RESEND_API_KEY');
+    expect(result.missing).toContain('EMAIL_FROM');
+    expect(result.missing).toContain('CLIENT_URL');
   });
 
   test('checkEmailConfig succeeds when all variables are present', () => {
-    process.env.EMAIL_USER = 'test@gmail.com';
-    process.env.EMAIL_APP_PASSWORD = 'password';
+    process.env.RESEND_API_KEY = 're_123456789';
+    process.env.EMAIL_FROM = 'DevFlow <onboarding@resend.dev>';
     process.env.CLIENT_URL = 'http://localhost:3000';
 
     const result = checkEmailConfig();
@@ -44,13 +44,11 @@ describe('Email Configuration and Utility Tests', () => {
 
   test('sendEmail throws MISSING_CONFIG when credentials are missing in non-test mode', async () => {
     process.env.NODE_ENV = 'development';
-    delete process.env.EMAIL_USER;
-    delete process.env.GMAIL_USER;
-    delete process.env.EMAIL_APP_PASSWORD;
-    delete process.env.EMAIL_PASS;
+    delete process.env.RESEND_API_KEY;
+    delete process.env.EMAIL_FROM;
 
     await expect(sendEmail({ to: 'user@example.com', subject: 'Test', html: '<p>Hi</p>' })).rejects.toThrow(
-      'Missing SMTP credentials'
+      'RESEND_API_KEY and EMAIL_FROM environment variables are required'
     );
   });
 });
