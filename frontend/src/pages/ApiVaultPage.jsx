@@ -499,10 +499,9 @@ export default function ApiVaultPage() {
                 {/* Value */}
                 <div>
                   <label className="text-[11px] font-mono text-gh-muted uppercase tracking-wider block mb-1">
-                    Secret Value *{editId && " (leave blank to keep current)"}
+                    Secret Value
                   </label>
                   <textarea
-                    required={!editId}
                     placeholder="Your secret value..."
                     value={form.value}
                     onChange={(e) => setForm((f) => ({ ...f, value: e.target.value }))}

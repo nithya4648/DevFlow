@@ -19,7 +19,6 @@ const apiVaultSchema = new mongoose.Schema(
     },
     value: {
       type: String,
-      required: true,
     },
     category: {
       type: String,

@@ -15,8 +15,9 @@ const createApiVaultSchema = z.object({
     .max(5000, "Key is too long"),
   value: z
     .string()
-    .min(1, "Value is required")
-    .max(10000, "Value is too long"),
+    .max(10000, "Value is too long")
+    .optional()
+    .default(""),
   category: z
     .enum(CATEGORIES, { errorMap: () => ({ message: `Category must be one of: ${CATEGORIES.join(", ")}` }) })
     .default("other"),
