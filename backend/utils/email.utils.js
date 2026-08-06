@@ -2,8 +2,8 @@ const logger = require("./logger");
 
 const checkEmailConfig = () => {
   const missing = [];
-  if (!process.env.RESEND_API_KEY) {
-    missing.push("RESEND_API_KEY");
+  if (!process.env.BREVO_API_KEY) {
+    missing.push("BREVO_API_KEY");
   }
   if (!process.env.EMAIL_FROM) {
     missing.push("EMAIL_FROM");
@@ -37,50 +37,56 @@ const sendEmail = async ({ to, subject, html, text }) => {
   }
   logger.info({ to, subject }, "Email sending triggered");
 
-  if (!process.env.RESEND_API_KEY || !process.env.EMAIL_FROM) {
+  if (!process.env.BREVO_API_KEY || !process.env.EMAIL_FROM) {
     logger.warn(
       { to, subject },
-      "Missing RESEND_API_KEY or EMAIL_FROM configuration. Email dispatch skipped."
+      "Missing BREVO_API_KEY or EMAIL_FROM configuration. Email dispatch skipped."
     );
-    const err = new Error("RESEND_API_KEY and EMAIL_FROM environment variables are required");
+    const err = new Error("BREVO_API_KEY and EMAIL_FROM environment variables are required");
     err.code = "MISSING_CONFIG";
     throw err;
   }
 
   try {
-    const response = await fetch("https://api.resend.com/emails", {
+    // Extract pure email address from EMAIL_FROM (may contain a name)
+    const extractEmail = (value) => {
+      const match = value.match(/<([^>]+)>/);
+      return match ? match[1] : value.trim();
+    };
+    const senderEmail = extractEmail(process.env.EMAIL_FROM);
+    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${process.env.RESEND_API_KEY}`,
+        "api-key": process.env.BREVO_API_KEY,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: process.env.EMAIL_FROM,
-        to,
+        sender: { email: senderEmail },
+        to: [{ email: to }],
         subject,
-        html,
-        text,
+        htmlContent: html,
+        textContent: text,
       }),
     });
 
     const data = await response.json().catch(() => ({}));
 
     if (!response.ok) {
-      const errorMessage = data?.message || data?.error?.message || `Resend API returned status ${response.status}`;
-      logger.error({ status: response.status, data, to, subject }, "Resend API returned non-OK status");
+      const errorMessage = data?.message || data?.error?.message || `Brevo API returned status ${response.status}`;
+      logger.error({ status: response.status, data, to, subject }, "Brevo API returned non-OK status");
       const err = new Error(errorMessage);
       err.code = "SMTP_ERROR";
       throw err;
     }
 
-    logger.info({ to, id: data.id }, "Email sent successfully via Resend HTTP API");
+    logger.info({ to, id: data.id }, "Email sent successfully via Brevo API");
     return data;
   } catch (error) {
     if (error.code === "MISSING_CONFIG" || error.code === "SMTP_ERROR") {
       throw error;
     }
-    logger.error({ err: error, to, subject }, "Failed to send email via Resend API");
-    const err = new Error(error.message || "Failed to send email via Resend API");
+    logger.error({ err: error, to, subject }, "Failed to send email via Brevo API");
+    const err = new Error(error.message || "Failed to send email via Brevo API");
     err.code = "SMTP_ERROR";
     throw err;
   }
