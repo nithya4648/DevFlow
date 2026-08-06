@@ -73,9 +73,6 @@ const createTeam = async (req, res, next) => {
   }
 };
 
-// @desc    Invite member by email
-// @route   POST /api/teams/:id/invite
-// @access  Private
 const inviteMember = async (req, res, next) => {
   try {
     const { email, role } = inviteMemberSchema.parse(req.body);
@@ -86,39 +83,64 @@ const inviteMember = async (req, res, next) => {
 
     // Check admin
     const currentMember = team.members.find(m => m.user.toString() === req.user._id.toString());
-    if (!currentMember || currentMember.role !== "admin") {
-      return res.status(403).json({ success: false, message: "Only admins can invite members" });
+    const isOwner = team.owner.toString() === req.user._id.toString();
+    if ((!currentMember || currentMember.role !== "admin") && !isOwner) {
+      return res.status(403).json({ success: false, message: "Only owners or admins can invite members" });
     }
 
-    const invitee = await User.findOne({ email });
-    if (!invitee) {
-      return res.status(404).json({ success: false, message: "User not found with that email" });
-    }
-
-    if (team.members.some(m => m.user.toString() === invitee._id.toString())) {
+    const invitee = await User.findOne({ email: email.toLowerCase() });
+    if (invitee && team.members.some(m => m.user.toString() === invitee._id.toString())) {
       return res.status(400).json({ success: false, message: "User is already a member" });
     }
 
-    team.members.push({ user: invitee._id, role });
-    await team.save();
+    // Create Invite
+    const crypto = require("crypto");
+    const Invite = require("../models/Invite.model");
+    const { sendEmail } = require("../utils/email.utils");
 
-    await logActivity(teamId, req.user._id, `invited ${invitee.name} as ${role}`, "user", invitee._id, invitee.name);
+    const token = crypto.randomBytes(32).toString("hex");
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
 
-    // Emit notification to the invitee
-    const Notification = require("../models/Notification.model");
-    const note = await Notification.create({
-      recipient: invitee._id,
-      type: "info",
-      message: `You have been invited to join the team: ${team.name}`,
-      relatedId: team._id,
+    await Invite.create({
+      email: email.toLowerCase(),
+      teamId,
+      invitedBy: req.user._id,
+      role,
+      token,
+      expiresAt,
     });
-    emitNotificationToUser(req, invitee._id, note);
 
-    res.status(200).json({ success: true, message: "Member invited successfully" });
+    const socketUrl = process.env.VITE_SOCKET_URL || `http://localhost:${process.env.PORT || 5000}`;
+    const acceptLink = `${socketUrl}/api/invites/${token}/accept`;
+    const rejectLink = `${socketUrl}/api/invites/${token}/reject`;
+
+    // Send Email via Resend
+    await sendEmail({
+      to: email.toLowerCase(),
+      subject: `Invitation to join team ${team.name} on DevFlow`,
+      text: `You have been invited to join the team ${team.name} as a ${role}. Accept invitation: ${acceptLink} | Reject: ${rejectLink}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
+          <h2 style="color: #6366f1; text-align: center;">Team Invitation</h2>
+          <p>Hi there,</p>
+          <p>You have been invited by <strong>${req.user.name}</strong> to join the team <strong>${team.name}</strong> as a <strong>${role}</strong> on DevFlow.</p>
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${acceptLink}" style="background-color: #6366f1; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block; margin-right: 10px;">Accept Invite</a>
+            <a href="${rejectLink}" style="background-color: #ef4444; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">Reject</a>
+          </div>
+          <p>This invitation link is valid for 7 days.</p>
+        </div>
+      `,
+    });
+
+    await logActivity(teamId, req.user._id, `invited ${email} as ${role}`, "user", null, email);
+
+    res.status(200).json({ success: true, message: "Invitation email sent successfully" });
   } catch (error) {
     next(error);
   }
 };
+
 
 // @desc    Change member role
 // @route   PATCH /api/teams/:id/members/:userId

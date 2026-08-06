@@ -195,9 +195,10 @@ export default function TeamSettingsPage() {
               )}
             </div>
 
-            {/* Invite Form (Admins only) */}
-            {isAdmin && (
+            {/* Invite Form (Admins/Owners only) */}
+            {(isAdmin || isOwner) && (
               <div className="bg-gh-subtle border border-gh-border p-4 rounded-md space-y-3">
+
                 <h3 className="text-xs font-mono font-semibold text-gh-heading">Invite Team Member</h3>
                 <form onSubmit={handleInvite} className="flex flex-col sm:flex-row gap-2">
                   <input

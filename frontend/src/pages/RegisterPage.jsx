@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
-import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { useState, useEffect } from "react";
 import useAuth from "../hooks/useAuth";
 import { useToast } from "../context/ToastContext";
 import { FaGoogle, FaUser, FaEnvelope, FaLock, FaSpinner, FaEye, FaEyeSlash } from "react-icons/fa";
@@ -9,16 +9,34 @@ function RegisterPage() {
   const { register: registerUser } = useAuth();
   const { addToast } = useToast();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const emailParam = searchParams.get("email") || "";
+  const inviteToken = searchParams.get("inviteToken") || "";
 
   const {
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors },
-  } = useForm();
+  } = useForm({
+    defaultValues: {
+      name: "",
+      email: emailParam,
+      password: "",
+      confirmPassword: ""
+    }
+  });
+
+  useEffect(() => {
+    if (emailParam) {
+      setValue("email", emailParam);
+    }
+  }, [emailParam, setValue]);
 
   const password = watch("password");
 
@@ -29,6 +47,7 @@ function RegisterPage() {
         name: data.name,
         email: data.email,
         password: data.password,
+        inviteToken,
       });
       if (res.success) {
         addToast(res.message || "Registration successful! Please check your email.", "success");
@@ -41,6 +60,7 @@ function RegisterPage() {
       setIsSubmitting(false);
     }
   };
+
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gh-bg px-4 py-12 font-ui text-gh-text">

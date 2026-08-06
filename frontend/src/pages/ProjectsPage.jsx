@@ -66,13 +66,15 @@ export default function ProjectsPage() {
     const teamId = project.teamId?._id || project.teamId;
     if (!teamId) return { canEdit: true, canDelete: true }; // private
     const team = teams.find((t) => t._id === teamId);
+    const isOwner = (team?.owner?._id || team?.owner) === user?._id;
     const member = team?.members?.find((m) => (m.user?._id || m.user) === user?._id);
     const role = member?.role || "viewer";
     return {
-      canEdit: role === "admin" || role === "editor",
-      canDelete: role === "admin",
+      canEdit: isOwner || role === "admin" || role === "editor",
+      canDelete: isOwner || role === "admin",
     };
   }, [teams, user]);
+
 
   // Strip empty filter keys before sending to API
   const activeFilters = Object.fromEntries(
