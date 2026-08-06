@@ -2,6 +2,8 @@
 const Team = require("../models/Team.model");
 const User = require("../models/User.model");
 const Activity = require("../models/Activity.model");
+const Invite = require("../models/Invite.model");
+const crypto = require("crypto");
 const { createTeamSchema, inviteMemberSchema, changeRoleSchema } = require("../validators/team.validators");
 const { emitNotificationToUser } = require("../utils/socketService");
 
@@ -207,6 +209,69 @@ const deleteTeam = async (req, res, next) => {
 };
 
 
+const renameTeam = async (req, res, next) => {
+  try {
+    const { name } = req.body;
+    const teamId = req.params.id;
+
+    const team = await Team.findById(teamId);
+    if (!team) {
+      return res.status(404).json({ success: false, message: "Team not found" });
+    }
+
+    // Authorization: admin or owner
+    const currentMember = team.members.find(m => m.user.toString() === req.user._id.toString());
+    const isOwner = team.owner.toString() === req.user._id.toString();
+    if ((!currentMember || currentMember.role !== "admin") && !isOwner) {
+      return res.status(403).json({ success: false, message: "Only owners or admins can rename a team" });
+    }
+
+    team.name = name;
+    await team.save();
+    res.status(200).json({ success: true, data: team });
+  } catch (err) {
+    next(err);
+  }
+};
+
+const generateInviteLink = async (req, res, next) => {
+  try {
+    const { email, role } = inviteMemberSchema.parse(req.body);
+    const teamId = req.params.id;
+
+    const team = await Team.findById(teamId);
+    if (!team) {
+      return res.status(404).json({ success: false, message: "Team not found" });
+    }
+
+    // Authorization: admin or owner
+    const currentMember = team.members.find(m => m.user.toString() === req.user._id.toString());
+    const isOwner = team.owner.toString() === req.user._id.toString();
+    if ((!currentMember || currentMember.role !== "admin") && !isOwner) {
+      return res.status(403).json({ success: false, message: "Only owners or admins can generate invites" });
+    }
+
+    const token = crypto.randomBytes(32).toString("hex");
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+
+    await Invite.create({
+      email: email.toLowerCase(),
+      teamId,
+      invitedBy: req.user._id,
+      role,
+      token,
+      expiresAt,
+    });
+
+    const baseUrl = process.env.VITE_CLIENT_URL || "http://localhost:3000"; // adjust if needed
+    const inviteLink = `${baseUrl}/invites/${token}`;
+
+    res.status(201).json({ success: true, inviteLink });
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = {
   getTeams,
   getTeamById,
@@ -215,6 +280,7 @@ module.exports = {
   changeMemberRole,
   removeMember,
   deleteTeam,
+  renameTeam,
+  generateInviteLink,
   logActivity,
 };
-
