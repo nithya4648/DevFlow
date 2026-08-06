@@ -10,5 +10,7 @@ export const teamService = {
   removeMember: (id, userId) => api.delete(`/teams/${id}/members/${userId}`).then((r) => r.data),
   deleteTeam: (id) => api.delete(`/teams/${id}`).then((r) => r.data),
   getActivity: (id) => api.get(`/teams/${id}/activity`).then((r) => r.data),
+  renameTeam: (id, name) => api.put(`/teams/${id}`, { name }).then((r) => r.data),
+  generateInviteLink: (id, email, role) => api.post(`/teams/${id}/invite`, { email, role }).then((r) => r.data),
 };
 

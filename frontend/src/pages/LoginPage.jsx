@@ -42,7 +42,15 @@ function LoginPage() {
       const res = await login(data);
       if (res.success) {
         addToast("Logged in successfully!", "success");
-        navigate("/");
+        const inviteToken = searchParams.get("inviteToken");
+        const redirect = searchParams.get("redirect");
+        if (inviteToken) {
+          navigate(`/invites/${inviteToken}`);
+        } else if (redirect) {
+          navigate(decodeURIComponent(redirect));
+        } else {
+          navigate("/");
+        }
       }
     } catch (err) {
       const errMsg = err.response?.data?.message || err.message || "Invalid credentials";

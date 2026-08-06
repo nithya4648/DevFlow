@@ -50,8 +50,12 @@ function RegisterPage() {
         inviteToken,
       });
       if (res.success) {
-        addToast(res.message || "Registration successful! Please check your email.", "success");
-        navigate("/login");
+        addToast(res.message || "Registration successful!", "success");
+        if (inviteToken) {
+          navigate(`/login?inviteToken=${inviteToken}`);
+        } else {
+          navigate("/login");
+        }
       }
     } catch (err) {
       const errMsg = err.response?.data?.message || err.message || "Failed to register";
@@ -151,7 +155,6 @@ function RegisterPage() {
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute inset-y-0 right-0 flex items-center pr-3 text-gh-muted hover:text-gh-heading transition focus:outline-none"
-                aria-label={showPassword ? "Hide password" : "Show password"}
               >
                 {showPassword ? <FaEyeSlash className="h-3.5 w-3.5" /> : <FaEye className="h-3.5 w-3.5" />}
               </button>
@@ -183,7 +186,6 @@ function RegisterPage() {
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 className="absolute inset-y-0 right-0 flex items-center pr-3 text-gh-muted hover:text-gh-heading transition focus:outline-none"
-                aria-label={showConfirmPassword ? "Hide password" : "Show password"}
               >
                 {showConfirmPassword ? <FaEyeSlash className="h-3.5 w-3.5" /> : <FaEye className="h-3.5 w-3.5" />}
               </button>
@@ -222,7 +224,10 @@ function RegisterPage() {
 
         <p className="mt-5 text-center text-xs text-gh-muted">
           Already have an account?{" "}
-          <Link to="/login" className="font-medium text-accent-blue hover:underline">
+          <Link
+            to={inviteToken ? `/login?inviteToken=${inviteToken}` : "/login"}
+            className="font-medium text-accent-blue hover:underline"
+          >
             Sign In
           </Link>
         </p>

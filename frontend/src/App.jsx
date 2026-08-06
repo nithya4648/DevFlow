@@ -9,6 +9,7 @@ import RegisterPage from "./pages/RegisterPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import VerifyEmailPage from "./pages/VerifyEmailPage";
+import InviteAcceptPage from "./pages/InviteAcceptPage";
 
 // Layout + Guard
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -92,6 +93,7 @@ function App() {
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
             <Route path="/verify-email/:token" element={<VerifyEmailPage />} />
+            <Route path="/invites/:token" element={<InviteAcceptPage />} />
           </Routes>
           </BrowserRouter>
         </NotificationProvider>

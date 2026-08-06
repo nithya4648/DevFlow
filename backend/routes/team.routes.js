@@ -10,6 +10,8 @@ const {
   changeMemberRole,
   removeMember,
   deleteTeam,
+  renameTeam,
+  generateInviteLink,
 } = require("../controllers/team.controller");
 const { getTeamActivity } = require("../controllers/activity.controller");
 

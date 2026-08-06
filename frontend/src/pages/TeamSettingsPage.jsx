@@ -1,6 +1,16 @@
 // frontend/src/pages/TeamSettingsPage.jsx
 import { useState, useEffect } from "react";
-import { useTeams, useCreateTeam, useTeamDetails, useInviteMember, useChangeRole, useRemoveMember, useDeleteTeam } from "../hooks/useTeams";
+import {
+  useTeams,
+  useCreateTeam,
+  useTeamDetails,
+  useInviteMember,
+  useChangeRole,
+  useRemoveMember,
+  useDeleteTeam,
+  useRenameTeam,
+  useGenerateInviteLink,
+} from "../hooks/useTeams";
 import useAuth from "../hooks/useAuth";
 
 export default function TeamSettingsPage() {
@@ -10,6 +20,18 @@ export default function TeamSettingsPage() {
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState("viewer");
   const [inviteMessage, setInviteMessage] = useState(null);
+
+  // Rename state
+  const [isRenaming, setIsRenaming] = useState(false);
+  const [renameInput, setRenameInput] = useState("");
+
+  // Invite-link state
+  const [showInviteLinkForm, setShowInviteLinkForm] = useState(false);
+  const [inviteLinkEmail, setInviteLinkEmail] = useState("");
+  const [inviteLinkRole, setInviteLinkRole] = useState("viewer");
+  const [generatedLink, setGeneratedLink] = useState("");
+  const [inviteLinkMessage, setInviteLinkMessage] = useState(null);
+  const [linkCopied, setLinkCopied] = useState(false);
 
   const { data: teamsRes, isLoading: teamsLoading } = useTeams();
   const teams = teamsRes?.data || [];
@@ -22,6 +44,8 @@ export default function TeamSettingsPage() {
   const changeRoleMutation = useChangeRole();
   const removeMemberMutation = useRemoveMember();
   const deleteTeamMutation = useDeleteTeam();
+  const renameTeamMutation = useRenameTeam();
+  const generateInviteLinkMutation = useGenerateInviteLink();
 
   // Auto-select first team after teams load, if none is already selected
   useEffect(() => {
@@ -29,6 +53,14 @@ export default function TeamSettingsPage() {
       setSelectedTeamId(teams[0]._id);
     }
   }, [teams, selectedTeamId]);
+
+  // Reset panels when switching teams
+  useEffect(() => {
+    setShowInviteLinkForm(false);
+    setGeneratedLink("");
+    setInviteLinkMessage(null);
+    setIsRenaming(false);
+  }, [selectedTeamId]);
 
   function handleCreateTeam(e) {
     e.preventDefault();
@@ -60,7 +92,6 @@ export default function TeamSettingsPage() {
     );
   }
 
-
   function handleRoleChange(memberUserId, newRole) {
     changeRoleMutation.mutate({ id: selectedTeamId, userId: memberUserId, role: newRole });
   }
@@ -89,6 +120,59 @@ export default function TeamSettingsPage() {
     } else if (promptVal !== null) {
       alert("Team name mismatch. Deletion cancelled.");
     }
+  }
+
+  function handleStartRename() {
+    setRenameInput(activeTeam.name);
+    setIsRenaming(true);
+  }
+
+  function handleRename(e) {
+    e.preventDefault();
+    if (!renameInput.trim() || renameInput === activeTeam.name) {
+      setIsRenaming(false);
+      return;
+    }
+    renameTeamMutation.mutate(
+      { id: selectedTeamId, name: renameInput.trim() },
+      {
+        onSuccess: () => setIsRenaming(false),
+        onError: (err) => {
+          alert(`Rename failed: ${err.response?.data?.message || err.message}`);
+        },
+      }
+    );
+  }
+
+  function handleGenerateInviteLink(e) {
+    e.preventDefault();
+    if (!inviteLinkEmail.trim()) return;
+    setInviteLinkMessage(null);
+    setGeneratedLink("");
+    setLinkCopied(false);
+    generateInviteLinkMutation.mutate(
+      { id: selectedTeamId, email: inviteLinkEmail, role: inviteLinkRole },
+      {
+        onSuccess: (data) => {
+          setGeneratedLink(data.inviteLink);
+          setInviteLinkMessage({ type: "success", text: "Link generated! Share it with the invitee." });
+        },
+        onError: (err) => {
+          setInviteLinkMessage({
+            type: "error",
+            text: err.response?.data?.message || err.message || "Failed to generate link",
+          });
+        },
+      }
+    );
+  }
+
+  function handleCopyLink() {
+    if (!generatedLink) return;
+    navigator.clipboard.writeText(generatedLink).then(() => {
+      setLinkCopied(true);
+      setTimeout(() => setLinkCopied(false), 2000);
+    });
   }
 
   const currentUserRole = activeTeam?.members?.find(m => m.user?._id === user?._id)?.role || "viewer";
@@ -163,10 +247,52 @@ export default function TeamSettingsPage() {
         ) : (
           <div className="flex flex-col h-full min-h-0 space-y-5">
 
-            {/* Header */}
+            {/* ── Header ── */}
             <div className="border-b border-gh-border pb-3 flex items-center justify-between gap-4">
-              <div>
-                <h1 className="text-lg font-bold text-gh-heading font-mono">{activeTeam.name}</h1>
+              <div className="flex-1 min-w-0">
+                {/* Inline rename form or team name */}
+                {isRenaming ? (
+                  <form onSubmit={handleRename} className="flex items-center gap-2">
+                    <input
+                      autoFocus
+                      value={renameInput}
+                      onChange={(e) => setRenameInput(e.target.value)}
+                      className="gh-input text-sm font-mono font-bold flex-1 min-w-0"
+                      required
+                    />
+                    <button
+                      type="submit"
+                      disabled={renameTeamMutation.isPending}
+                      className="btn-primary text-xs font-mono shrink-0"
+                    >
+                      {renameTeamMutation.isPending ? "Saving…" : "Save"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setIsRenaming(false)}
+                      className="btn-secondary text-xs font-mono shrink-0"
+                    >
+                      Cancel
+                    </button>
+                  </form>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <h1 className="text-lg font-bold text-gh-heading font-mono truncate">{activeTeam.name}</h1>
+                    {(isAdmin || isOwner) && (
+                      <button
+                        type="button"
+                        onClick={handleStartRename}
+                        className="text-gh-muted hover:text-gh-heading transition-colors shrink-0"
+                        title="Edit team name"
+                      >
+                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                            d="M15.232 5.232l3.536 3.536M9 13l6.536-6.536a2 2 0 012.828 2.828L11.828 15.828a2 2 0 01-1.415.586H8v-2.414a2 2 0 01.586-1.414z" />
+                        </svg>
+                      </button>
+                    )}
+                  </div>
+                )}
                 <p className="text-xs text-gh-muted font-mono mt-0.5">
                   Role: <span className="uppercase font-semibold text-accent-fg">{currentUserRole}</span>
                   {isOwner && <span className="ml-2 text-[10px] bg-amber-500/10 border border-amber-500/20 text-amber-400 px-1.5 py-0.5 rounded uppercase">Owner</span>}
@@ -188,10 +314,11 @@ export default function TeamSettingsPage() {
               )}
             </div>
 
-            {/* Invite Form (Admins/Owners only) */}
+            {/* ── Add Member + Generate Invite Link (admins/owners only) ── */}
             {(isAdmin || isOwner) && (
               <div className="bg-gh-subtle border border-gh-border p-4 rounded-md space-y-3">
 
+                {/* Add Member directly */}
                 <h3 className="text-xs font-mono font-semibold text-gh-heading">Add Team Member</h3>
                 <form onSubmit={handleInvite} className="flex flex-col sm:flex-row gap-2">
                   <input
@@ -231,11 +358,109 @@ export default function TeamSettingsPage() {
                     {inviteMessage.text}
                   </div>
                 )}
+
+                {/* Generate Invite Link section */}
+                <div className="border-t border-gh-border pt-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowInviteLinkForm(!showInviteLinkForm);
+                      setGeneratedLink("");
+                      setInviteLinkMessage(null);
+                      setLinkCopied(false);
+                    }}
+                    className="flex items-center gap-1.5 text-xs font-mono text-gh-muted hover:text-gh-heading transition-colors"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                        d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                    </svg>
+                    {showInviteLinkForm ? "Hide Invite Link" : "Generate Invite Link"}
+                  </button>
+
+                  {showInviteLinkForm && (
+                    <div className="mt-3 space-y-2">
+                      <p className="text-[10px] font-mono text-gh-muted">
+                        Generate a shareable link tied to an email. The recipient visits the link and joins automatically after logging in.
+                      </p>
+                      <form onSubmit={handleGenerateInviteLink} className="flex flex-col sm:flex-row gap-2">
+                        <input
+                          type="email"
+                          placeholder="Their email address..."
+                          value={inviteLinkEmail}
+                          onChange={(e) => setInviteLinkEmail(e.target.value)}
+                          required
+                          className="gh-input text-xs font-mono flex-1"
+                        />
+                        <select
+                          value={inviteLinkRole}
+                          onChange={(e) => setInviteLinkRole(e.target.value)}
+                          className="gh-input text-xs font-mono"
+                        >
+                          <option value="viewer" className="bg-gh-surface">Viewer</option>
+                          <option value="editor" className="bg-gh-surface">Editor</option>
+                          <option value="admin" className="bg-gh-surface">Admin</option>
+                        </select>
+                        <button
+                          type="submit"
+                          disabled={generateInviteLinkMutation.isPending}
+                          className="btn-primary text-xs font-mono shrink-0"
+                        >
+                          {generateInviteLinkMutation.isPending ? "Generating..." : "Generate"}
+                        </button>
+                      </form>
+
+                      {inviteLinkMessage && (
+                        <div
+                          className={`p-2.5 rounded-md text-xs font-mono border ${
+                            inviteLinkMessage.type === "success"
+                              ? "bg-accent-light border-accent-border text-accent-fg"
+                              : "bg-red-500/10 border-red-500/20 text-red-400"
+                          }`}
+                        >
+                          {inviteLinkMessage.text}
+                        </div>
+                      )}
+
+                      {generatedLink && (
+                        <div className="flex gap-2 items-center">
+                          <input
+                            readOnly
+                            value={generatedLink}
+                            className="gh-input text-xs font-mono flex-1 select-all"
+                            onFocus={(e) => e.target.select()}
+                          />
+                          <button
+                            type="button"
+                            onClick={handleCopyLink}
+                            className="btn-secondary text-xs font-mono shrink-0 flex items-center gap-1.5"
+                          >
+                            {linkCopied ? (
+                              <>
+                                <svg className="w-3 h-3 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                </svg>
+                                Copied!
+                              </>
+                            ) : (
+                              <>
+                                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                </svg>
+                                Copy
+                              </>
+                            )}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
             )}
 
-
-            {/* Members table */}
+            {/* ── Members table ── */}
             <div className="flex-1 min-h-0 overflow-y-auto">
               <h3 className="text-xs font-mono font-semibold text-gh-heading mb-2.5">Workspace Members</h3>
               <div className="bg-gh-bg border border-gh-border rounded-md overflow-hidden">
@@ -303,3 +528,5 @@ export default function TeamSettingsPage() {
     </div>
   );
 }
+
+

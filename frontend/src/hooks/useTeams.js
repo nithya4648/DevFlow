@@ -86,3 +86,20 @@ export function useDeleteTeam() {
     onSuccess: () => qc.invalidateQueries({ queryKey: [TEAM_KEY] }),
   });
 }
+
+export function useRenameTeam() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, name }) => teamService.renameTeam(id, name),
+    onSuccess: (_, { id }) => {
+      qc.invalidateQueries({ queryKey: [TEAM_KEY] });
+      qc.invalidateQueries({ queryKey: [TEAM_KEY, "detail", id] });
+    },
+  });
+}
+
+export function useGenerateInviteLink() {
+  return useMutation({
+    mutationFn: ({ id, email, role }) => teamService.generateInviteLink(id, email, role),
+  });
+}
