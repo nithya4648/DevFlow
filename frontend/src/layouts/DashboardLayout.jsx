@@ -68,7 +68,7 @@ export const DashboardLayout = () => {
     { name: "Notes", path: "/notes", icon: FaStickyNote },
     { name: "Env Vault", path: "/env-vault", icon: FaLock },
     { name: "Bookmarks", path: "/bookmarks", icon: FaBookmark },
-    { name: "Teams", path: "/teams", icon: FaUsers },
+
     { name: "Activity", path: "/activity", icon: FaHistory },
     { name: "Settings", path: "/settings", icon: FaCog },
   ];
