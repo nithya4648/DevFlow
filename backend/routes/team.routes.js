@@ -6,7 +6,7 @@ const {
   getTeams,
   getTeamById,
   createTeam,
-  inviteMember,
+  addMember,
   changeMemberRole,
   removeMember,
   deleteTeam,
@@ -17,8 +17,9 @@ router.use(protect);
 
 router.route("/").get(getTeams).post(createTeam);
 router.route("/:id").get(getTeamById).delete(deleteTeam);
-router.route("/:id/invite").post(inviteMember);
+router.route("/:id/members").post(addMember);
 router.route("/:id/activity").get(getTeamActivity);
-router.route("/:id/members/:userId").patch(changeMemberRole).delete(removeMember);
+router.route("/:id/members/:userId").put(changeMemberRole).delete(removeMember);
 
 module.exports = router;
+

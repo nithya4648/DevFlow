@@ -50,23 +50,16 @@ export default function TeamSettingsPage() {
       {
         onSuccess: () => {
           setInviteEmail("");
-          setInviteMessage({ type: "success", text: "Member invited successfully!" });
+          setInviteMessage({ type: "success", text: "Member added successfully!" });
         },
         onError: (err) => {
-          const status = err.response?.status;
           const msg = err.response?.data?.message || err.message || "";
-          if (status === 404 || msg.toLowerCase().includes("not found")) {
-            setInviteMessage({
-              type: "error",
-              text: "This email hasn't signed up for DevFlow yet. They need to create an account before you can add them to a team.",
-            });
-          } else {
-            setInviteMessage({ type: "error", text: msg || "Failed to send invitation." });
-          }
+          setInviteMessage({ type: "error", text: msg });
         },
       }
     );
   }
+
 
   function handleRoleChange(memberUserId, newRole) {
     changeRoleMutation.mutate({ id: selectedTeamId, userId: memberUserId, role: newRole });
@@ -199,7 +192,7 @@ export default function TeamSettingsPage() {
             {(isAdmin || isOwner) && (
               <div className="bg-gh-subtle border border-gh-border p-4 rounded-md space-y-3">
 
-                <h3 className="text-xs font-mono font-semibold text-gh-heading">Invite Team Member</h3>
+                <h3 className="text-xs font-mono font-semibold text-gh-heading">Add Team Member</h3>
                 <form onSubmit={handleInvite} className="flex flex-col sm:flex-row gap-2">
                   <input
                     type="email"
@@ -214,16 +207,16 @@ export default function TeamSettingsPage() {
                     onChange={(e) => setInviteRole(e.target.value)}
                     className="gh-input text-xs font-mono"
                   >
-                    <option value="viewer" className="bg-gh-surface">Viewer (Read-only)</option>
-                    <option value="editor" className="bg-gh-surface">Editor (Can edit)</option>
-                    <option value="admin" className="bg-gh-surface">Admin (Can invite)</option>
+                    <option value="viewer" className="bg-gh-surface">Viewer</option>
+                    <option value="editor" className="bg-gh-surface">Editor</option>
+                    <option value="admin" className="bg-gh-surface">Admin</option>
                   </select>
                   <button
                     type="submit"
                     disabled={inviteMutation.isPending}
                     className="btn-primary text-xs font-mono shrink-0"
                   >
-                    {inviteMutation.isPending ? "Inviting..." : "Invite"}
+                    {inviteMutation.isPending ? "Adding..." : "Add Member"}
                   </button>
                 </form>
 
@@ -240,6 +233,7 @@ export default function TeamSettingsPage() {
                 )}
               </div>
             )}
+
 
             {/* Members table */}
             <div className="flex-1 min-h-0 overflow-y-auto">

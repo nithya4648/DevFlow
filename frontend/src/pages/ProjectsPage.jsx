@@ -70,10 +70,11 @@ export default function ProjectsPage() {
     const member = team?.members?.find((m) => (m.user?._id || m.user) === user?._id);
     const role = member?.role || "viewer";
     return {
-      canEdit: isOwner || role === "admin" || role === "editor",
+      canEdit: isOwner || role === "admin",
       canDelete: isOwner || role === "admin",
     };
   }, [teams, user]);
+
 
 
   // Strip empty filter keys before sending to API

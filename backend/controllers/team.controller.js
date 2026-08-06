@@ -73,7 +73,7 @@ const createTeam = async (req, res, next) => {
   }
 };
 
-const inviteMember = async (req, res, next) => {
+const addMember = async (req, res, next) => {
   try {
     const { email, role } = inviteMemberSchema.parse(req.body);
     const teamId = req.params.id;
@@ -81,69 +81,35 @@ const inviteMember = async (req, res, next) => {
     const team = await Team.findById(teamId);
     if (!team) return res.status(404).json({ success: false, message: "Team not found" });
 
-    // Check admin
+    // Check admin or owner
     const currentMember = team.members.find(m => m.user.toString() === req.user._id.toString());
     const isOwner = team.owner.toString() === req.user._id.toString();
     if ((!currentMember || currentMember.role !== "admin") && !isOwner) {
-      return res.status(403).json({ success: false, message: "Only owners or admins can invite members" });
+      return res.status(403).json({ success: false, message: "Only team owners or admins can add members" });
     }
 
-    const invitee = await User.findOne({ email: email.toLowerCase() });
-    if (invitee && team.members.some(m => m.user.toString() === invitee._id.toString())) {
+    const targetUser = await User.findOne({ email: email.toLowerCase() });
+    if (!targetUser) {
+      return res.status(400).json({ success: false, message: "No account with this email — ask them to sign up first" });
+    }
+
+    if (team.members.some(m => m.user.toString() === targetUser._id.toString())) {
       return res.status(400).json({ success: false, message: "User is already a member" });
     }
 
-    // Create Invite
-    const crypto = require("crypto");
-    const Invite = require("../models/Invite.model");
-    const { sendEmail } = require("../utils/email.utils");
+    team.members.push({ user: targetUser._id, role: role || "viewer" });
+    await team.save();
 
-    const token = crypto.randomBytes(32).toString("hex");
-    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+    await logActivity(teamId, req.user._id, `added ${targetUser.name} as ${role}`, "user", targetUser._id, targetUser.name);
 
-    await Invite.create({
-      email: email.toLowerCase(),
-      teamId,
-      invitedBy: req.user._id,
-      role,
-      token,
-      expiresAt,
-    });
-
-    const socketUrl = process.env.VITE_SOCKET_URL || `http://localhost:${process.env.PORT || 5000}`;
-    const acceptLink = `${socketUrl}/api/invites/${token}/accept`;
-    const rejectLink = `${socketUrl}/api/invites/${token}/reject`;
-
-    // Send Email via Resend
-    await sendEmail({
-      to: email.toLowerCase(),
-      subject: `Invitation to join team ${team.name} on DevFlow`,
-      text: `You have been invited to join the team ${team.name} as a ${role}. Accept invitation: ${acceptLink} | Reject: ${rejectLink}`,
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
-          <h2 style="color: #6366f1; text-align: center;">Team Invitation</h2>
-          <p>Hi there,</p>
-          <p>You have been invited by <strong>${req.user.name}</strong> to join the team <strong>${team.name}</strong> as a <strong>${role}</strong> on DevFlow.</p>
-          <div style="text-align: center; margin: 30px 0;">
-            <a href="${acceptLink}" style="background-color: #6366f1; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block; margin-right: 10px;">Accept Invite</a>
-            <a href="${rejectLink}" style="background-color: #ef4444; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">Reject</a>
-          </div>
-          <p>This invitation link is valid for 7 days.</p>
-        </div>
-      `,
-    });
-
-    await logActivity(teamId, req.user._id, `invited ${email} as ${role}`, "user", null, email);
-
-    res.status(200).json({ success: true, message: "Invitation email sent successfully" });
+    res.status(200).json({ success: true, message: "Member added successfully" });
   } catch (error) {
     next(error);
   }
 };
 
-
 // @desc    Change member role
-// @route   PATCH /api/teams/:id/members/:userId
+// @route   PUT /api/teams/:id/members/:userId
 // @access  Private
 const changeMemberRole = async (req, res, next) => {
   try {
@@ -154,10 +120,11 @@ const changeMemberRole = async (req, res, next) => {
     const team = await Team.findById(teamId);
     if (!team) return res.status(404).json({ success: false, message: "Team not found" });
 
-    // Check admin
+    // Check admin or owner
     const currentMember = team.members.find(m => m.user.toString() === req.user._id.toString());
-    if (!currentMember || currentMember.role !== "admin") {
-      return res.status(403).json({ success: false, message: "Only admins can change roles" });
+    const isOwner = team.owner.toString() === req.user._id.toString();
+    if ((!currentMember || currentMember.role !== "admin") && !isOwner) {
+      return res.status(403).json({ success: false, message: "Only team owners or admins can change roles" });
     }
 
     if (team.owner.toString() === targetUserId && role !== "admin") {
@@ -188,10 +155,12 @@ const removeMember = async (req, res, next) => {
     if (!team) return res.status(404).json({ success: false, message: "Team not found" });
 
     const currentMember = team.members.find(m => m.user.toString() === req.user._id.toString());
-    
-    // User can remove themselves, or an admin can remove them
+    const isOwner = team.owner.toString() === req.user._id.toString();
+
+    // User can remove themselves, or an admin/owner can remove them
     const isSelfRemoval = req.user._id.toString() === targetUserId;
-    if (!currentMember || (currentMember.role !== "admin" && !isSelfRemoval)) {
+    const isAuthorized = isSelfRemoval || isOwner || (currentMember && currentMember.role === "admin");
+    if (!isAuthorized) {
       return res.status(403).json({ success: false, message: "Unauthorized to remove this member" });
     }
 
@@ -237,13 +206,15 @@ const deleteTeam = async (req, res, next) => {
   }
 };
 
+
 module.exports = {
   getTeams,
   getTeamById,
   createTeam,
-  inviteMember,
+  addMember,
   changeMemberRole,
   removeMember,
   deleteTeam,
   logActivity,
 };
+
