@@ -9,7 +9,6 @@ import RegisterPage from "./pages/RegisterPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import VerifyEmailPage from "./pages/VerifyEmailPage";
-import InviteAcceptPage from "./pages/InviteAcceptPage";
 
 // Layout + Guard
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -28,7 +27,6 @@ import NotesPage from "./pages/NotesPage";
 import EnvVaultPage from "./pages/EnvVaultPage";
 import BookmarksPage from "./pages/BookmarksPage";
 import SettingsPage from "./pages/SettingsPage";
-import TeamSettingsPage from "./pages/TeamSettingsPage";
 import ActivityFeedPage from "./pages/ActivityFeedPage";
 
 // Dev Tools
@@ -65,10 +63,9 @@ function App() {
                 <Route path="/notes" element={<ErrorBoundary><NotesPage /></ErrorBoundary>} />
                 <Route path="/env-vault" element={<ErrorBoundary><EnvVaultPage /></ErrorBoundary>} />
                 <Route path="/bookmarks" element={<ErrorBoundary><BookmarksPage /></ErrorBoundary>} />
-                <Route path="/teams" element={<ErrorBoundary><TeamSettingsPage /></ErrorBoundary>} />
                 <Route path="/activity" element={<ErrorBoundary><ActivityFeedPage /></ErrorBoundary>} />
                 <Route path="/settings" element={<ErrorBoundary><SettingsPage /></ErrorBoundary>} />
-
+                
                 {/* Dev Tools sub-routes */}
                 <Route path="/tools" element={<ErrorBoundary><ToolsIndex /></ErrorBoundary>} />
                 <Route element={<ToolLayout />}>
@@ -93,7 +90,6 @@ function App() {
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
             <Route path="/verify-email/:token" element={<VerifyEmailPage />} />
-            <Route path="/invites/:token" element={<InviteAcceptPage />} />
           </Routes>
           </BrowserRouter>
         </NotificationProvider>

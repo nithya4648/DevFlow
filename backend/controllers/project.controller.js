@@ -1,14 +1,13 @@
 // backend/controllers/project.controller.js
 const Project = require("../models/Project.model");
-const Team = require("../models/Team.model");
 const { createProjectSchema, updateProjectSchema } = require("../validators/project.validators");
 const { hasTeamPermission } = require("../utils/rbac");
-const { logActivity } = require("./team.controller");
+
+const logActivity = async () => {};
 
 // Helper to get teams a user belongs to
 const getUserTeams = async (userId) => {
-  const teams = await Team.find({ "members.user": userId }).select("_id").lean();
-  return teams.map((t) => t._id);
+  return [];
 };
 
 // @desc    Get all projects for logged-in user (paginated + filtered + team)

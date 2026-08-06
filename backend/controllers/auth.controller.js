@@ -53,21 +53,7 @@ const register = async (req, res, next) => {
       isVerified: false,
     });
 
-    // Check for inviteToken
-    if (req.body.inviteToken) {
-      const Invite = require("../models/Invite.model");
-      const Team = require("../models/Team.model");
-      const invite = await Invite.findOne({ token: req.body.inviteToken, status: "pending" });
-      if (invite && invite.email.toLowerCase() === email.toLowerCase()) {
-        const team = await Team.findById(invite.teamId);
-        if (team) {
-          team.members.push({ user: user._id, role: invite.role });
-          await team.save();
-        }
-        invite.status = "accepted";
-        await invite.save();
-      }
-    }
+
 
     // --- CREATE AND EMIT WELCOME NOTIFICATION ---
     try {

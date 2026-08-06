@@ -1,6 +1,5 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/User.model");
-const Team = require("../models/Team.model");
 
 const protect = async (req, res, next) => {
   let token;
@@ -51,28 +50,11 @@ const requireTeamAdmin = async (req, res, next) => {
       return res.status(404).json({ success: false, message: "Project not found" });
     }
 
-    if (!project.teamId) {
-      // Private project - only owner can access
-      if (project.owner.toString() !== req.user._id.toString()) {
-        return res.status(403).json({ success: false, message: "Access denied" });
-      }
-      return next();
+    // Since Teams are disabled, only the owner can modify/delete the project
+    if (project.owner.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ success: false, message: "Access denied" });
     }
-
-    const team = await Team.findById(project.teamId);
-    if (!team) {
-      return res.status(404).json({ success: false, message: "Associated team not found" });
-    }
-
-    const isOwner = team.owner.toString() === req.user._id.toString();
-    const member = team.members.find(m => m.user.toString() === req.user._id.toString());
-    const isAdmin = member && member.role === "admin";
-
-    if (!isOwner && !isAdmin) {
-      return res.status(403).json({ success: false, message: "Only team owners or admins can modify/delete this project" });
-    }
-
-    next();
+    return next();
   } catch (error) {
     next(error);
   }

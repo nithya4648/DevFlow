@@ -1,15 +1,14 @@
 // backend/controllers/doc.controller.js
 const Doc = require("../models/Doc.model");
 const DocVersion = require("../models/DocVersion.model");
-const Team = require("../models/Team.model");
 const { createDocSchema, updateDocSchema } = require("../validators/doc.validators");
 const { hasTeamPermission } = require("../utils/rbac");
-const { logActivity } = require("./team.controller");
+
+const logActivity = async () => {};
 
 // Helper to get teams a user belongs to
 const getUserTeams = async (userId) => {
-  const teams = await Team.find({ "members.user": userId }).select("_id").lean();
-  return teams.map((t) => t._id);
+  return [];
 };
 
 // @desc    Get all docs for logged-in user

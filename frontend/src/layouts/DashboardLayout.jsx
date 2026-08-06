@@ -24,7 +24,6 @@ import {
   FaBookmark,
   FaCog,
   FaBell,
-  FaUsers,
   FaHistory,
 } from "react-icons/fa";
 
