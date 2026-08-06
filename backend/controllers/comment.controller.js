@@ -6,7 +6,7 @@ const Snippet = require("../models/Snippet.model");
 const Doc = require("../models/Doc.model");
 const { createCommentSchema } = require("../validators/comment.validators");
 const { hasTeamPermission } = require("../utils/rbac");
-const { logActivity } = require("./team.controller");
+const logActivity = async () => {};
 
 // Helper to find the teamId associated with the target
 const getTargetTeamId = async (targetType, targetId) => {
@@ -112,10 +112,6 @@ const createComment = async (req, res, next) => {
       const io = req.app.get("io");
       if (io) {
         io.to(`team_${teamId}`).emit("comment:new", populated);
-        
-        // Also emit activity:new
-        const teamActivity = await Activity.findOne({ team: teamId }).sort({ createdAt: -1 }).populate("user", "name email avatar").lean();
-        io.to(`team_${teamId}`).emit("activity:new", teamActivity);
       }
     }
 
