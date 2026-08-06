@@ -25,6 +25,7 @@ import SnippetsPage from "./pages/SnippetsPage";
 import DocsPage from "./pages/DocsPage";
 import NotesPage from "./pages/NotesPage";
 import EnvVaultPage from "./pages/EnvVaultPage";
+import ApiVaultPage from "./pages/ApiVaultPage";
 import BookmarksPage from "./pages/BookmarksPage";
 import SettingsPage from "./pages/SettingsPage";
 import ActivityFeedPage from "./pages/ActivityFeedPage";
@@ -62,6 +63,7 @@ function App() {
                 <Route path="/docs" element={<ErrorBoundary><DocsPage /></ErrorBoundary>} />
                 <Route path="/notes" element={<ErrorBoundary><NotesPage /></ErrorBoundary>} />
                 <Route path="/env-vault" element={<ErrorBoundary><EnvVaultPage /></ErrorBoundary>} />
+                <Route path="/api-vault" element={<ErrorBoundary><ApiVaultPage /></ErrorBoundary>} />
                 <Route path="/bookmarks" element={<ErrorBoundary><BookmarksPage /></ErrorBoundary>} />
                 <Route path="/activity" element={<ErrorBoundary><ActivityFeedPage /></ErrorBoundary>} />
                 <Route path="/settings" element={<ErrorBoundary><SettingsPage /></ErrorBoundary>} />

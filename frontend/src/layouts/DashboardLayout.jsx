@@ -25,6 +25,7 @@ import {
   FaCog,
   FaBell,
   FaHistory,
+  FaShieldAlt,
 } from "react-icons/fa";
 
 export const DashboardLayout = () => {
@@ -67,6 +68,7 @@ export const DashboardLayout = () => {
     { name: "Docs", path: "/docs", icon: FaBook },
     { name: "Notes", path: "/notes", icon: FaStickyNote },
     { name: "Env Vault", path: "/env-vault", icon: FaLock },
+    { name: "API Vault", path: "/api-vault", icon: FaShieldAlt },
     { name: "Bookmarks", path: "/bookmarks", icon: FaBookmark },
 
     { name: "Activity", path: "/activity", icon: FaHistory },

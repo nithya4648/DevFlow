@@ -97,6 +97,7 @@ const searchRoutes = require("./routes/search.routes");
 const userRoutes = require("./routes/user.routes");
 const apiKeyRoutes = require("./routes/api-key.routes");
 const analyticsRoutes = require("./routes/analytics.routes");
+const apiVaultRoutes = require("./routes/apiVault.route");
 
 
 // Routes
@@ -114,6 +115,7 @@ app.use("/api/bookmarks", bookmarkRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/search", searchRoutes);
+app.use("/api/api-vault", apiVaultRoutes);
 
 
 // Root health-check — must exist so Render's health pings and browsers don't get a 404
