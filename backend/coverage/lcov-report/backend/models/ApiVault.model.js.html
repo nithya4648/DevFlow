@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">40% </span>
+                <span class="strong">32% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>8/20</span>
+                <span class='fraction'>8/25</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/8</span>
+                <span class='fraction'>0/12</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">42.1% </span>
+                <span class="strong">34.78% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>8/19</span>
+                <span class='fraction'>8/23</span>
             </div>
         
             
@@ -143,7 +143,12 @@
 <a name='L78'></a><a href='#L78'>78</a>
 <a name='L79'></a><a href='#L79'>79</a>
 <a name='L80'></a><a href='#L80'>80</a>
-<a name='L81'></a><a href='#L81'>81</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
@@ -191,7 +196,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -209,6 +213,11 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -219,6 +228,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -244,7 +254,6 @@ const apiVaultSchema = new mongoose.Schema(
     },
     value: {
       type: String,
-      required: true,
     },
     category: {
       type: String,
@@ -287,8 +296,13 @@ apiVaultSchema.pre('save', <span class="fstat-no" title="function not covered" >
 <span class="cstat-no" title="statement not covered" >    this.key = encrypt(this.key);</span>
   }
 <span class="cstat-no" title="statement not covered" >  if (this.isModified('value')) {</span>
-<span class="cstat-no" title="statement not covered" >    this.maskedValue = maskSecret(this.value);</span>
-<span class="cstat-no" title="statement not covered" >    this.value = encrypt(this.value);</span>
+<span class="cstat-no" title="statement not covered" >    if (this.value) {</span>
+<span class="cstat-no" title="statement not covered" >      this.maskedValue = maskSecret(this.value);</span>
+<span class="cstat-no" title="statement not covered" >      this.value = encrypt(this.value);</span>
+    } else {
+<span class="cstat-no" title="statement not covered" >      this.maskedValue = undefined;</span>
+<span class="cstat-no" title="statement not covered" >      this.value = undefined;</span>
+    }
   }
 <span class="cstat-no" title="statement not covered" >  next();</span>
 });
@@ -299,6 +313,7 @@ apiVaultSchema.methods.decryptKey = <span class="fstat-no" title="function not c
 };
 &nbsp;
 apiVaultSchema.methods.decryptValue = <span class="fstat-no" title="function not covered" >fu</span>nction () {
+<span class="cstat-no" title="statement not covered" >  if (!this.value) <span class="cstat-no" title="statement not covered" >return '';</span></span>
 <span class="cstat-no" title="statement not covered" >  return decrypt(this.value);</span>
 };
 &nbsp;
@@ -310,7 +325,7 @@ module.exports = mongoose.model('ApiVault', apiVaultSchema);
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-08-06T16:10:03.764Z
+                at 2026-08-06T17:08:27.270Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1786032604121" clover="3.2.0">
-  <project timestamp="1786032604121" name="All files">
-    <metrics statements="1688" coveredstatements="691" conditionals="605" coveredconditionals="82" methods="149" coveredmethods="21" elements="2442" coveredelements="794" complexity="0" loc="1688" ncloc="1688" packages="8" files="67" classes="67"/>
+<coverage generated="1786036107603" clover="3.2.0">
+  <project timestamp="1786036107603" name="All files">
+    <metrics statements="1692" coveredstatements="691" conditionals="609" coveredconditionals="82" methods="149" coveredmethods="21" elements="2450" coveredelements="794" complexity="0" loc="1692" ncloc="1692" packages="8" files="67" classes="67"/>
     <package name="backend">
       <metrics statements="87" coveredstatements="78" conditionals="20" coveredconditionals="8" methods="3" coveredmethods="1"/>
       <file name="server.js" path="C:\Users\nithy\DevFlow\backend\server.js">
@@ -1297,7 +1297,7 @@
       </file>
     </package>
     <package name="backend.models">
-      <metrics statements="95" coveredstatements="81" conditionals="12" coveredconditionals="3" methods="9" coveredmethods="3"/>
+      <metrics statements="99" coveredstatements="81" conditionals="16" coveredconditionals="3" methods="9" coveredmethods="3"/>
       <file name="Activity.model.js" path="C:\Users\nithy\DevFlow\backend\models\Activity.model.js">
         <metrics statements="4" coveredstatements="4" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
         <line num="2" count="1" type="stmt"/>
@@ -1313,26 +1313,30 @@
         <line num="35" count="1" type="stmt"/>
       </file>
       <file name="ApiVault.model.js" path="C:\Users\nithy\DevFlow\backend\models\ApiVault.model.js">
-        <metrics statements="19" coveredstatements="8" conditionals="8" coveredconditionals="0" methods="4" coveredmethods="0"/>
+        <metrics statements="23" coveredstatements="8" conditionals="12" coveredconditionals="0" methods="4" coveredmethods="0"/>
         <line num="1" count="1" type="stmt"/>
         <line num="2" count="1" type="stmt"/>
         <line num="4" count="1" type="stmt"/>
-        <line num="50" count="1" type="stmt"/>
-        <line num="54" count="0" type="cond" truecount="0" falsecount="4"/>
-        <line num="55" count="0" type="stmt"/>
-        <line num="59" count="1" type="stmt"/>
-        <line num="60" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="49" count="1" type="stmt"/>
+        <line num="53" count="0" type="cond" truecount="0" falsecount="4"/>
+        <line num="54" count="0" type="stmt"/>
+        <line num="58" count="1" type="stmt"/>
+        <line num="59" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="60" count="0" type="stmt"/>
         <line num="61" count="0" type="stmt"/>
-        <line num="62" count="0" type="stmt"/>
+        <line num="63" count="0" type="cond" truecount="0" falsecount="2"/>
         <line num="64" count="0" type="cond" truecount="0" falsecount="2"/>
         <line num="65" count="0" type="stmt"/>
         <line num="66" count="0" type="stmt"/>
         <line num="68" count="0" type="stmt"/>
-        <line num="72" count="1" type="stmt"/>
-        <line num="73" count="0" type="stmt"/>
+        <line num="69" count="0" type="stmt"/>
+        <line num="72" count="0" type="stmt"/>
         <line num="76" count="1" type="stmt"/>
         <line num="77" count="0" type="stmt"/>
         <line num="80" count="1" type="stmt"/>
+        <line num="81" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="82" count="0" type="stmt"/>
+        <line num="85" count="1" type="stmt"/>
       </file>
       <file name="Bookmark.model.js" path="C:\Users\nithy\DevFlow\backend\models\Bookmark.model.js">
         <metrics statements="5" coveredstatements="5" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
@@ -1849,9 +1853,9 @@
         <line num="2" count="1" type="stmt"/>
         <line num="4" count="1" type="stmt"/>
         <line num="6" count="1" type="stmt"/>
-        <line num="21" count="0" type="stmt"/>
-        <line num="31" count="1" type="stmt"/>
-        <line num="33" count="1" type="stmt"/>
+        <line num="22" count="0" type="stmt"/>
+        <line num="32" count="1" type="stmt"/>
+        <line num="34" count="1" type="stmt"/>
       </file>
       <file name="auth.validators.js" path="C:\Users\nithy\DevFlow\backend\validators\auth.validators.js">
         <metrics statements="6" coveredstatements="6" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>

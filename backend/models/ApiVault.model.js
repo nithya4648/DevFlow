@@ -61,8 +61,13 @@ apiVaultSchema.pre('save', function (next) {
     this.key = encrypt(this.key);
   }
   if (this.isModified('value')) {
-    this.maskedValue = maskSecret(this.value);
-    this.value = encrypt(this.value);
+    if (this.value) {
+      this.maskedValue = maskSecret(this.value);
+      this.value = encrypt(this.value);
+    } else {
+      this.maskedValue = undefined;
+      this.value = undefined;
+    }
   }
   next();
 });
@@ -73,6 +78,7 @@ apiVaultSchema.methods.decryptKey = function () {
 };
 
 apiVaultSchema.methods.decryptValue = function () {
+  if (!this.value) return '';
   return decrypt(this.value);
 };
 
