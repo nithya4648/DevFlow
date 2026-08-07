@@ -102,7 +102,7 @@ export const DashboardLayout = () => {
         {/* Brand Header */}
         <div className="flex h-14 items-center justify-between px-4 border-b border-gh-border shrink-0">
           <Link to="/" className="flex items-center gap-2.5">
-            <img src="/favicon.svg" className="h-7 w-7" alt="DevFlow" />
+            <img src="/favicon.svg" className="h-7 w-7" alt="DevFlow" style={{ filter: 'brightness(0) saturate(100%) invert(1) sepia(1) saturate(2) hue-rotate(120deg)' }} />
             {!collapsed && (
               <span className="font-mono text-base font-bold tracking-tight text-gh-heading">
                 DevFlow
@@ -133,7 +133,7 @@ export const DashboardLayout = () => {
                   }`
                 }
               >
-                <Icon className="h-4 w-4 shrink-0" />
+                <Icon className="h-4 w-4 shrink-0 text-[#22c55e]" />
                 {!collapsed && <span>{item.name}</span>}
                 {collapsed && (
                   <span className="absolute left-16 z-50 rounded-md bg-gh-surface border border-gh-border px-2 py-1 text-xs font-mono text-gh-heading opacity-0 pointer-events-none group-hover:opacity-100 transition whitespace-nowrap shadow-md">
@@ -202,7 +202,7 @@ export const DashboardLayout = () => {
                   }}
                   className="btn-secondary p-1.5 relative"
                 >
-                  <FaBell className="h-3.5 w-3.5" />
+                  <FaBell className="h-3.5 w-3.5 text-[#22c55e]" />
                   {unreadCount > 0 && (
                     <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-accent text-[9px] font-mono font-bold text-white">
                       {unreadCount > 99 ? '99+' : unreadCount}
@@ -285,7 +285,7 @@ export const DashboardLayout = () => {
                       className="h-7 w-7 rounded-full border border-gh-border object-cover"
                     />
                   ) : (
-                    <FaUserCircle className="h-7 w-7 text-gh-muted hover:text-gh-heading" />
+                    <FaUserCircle className="h-7 w-7 text-[#22c55e] hover:text-[#238636]" />
                   )}
                 </button>
 
@@ -305,13 +305,13 @@ export const DashboardLayout = () => {
                         onClick={() => setProfileDropdownOpen(false)}
                         className="flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 text-xs font-medium text-gh-text hover:bg-gh-subtle hover:text-gh-heading transition"
                       >
-                        <FaCog className="h-3.5 w-3.5 text-gh-muted" /> Settings
+                        <FaCog className="h-3.5 w-3.5 text-[#22c55e]" /> Settings
                       </Link>
                       <button
                         onClick={handleLogout}
                         className="flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 text-xs font-medium text-red-400 hover:bg-red-500/10 transition"
                       >
-                        <FaSignOutAlt className="h-3.5 w-3.5" /> Log Out
+                        <FaSignOutAlt className="h-3.5 w-3.5 text-[#22c55e]" /> Log Out
                       </button>
                     </div>
                   </>
