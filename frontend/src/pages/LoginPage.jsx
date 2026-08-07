@@ -1,4 +1,5 @@
 import { useForm } from "react-hook-form";
+
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import useAuth from "../hooks/useAuth";
@@ -85,7 +86,8 @@ function LoginPage() {
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = `${import.meta.env.VITE_SOCKET_URL}/api/auth/google`;
+    const socketUrl = import.meta.env.VITE_SOCKET_URL || "https://devflow-vfnd.onrender.com";
+    window.location.href = `${socketUrl}/api/auth/google`;
   };
 
   return (
@@ -93,7 +95,12 @@ function LoginPage() {
       <div className="flex min-h-screen items-center justify-center px-4 py-12 font-ui text-gh-text">
         <div className="w-full max-w-md gh-card p-8">
           <div className="text-center">
-            <img src="/favicon.svg" className="h-9 w-9 mx-auto mb-3" alt="DevFlow" />
+            <img
+              src="/favicon.svg"
+              alt="DevFlow"
+              className="h-9 w-9 mb-3 mx-auto"
+              style={{ filter: 'brightness(0) saturate(100%) invert(1) sepia(1) saturate(2) hue-rotate(120deg)' }}
+            />
             <h2 className="text-xl font-bold text-gh-heading">
               Sign in to DevFlow
             </h2>

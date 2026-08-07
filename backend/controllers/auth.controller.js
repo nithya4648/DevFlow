@@ -338,18 +338,19 @@ const verifyEmail = async (req, res, next) => {
 // @route   GET /api/auth/google/callback
 // @access  Public
 const googleCallback = async (req, res, next) => {
+  const clientUrl = process.env.CLIENT_URL || "https://dev-flow-zeta-ashy.vercel.app";
   try {
     const user = req.user;
     if (!user) {
-      return res.redirect(`${process.env.CLIENT_URL || "https://dev-flow-zeta-ashy.vercel.app"}/login?error=AuthenticationFailed`);
+      return res.redirect(`${clientUrl}/login?error=AuthenticationFailed`);
     }
 
     const token = generateAccessToken(user._id);
     setTokenCookie(res, token);
 
-    res.redirect(`${(process.env.CLIENT_URL || "https://dev-flow-zeta-ashy.vercel.app")}/dashboard`);
+    res.redirect(`${clientUrl}/dashboard?token=${token}`);
   } catch (error) {
-    res.redirect(`${(process.env.CLIENT_URL || "https://dev-flow-zeta-ashy.vercel.app")}/login?error=AuthenticationFailed`);
+    res.redirect(`${clientUrl}/login?error=AuthenticationFailed`);
   }
 };
 
