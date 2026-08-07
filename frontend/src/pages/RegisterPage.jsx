@@ -67,12 +67,15 @@ function RegisterPage() {
 
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gh-bg px-4 py-12 font-ui text-gh-text">
+    <div className="dark min-h-screen bg-gh-bg px-4 py-12 font-ui text-gh-text flex flex-col justify-center items-center">
       <div className="w-full max-w-md gh-card p-8">
         <div className="text-center">
-          <div className="inline-flex h-9 w-9 items-center justify-center rounded-md bg-accent-light text-accent-fg border border-accent-border font-mono font-bold text-base mb-3">
-            &gt;_
-          </div>
+          <img
+              src="/favicon.svg"
+              alt="DevFlow"
+              className="h-9 w-9 mb-3 mx-auto"
+              style={{ filter: 'brightness(0) saturate(100%) invert(1) sepia(1) saturate(2) hue-rotate(120deg)' }}
+            />
           <h2 className="text-xl font-bold text-gh-heading">
             Create your account
           </h2>
