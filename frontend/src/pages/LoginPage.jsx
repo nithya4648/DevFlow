@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form";
-import LogoIcon from "../assets/logo.svg"; // favicon icon
+
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import useAuth from "../hooks/useAuth";
