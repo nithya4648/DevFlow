@@ -102,9 +102,7 @@ export const DashboardLayout = () => {
         {/* Brand Header */}
         <div className="flex h-14 items-center justify-between px-4 border-b border-gh-border shrink-0">
           <Link to="/" className="flex items-center gap-2.5">
-            <div className="flex h-7 w-7 items-center justify-center rounded-md bg-accent-light text-accent-fg border border-accent-border font-mono font-bold text-xs">
-              &gt;_
-            </div>
+            <img src="/favicon.svg" className="h-7 w-7" alt="DevFlow" />
             {!collapsed && (
               <span className="font-mono text-base font-bold tracking-tight text-gh-heading">
                 DevFlow

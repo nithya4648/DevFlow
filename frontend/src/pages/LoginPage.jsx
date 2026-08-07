@@ -93,9 +93,7 @@ function LoginPage() {
       <div className="flex min-h-screen items-center justify-center px-4 py-12 font-ui text-gh-text">
         <div className="w-full max-w-md gh-card p-8">
           <div className="text-center">
-            <div className="inline-flex h-9 w-9 items-center justify-center rounded-md bg-accent-light text-accent-fg border border-accent-border font-mono font-bold text-base mb-3">
-              &gt;_
-            </div>
+            <img src="/favicon.svg" className="h-9 w-9 mx-auto mb-3" alt="DevFlow" />
             <h2 className="text-xl font-bold text-gh-heading">
               Sign in to DevFlow
             </h2>
