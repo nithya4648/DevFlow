@@ -25,8 +25,15 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    checkAuth();
-  }, [checkAuth]);
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get('token');
+  if (token) {
+    localStorage.setItem('devflow_token', token);
+    // Remove token param from URL
+    window.history.replaceState({}, document.title, window.location.pathname);
+  }
+  checkAuth();
+}, [checkAuth]);
 
   const login = async (credentials) => {
     try {

@@ -85,7 +85,8 @@ function LoginPage() {
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = `${import.meta.env.VITE_SOCKET_URL}/api/auth/google`;
+    const socketUrl = import.meta.env.VITE_SOCKET_URL || "https://devflow-vfnd.onrender.com";
+    window.location.href = `${socketUrl}/api/auth/google`;
   };
 
   return (

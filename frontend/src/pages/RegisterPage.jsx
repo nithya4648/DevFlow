@@ -215,7 +215,10 @@ function RegisterPage() {
         {/* Google OAuth Button */}
         <button
           type="button"
-          onClick={() => window.location.href = `${import.meta.env.VITE_SOCKET_URL}/api/auth/google`}
+          onClick={() => {
+    const socketUrl = import.meta.env.VITE_SOCKET_URL || "https://devflow-vfnd.onrender.com";
+    window.location.href = `${socketUrl}/api/auth/google`;
+  }}
           className="btn-secondary w-full py-2"
         >
           <FaGoogle className="text-red-400" />
