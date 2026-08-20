@@ -1,6 +1,6 @@
 // backend/models/EnvVariable.model.js
 const mongoose = require("mongoose");
-const { encrypt, decrypt } = require("../utils/crypto");
+const { encrypt, decrypt } = require("../utils/encryption.utils");
 
 const envVariableSchema = new mongoose.Schema(
   {

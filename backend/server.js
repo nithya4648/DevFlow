@@ -64,6 +64,11 @@ if (!process.env.CLIENT_URL) {
   process.exit(1);
 }
 
+if (!process.env.ENCRYPTION_KEY) {
+  logger.error("FATAL: ENCRYPTION_KEY is not defined. Cannot start server.");
+  process.exit(1);
+}
+
 // Global rate limiting
 const isDev = process.env.NODE_ENV === "development";
 const isTest = process.env.NODE_ENV === "test";

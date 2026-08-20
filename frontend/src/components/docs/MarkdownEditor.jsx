@@ -2,7 +2,6 @@
 import { useEffect, useRef, useState } from "react";
 import { marked } from "marked";
 import DOMPurify from "dompurify";
-import { useTeams } from "../../hooks/useTeams";
 
 // Configure marked for GitHub-style rendering
 marked.setOptions({
@@ -24,8 +23,6 @@ export default function MarkdownEditor({ title, content, category, teamId, onSav
   const [isDirty, setIsDirty] = useState(false);
   const autoSaveTimer = useRef(null);
 
-  const { data: teamsRes } = useTeams();
-  const teams = teamsRes?.data || [];
 
   // Sync props when doc changes
   useEffect(() => {
@@ -91,19 +88,6 @@ export default function MarkdownEditor({ title, content, category, teamId, onSav
           className={`w-32 gh-input text-xs ${readOnly ? "cursor-default opacity-80" : ""}`}
         />
 
-        {/* Team Scope Select */}
-        {!readOnly && (
-          <select
-            value={localTeamId}
-            onChange={(e) => { setLocalTeamId(e.target.value); markDirty(); }}
-            className="w-36 gh-input text-xs"
-          >
-            <option value="" className="bg-gh-surface">Private (Personal)</option>
-            {teams.map((t) => (
-              <option key={t._id} value={t._id} className="bg-gh-surface">{t.name}</option>
-            ))}
-          </select>
-        )}
 
         {/* Editor / Preview toggle */}
         <div className="flex items-center bg-gh-subtle border border-gh-border rounded-md p-0.5">

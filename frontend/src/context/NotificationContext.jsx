@@ -37,13 +37,9 @@ export const NotificationProvider = ({ children }) => {
   useEffect(() => {
     if (!user) return;
 
-    const token = typeof window !== 'undefined' ? localStorage.getItem("devflow_token") : null;
     const socketInstance = io(import.meta.env.VITE_SOCKET_URL || "https://devflow-vfnd.onrender.com", {
       withCredentials: true,
       transports: ["websocket", "polling"],
-      auth: {
-        token: token || "",
-      },
     });
 
     setSocket(socketInstance);

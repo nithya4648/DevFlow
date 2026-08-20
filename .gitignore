@@ -8,3 +8,5 @@ frontend/.env.local
 build/
 dist/
 .DS_Store
+coverage/
+backend/coverage/

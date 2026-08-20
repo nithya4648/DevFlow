@@ -25,23 +25,13 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-  const params = new URLSearchParams(window.location.search);
-  const token = params.get('token');
-  if (token) {
-    localStorage.setItem('devflow_token', token);
-    // Remove token param from URL
-    window.history.replaceState({}, document.title, window.location.pathname);
-  }
-  checkAuth();
-}, [checkAuth]);
+    checkAuth();
+  }, [checkAuth]);
 
   const login = async (credentials) => {
     try {
       const data = await authService.login(credentials);
       if (data.success && data.user) {
-        if (data.token) {
-          localStorage.setItem("devflow_token", data.token);
-        }
         setUser(data.user);
       }
       return data;
@@ -61,7 +51,6 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       await authService.logout();
-      localStorage.removeItem("devflow_token");
       setUser(null);
     } catch (error) {
       console.error("Error logging out:", error.message);

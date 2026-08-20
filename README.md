@@ -13,7 +13,7 @@ A real-time collaborative platform for developers. Manage projects, snippets, do
 - **Real-time collaboration** – Live activity feeds, presence awareness, instant notifications via WebSocket
 - **Secure Vault** – AES-256-GCM encrypted storage for API keys and environment variables
 - **Full-text search** – Fast retrieval across projects, snippets, docs, bookmarks
-- **Authentication** – JWT with bcrypt password hashing and refresh tokens
+- **Authentication** – JWT (httpOnly cookie) with bcrypt password hashing
 - **Production deployment** – Vercel (frontend) + Render (backend) with MongoDB Atlas
 
 ## Key Decisions
@@ -46,5 +46,5 @@ Open `http://localhost:5173`
 - Production-grade encryption for sensitive data
 - Real-time architecture with connection resilience
 - MongoDB query optimization (80%+ reduction in response times)
-- Full authentication flow with JWT and refresh tokens
+- Full authentication flow with JWT
 - Containerization and deployment automation

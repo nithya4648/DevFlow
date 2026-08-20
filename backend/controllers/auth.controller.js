@@ -185,7 +185,6 @@ const login = async (req, res, next) => {
         isVerified: user.isVerified,
         createdAt: user.createdAt,
       },
-      token, // Return token as well for API interceptor fallback
     });
   } catch (error) {
     next(error);
@@ -358,7 +357,7 @@ const googleCallback = async (req, res, next) => {
     const token = generateAccessToken(user._id);
     setTokenCookie(res, token);
 
-    res.redirect(`${clientUrl}/dashboard?token=${token}`);
+    res.redirect(`${clientUrl}/dashboard`);
   } catch (error) {
     res.redirect(`${clientUrl}/login?error=AuthenticationFailed`);
   }
