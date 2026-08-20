@@ -35,12 +35,15 @@ export const NotificationProvider = ({ children }) => {
 
   // 2. Setup Socket Connection
   useEffect(() => {
-    if (!user) return; // Only connect if authenticated
+    if (!user) return;
 
-    // Since we use httpOnly cookies, credentials: true automatically sends the devflow_token cookie to the backend during the handshake
+    const token = typeof window !== 'undefined' ? localStorage.getItem("devflow_token") : null;
     const socketInstance = io(import.meta.env.VITE_SOCKET_URL || "https://devflow-vfnd.onrender.com", {
       withCredentials: true,
       transports: ["websocket", "polling"],
+      auth: {
+        token: token || "",
+      },
     });
 
     setSocket(socketInstance);

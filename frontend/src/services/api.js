@@ -1,13 +1,14 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "https://devflow-vfnd.onrender.com/api",
+  baseURL: import.meta.env.VITE_API_URL || process.env.VITE_API_URL || "/api",
   withCredentials: true,
+  timeout: 15000,
 });
 
 // Attach JWT token to every request if present
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("devflow_token");
+  const token = typeof window !== "undefined" ? localStorage.getItem("devflow_token") : null;
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });

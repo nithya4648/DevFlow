@@ -2,6 +2,11 @@ require("dotenv").config();
 const dns = require("dns");
 dns.setServers(["8.8.8.8", "8.8.4.4"]);
 
+// Set default NODE_ENV if not provided
+if (!process.env.NODE_ENV) {
+  process.env.NODE_ENV = "production";
+}
+
 const express = require("express");
 const cors = require("cors");
 const http = require("http");
@@ -42,6 +47,22 @@ app.use(helmet());
 app.use(compression());
 app.use(passport.initialize());
 app.use(pinoHttp({ logger }));
+
+// Validate critical environment variables
+if (!process.env.JWT_SECRET) {
+  logger.error("FATAL: JWT_SECRET is not defined. Cannot start server.");
+  process.exit(1);
+}
+
+if (!process.env.MONGO_URI) {
+  logger.error("FATAL: MONGO_URI is not defined. Cannot start server.");
+  process.exit(1);
+}
+
+if (!process.env.CLIENT_URL) {
+  logger.error("FATAL: CLIENT_URL is not defined. Cannot start server.");
+  process.exit(1);
+}
 
 // Global rate limiting
 const isDev = process.env.NODE_ENV === "development";

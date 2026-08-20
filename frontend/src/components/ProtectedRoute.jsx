@@ -1,10 +1,21 @@
 import { Navigate, Outlet } from "react-router-dom";
+import { useEffect, useState } from "react";
 import useAuth from "../hooks/useAuth";
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
+  const [timedOut, setTimedOut] = useState(false);
 
-  if (loading) {
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (loading) {
+        setTimedOut(true);
+      }
+    }, 10000);
+    return () => clearTimeout(timeoutId);
+  }, [loading]);
+
+  if (loading && !timedOut) {
     return (
       <div className="flex h-screen items-center justify-center bg-gray-50 dark:bg-gray-950">
         <div className="flex flex-col items-center gap-4">
@@ -13,6 +24,10 @@ const ProtectedRoute = ({ children }) => {
         </div>
       </div>
     );
+  }
+
+  if (timedOut) {
+    return <Navigate to="/login" replace />;
   }
 
   if (!user) {

@@ -107,6 +107,13 @@ const register = async (req, res, next) => {
       }
     }
 
+    // Auto-verify in development if email config is missing
+    if (!emailSent && emailReason === "missing_config" && process.env.NODE_ENV !== "production") {
+      user.isVerified = true;
+      await user.save();
+      logger.info({ email: user.email }, "User auto-verified in dev mode due to missing email config");
+    }
+
     const responsePayload = {
       success: true,
       emailSent,
@@ -146,10 +153,13 @@ const login = async (req, res, next) => {
     // 3. Compare passwords
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
+      logger.warn({ email, ip: req.ip }, "Failed login attempt - invalid password");
       const error = new Error("Invalid email or password");
       error.statusCode = 401;
       return next(error);
     }
+
+    logger.info({ email, userId: user._id }, "User logged in successfully");
 
     // Check if verified
     if (!user.isVerified) {

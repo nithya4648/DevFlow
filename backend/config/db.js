@@ -12,8 +12,11 @@ const connectDB = async () => {
   const connect = async () => {
     try {
       const conn = await mongoose.connect(uri, {
-        serverSelectionTimeoutMS: 10000, // 10s timeout
+        serverSelectionTimeoutMS: 10000,
         socketTimeoutMS: 45000,
+        maxPoolSize: 5,
+        minPoolSize: 2,
+        maxIdleTimeMS: 30000,
       });
       logger.info({ host: conn.connection.host }, "MongoDB connected");
     } catch (error) {

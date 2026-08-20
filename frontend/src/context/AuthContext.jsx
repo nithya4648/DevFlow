@@ -39,6 +39,9 @@ export const AuthProvider = ({ children }) => {
     try {
       const data = await authService.login(credentials);
       if (data.success && data.user) {
+        if (data.token) {
+          localStorage.setItem("devflow_token", data.token);
+        }
         setUser(data.user);
       }
       return data;
@@ -58,6 +61,7 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       await authService.logout();
+      localStorage.removeItem("devflow_token");
       setUser(null);
     } catch (error) {
       console.error("Error logging out:", error.message);

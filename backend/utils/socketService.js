@@ -11,22 +11,29 @@ const configureSocket = (io) => {
   // Middleware to authenticate socket connections
   io.use(async (socket, next) => {
     try {
-      // For WebSocket, standard cookies are sometimes tricky cross-origin if not setup perfectly,
-      // but since we are on the same domain or have CORS configured with credentials: true,
-      // we can parse the cookie header.
+      let token = null;
+
+      // Try 1: Get from cookies
       const cookieHeader = socket.request.headers.cookie;
-      if (!cookieHeader) {
-        return next(new Error("Authentication error: No cookies"));
+      if (cookieHeader) {
+        const cookies = cookieHeader.split(";").reduce((acc, cookie) => {
+          const [name, value] = cookie.trim().split("=");
+          acc[name] = value;
+          return acc;
+        }, {});
+        token = cookies.devflow_token;
       }
 
-      // Simple cookie parser for devflow_token
-      const cookies = cookieHeader.split(";").reduce((acc, cookie) => {
-        const [name, value] = cookie.trim().split("=");
-        acc[name] = value;
-        return acc;
-      }, {});
+      // Try 2: Fallback to Bearer token from auth header or query
+      if (!token && socket.handshake.auth && socket.handshake.auth.token) {
+        token = socket.handshake.auth.token;
+      }
 
-      const token = cookies.devflow_token;
+      // Try 3: Fallback to query param
+      if (!token && socket.handshake.query && socket.handshake.query.token) {
+        token = socket.handshake.query.token;
+      }
+
       if (!token) {
         return next(new Error("Authentication error: No token"));
       }
@@ -38,7 +45,6 @@ const configureSocket = (io) => {
         return next(new Error("Authentication error: User not found"));
       }
 
-      // Attach user to socket
       socket.user = user;
       next();
     } catch (error) {
