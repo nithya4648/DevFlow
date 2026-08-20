@@ -3,14 +3,13 @@ import useAuth from "../hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { analyticsService } from "../services/analytics.service";
 import QuickLaunch from "../components/dashboard/QuickLaunch";
-import UsageStats from "../components/dashboard/UsageStats";
 import RecentProjects from "../components/dashboard/RecentProjects";
 import RecentBookmarks from "../components/dashboard/RecentBookmarks";
 import RecentSnippets from "../components/dashboard/RecentSnippets";
 import RecentNotes from "../components/dashboard/RecentNotes";
 import ActivityFeed from "../components/dashboard/ActivityFeed";
 import PinnedTools from "../components/dashboard/PinnedTools";
-import DashboardCharts from "../components/dashboard/DashboardCharts";
+import ContributionGraph from "../components/dashboard/ContributionGraph";
 import { ListSkeleton } from "../components/ui/Skeleton";
 
 export const DashboardPage = () => {
@@ -44,18 +43,10 @@ export const DashboardPage = () => {
       {/* 2. Quick Launch Shortcuts (Always at top) */}
       <QuickLaunch />
 
-      {/* 3. Analytics Overview & Charts */}
       {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {Array.from({ length: 4 }).map((_, idx) => (
-            <div key={idx} className="h-24 animate-pulse rounded-md bg-gh-surface border border-gh-border" />
-          ))}
-        </div>
+        <div className="h-40 animate-pulse rounded-md bg-gh-surface border border-gh-border" />
       ) : (
-        <>
-          <UsageStats overview={overview} />
-          <DashboardCharts overview={overview} />
-        </>
+        <ContributionGraph />
       )}
 
       {/* 4. Grid Content - Widgets & Activity */}

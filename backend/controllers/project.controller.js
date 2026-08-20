@@ -3,7 +3,10 @@ const Project = require("../models/Project.model");
 const { createProjectSchema, updateProjectSchema } = require("../validators/project.validators");
 const { hasTeamPermission } = require("../utils/rbac");
 
-const logActivity = async () => {};
+const Activity = require("../models/Activity.model");
+const logActivity = async (teamId, userId, action, targetType, targetId, targetName) => {
+  await Activity.create({ team: teamId || null, user: userId, action, targetType, targetId, targetName });
+};
 
 // Helper to get teams a user belongs to
 const getUserTeams = async (userId) => {
@@ -87,8 +90,8 @@ const createProject = async (req, res, next) => {
       owner: req.user._id,
     });
 
+    await logActivity(teamId, req.user._id, "created project", "project", project._id, project.title);
     if (teamId) {
-      await logActivity(teamId, req.user._id, "created project", "project", project._id, project.title);
       // Emit socket event to team
       const io = req.app.get("io");
       if (io) io.to(`team_${teamId}`).emit("project:created", project);
@@ -159,8 +162,8 @@ const updateProject = async (req, res, next) => {
     Object.assign(project, validatedData);
     await project.save();
 
+    await logActivity(project.teamId, req.user._id, "updated project", "project", project._id, project.title);
     if (project.teamId) {
-      await logActivity(project.teamId, req.user._id, "updated project", "project", project._id, project.title);
       // Emit socket event
       const io = req.app.get("io");
       if (io) io.to(`team_${project.teamId}`).emit("project:updated", project);
@@ -199,8 +202,8 @@ const deleteProject = async (req, res, next) => {
     
     await Project.findByIdAndDelete(req.params.id);
 
+    await logActivity(teamId, req.user._id, "deleted project", "project", null, title);
     if (teamId) {
-      await logActivity(teamId, req.user._id, "deleted project", "project", null, title);
       // Emit socket event
       const io = req.app.get("io");
       if (io) io.to(`team_${teamId}`).emit("project:deleted", { id: req.params.id });

@@ -132,7 +132,49 @@ const logToolUsage = async (req, res, next) => {
   }
 };
 
+// @desc    Get daily activity counts for the last N days (GitHub-style contribution calendar)
+// @route   GET /api/analytics/contributions?days=365
+// @access  Private
+const getContributions = async (req, res, next) => {
+  try {
+    const userId = req.user._id;
+    const days = Math.min(parseInt(req.query.days, 10) || 365, 365);
+
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - (days - 1));
+    startDate.setHours(0, 0, 0, 0);
+
+    const raw = await Activity.aggregate([
+      { $match: { user: userId, createdAt: { $gte: startDate } } },
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    const countByDate = raw.reduce((acc, r) => {
+      acc[r._id] = r.count;
+      return acc;
+    }, {});
+
+    const contributions = [];
+    for (let i = days - 1; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const dateStr = d.toISOString().split("T")[0];
+      contributions.push({ date: dateStr, count: countByDate[dateStr] || 0 });
+    }
+
+    res.status(200).json({ success: true, contributions });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getOverview,
-  logToolUsage
+  logToolUsage,
+  getContributions,
 };

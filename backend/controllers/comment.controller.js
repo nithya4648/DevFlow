@@ -6,7 +6,10 @@ const Snippet = require("../models/Snippet.model");
 const Doc = require("../models/Doc.model");
 const { createCommentSchema } = require("../validators/comment.validators");
 const { hasTeamPermission } = require("../utils/rbac");
-const logActivity = async () => {};
+const Activity = require("../models/Activity.model");
+const logActivity = async (teamId, userId, action, targetType, targetId, targetName) => {
+  await Activity.create({ team: teamId || null, user: userId, action, targetType, targetId, targetName });
+};
 
 // Helper to find the teamId associated with the target
 const getTargetTeamId = async (targetType, targetId) => {
@@ -91,23 +94,22 @@ const createComment = async (req, res, next) => {
 
     const populated = await comment.populate("author", "name email avatar");
 
-    // Log Activity if it is a team target
+    // Get target details
+    let targetName = "";
+    if (targetType === "project") {
+      const p = await Project.findById(targetId).select("title");
+      targetName = p?.title;
+    } else if (targetType === "snippet") {
+      const s = await Snippet.findById(targetId).select("title");
+      targetName = s?.title;
+    } else if (targetType === "doc") {
+      const d = await Doc.findById(targetId).select("title");
+      targetName = d?.title;
+    }
+
+    await logActivity(teamId, req.user._id, `commented on ${targetType}`, targetType, targetId, targetName);
+
     if (teamId) {
-      // Get target details
-      let targetName = "";
-      if (targetType === "project") {
-        const p = await Project.findById(targetId).select("title");
-        targetName = p?.title;
-      } else if (targetType === "snippet") {
-        const s = await Snippet.findById(targetId).select("title");
-        targetName = s?.title;
-      } else if (targetType === "doc") {
-        const d = await Doc.findById(targetId).select("title");
-        targetName = d?.title;
-      }
-
-      await logActivity(teamId, req.user._id, `commented on ${targetType}`, targetType, targetId, targetName);
-
       // Emit to team via socket
       const io = req.app.get("io");
       if (io) {

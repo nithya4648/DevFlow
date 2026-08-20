@@ -3,7 +3,10 @@ const Snippet = require("../models/Snippet.model");
 const { createSnippetSchema, updateSnippetSchema } = require("../validators/snippet.validators");
 const { hasTeamPermission } = require("../utils/rbac");
 
-const logActivity = async () => {};
+const Activity = require("../models/Activity.model");
+const logActivity = async (teamId, userId, action, targetType, targetId, targetName) => {
+  await Activity.create({ team: teamId || null, user: userId, action, targetType, targetId, targetName });
+};
 
 // Helper to get teams a user belongs to
 const getUserTeams = async (userId) => {
@@ -107,8 +110,8 @@ const createSnippet = async (req, res, next) => {
       owner: req.user._id,
     });
 
+    await logActivity(teamId, req.user._id, "created snippet", "snippet", snippet._id, snippet.title);
     if (teamId) {
-      await logActivity(teamId, req.user._id, "created snippet", "snippet", snippet._id, snippet.title);
       // Emit socket event
       const io = req.app.get("io");
       if (io) io.to(`team_${teamId}`).emit("snippet:created", snippet);
@@ -178,8 +181,8 @@ const updateSnippet = async (req, res, next) => {
     Object.assign(snippet, validatedData);
     await snippet.save();
 
+    await logActivity(snippet.teamId, req.user._id, "updated snippet", "snippet", snippet._id, snippet.title);
     if (snippet.teamId) {
-      await logActivity(snippet.teamId, req.user._id, "updated snippet", "snippet", snippet._id, snippet.title);
       // Emit socket event
       const io = req.app.get("io");
       if (io) io.to(`team_${snippet.teamId}`).emit("snippet:updated", snippet);
@@ -218,8 +221,8 @@ const deleteSnippet = async (req, res, next) => {
 
     await Snippet.findByIdAndDelete(req.params.id);
 
+    await logActivity(teamId, req.user._id, "deleted snippet", "snippet", null, title);
     if (teamId) {
-      await logActivity(teamId, req.user._id, "deleted snippet", "snippet", null, title);
       // Emit socket event
       const io = req.app.get("io");
       if (io) io.to(`team_${teamId}`).emit("snippet:deleted", { id: req.params.id });

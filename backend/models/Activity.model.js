@@ -6,7 +6,7 @@ const activitySchema = new mongoose.Schema(
     team: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Team",
-      required: true,
+      default: null,
       index: true,
     },
     user: {

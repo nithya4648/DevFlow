@@ -10,7 +10,13 @@ const logToolUsage = async (toolSlug) => {
   return response.data;
 };
 
+const getContributions = async (days = 365) => {
+  const response = await api.get(`/analytics/contributions?days=${days}`);
+  return response.data;
+};
+
 export const analyticsService = {
   getOverview,
   logToolUsage,
+  getContributions,
 };

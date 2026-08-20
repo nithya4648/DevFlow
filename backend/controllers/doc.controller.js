@@ -4,7 +4,10 @@ const DocVersion = require("../models/DocVersion.model");
 const { createDocSchema, updateDocSchema } = require("../validators/doc.validators");
 const { hasTeamPermission } = require("../utils/rbac");
 
-const logActivity = async () => {};
+const Activity = require("../models/Activity.model");
+const logActivity = async (teamId, userId, action, targetType, targetId, targetName) => {
+  await Activity.create({ team: teamId || null, user: userId, action, targetType, targetId, targetName });
+};
 
 // Helper to get teams a user belongs to
 const getUserTeams = async (userId) => {
@@ -77,8 +80,8 @@ const createDoc = async (req, res, next) => {
       owner: req.user._id,
     });
 
+    await logActivity(teamId, req.user._id, "created document", "doc", doc._id, doc.title);
     if (teamId) {
-      await logActivity(teamId, req.user._id, "created document", "doc", doc._id, doc.title);
       // Emit socket event
       const io = req.app.get("io");
       if (io) io.to(`team_${teamId}`).emit("doc:created", doc);
@@ -155,8 +158,8 @@ const updateDoc = async (req, res, next) => {
     Object.assign(existing, validatedData);
     await existing.save();
 
+    await logActivity(existing.teamId, req.user._id, "updated document", "doc", existing._id, existing.title);
     if (existing.teamId) {
-      await logActivity(existing.teamId, req.user._id, "updated document", "doc", existing._id, existing.title);
       // Emit socket event
       const io = req.app.get("io");
       if (io) io.to(`team_${existing.teamId}`).emit("doc:updated", existing);
@@ -195,8 +198,8 @@ const deleteDoc = async (req, res, next) => {
     await Doc.findByIdAndDelete(req.params.id);
     await DocVersion.deleteMany({ docId: doc._id });
 
+    await logActivity(teamId, req.user._id, "deleted document", "doc", null, title);
     if (teamId) {
-      await logActivity(teamId, req.user._id, "deleted document", "doc", null, title);
       // Emit socket event
       const io = req.app.get("io");
       if (io) io.to(`team_${teamId}`).emit("doc:deleted", { id: req.params.id });
