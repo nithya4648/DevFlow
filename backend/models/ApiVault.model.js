@@ -16,6 +16,8 @@ const apiVaultSchema = new mongoose.Schema(
     key: {
       type: String,
       required: true,
+      maxlength: [10000, "Encrypted key too large"],
+      trim: false
     },
     value: {
       type: String,

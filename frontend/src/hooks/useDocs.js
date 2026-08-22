@@ -50,28 +50,34 @@ export function useUpdateDoc() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: ({ id, data }) => docService.updateDoc(id, data),
-    onMutate: async (variables) => {
-      await qc.cancelQueries({ queryKey: [DOC_KEY, "detail", variables.id] });
-      const previousDoc = qc.getQueryData([DOC_KEY, "detail", variables.id]);
-      qc.setQueryData([DOC_KEY, "detail", variables.id], (prev) => {
-        if (!prev) return prev;
-        return {
-          ...prev,
-          data: { ...prev.data, ...variables.data },
-        };
-      });
-      return { previousDoc };
+    onMutate: async ({ id, data }) => {
+      // Cancel outgoing queries to prevent race condition
+      await qc.cancelQueries({ queryKey: [DOC_KEY, "detail", id] });
+      
+      // Snapshot old data for rollback
+      const previousDoc = qc.getQueryData([DOC_KEY, "detail", id]);
+      
+      // Optimistically update UI immediately
+      qc.setQueryData([DOC_KEY, "detail", id], (old) => ({
+        ...old,
+        data: { ...old?.data, ...data }
+      }));
+      
+      return { previousDoc, id };
     },
-    onError: (err, variables, context) => {
-      if (context?.previousDoc) {
-        qc.setQueryData([DOC_KEY, "detail", variables.id], context.previousDoc);
-      }
-    },
-    onSuccess: (_, { id }) => {
+    onSuccess: (responseData, { id }) => {
+      // Update with server response (source of truth)
+      qc.setQueryData([DOC_KEY, "detail", id], responseData);
+      // Invalidate list to reflect updated timestamp
       qc.invalidateQueries({ queryKey: [DOC_KEY, "list"] });
-      qc.invalidateQueries({ queryKey: [DOC_KEY, "detail", id] });
       qc.invalidateQueries({ queryKey: [DOC_KEY, "versions", id] });
     },
+    onError: (error, { id }, context) => {
+      // Rollback on error
+      if (context?.previousDoc) {
+        qc.setQueryData([DOC_KEY, "detail", id], context.previousDoc);
+      }
+    }
   });
 }
 

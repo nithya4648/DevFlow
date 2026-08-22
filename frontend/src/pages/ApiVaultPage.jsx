@@ -488,7 +488,7 @@ export default function ApiVaultPage() {
                 {/* Key */}
                 <div>
                   <label className="text-[11px] font-mono text-gh-muted uppercase tracking-wider block mb-1">
-                    API Key *{editId && " (leave blank to keep current)"} <span className="text-[10px] text-gh-muted">(max 500 chars)</span>
+                    API Key *{editId && " (leave blank to keep current)"} <span className="text-[10px] text-gh-muted">(max 2048 chars)</span>
                   </label>
                   <input
                     type="password"
@@ -496,12 +496,15 @@ export default function ApiVaultPage() {
                     placeholder="sk-proj-abc123..."
                     value={form.key}
                     onChange={(e) => {
-                      if (e.target.value.length <= 500) setForm((f) => ({ ...f, key: e.target.value }));
+                      if (e.target.value.length <= 2048) setForm((f) => ({ ...f, key: e.target.value }));
                     }}
-                    maxLength={500}
+                    maxLength={2048}
                     className="gh-input text-xs font-mono w-full"
                     autoComplete="off"
                   />
+                  <div className="text-[10px] text-gh-muted font-mono mt-0.5">
+                    {(form.key?.length || 0)} / 2048 characters
+                  </div>
                 </div>
 
                 {/* Value */}

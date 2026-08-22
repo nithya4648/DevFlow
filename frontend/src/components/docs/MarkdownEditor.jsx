@@ -72,6 +72,14 @@ export default function MarkdownEditor({ title, content, category, onSave, isSav
     return () => window.removeEventListener("keydown", handler);
   });
 
+  useEffect(() => {
+    return () => {
+      // When component unmounts, fire save if dirty
+      if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current);
+      if (isDirty) handleSave();
+    };
+  }, [isDirty]);
+
   const rendered = renderMarkdown(localContent);
 
   return (

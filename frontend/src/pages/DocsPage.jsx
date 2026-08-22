@@ -46,6 +46,7 @@ export default function DocsPage() {
 
   function handleSaveDoc({ title, content, category }) {
     if (!selectedDocId) return;
+    console.log('Saving doc:', { id: selectedDocId, title, content: content.substring(0, 50) + '...' });
     updateMutation.mutate({
       id: selectedDocId,
       data: { title, content, category },
