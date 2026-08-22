@@ -91,21 +91,32 @@ const authLimiter = rateLimit({
   message: "Too many authentication attempts, please try again after 15 minutes",
 });
 
-if (!isTest) {
-  app.use("/api/auth/login", authLimiter);
-  app.use("/api/auth/register", authLimiter);
-  app.use("/api/auth/forgot-password", authLimiter);
-}
+const defaultOrigins = [
+  "https://dev-flow-zeta-ashy.vercel.app",
+  "https://devflow-1-ilfg.onrender.com",
+  "https://devflow-vfnd.onrender.com",
+  "http://localhost:5173",
+  "http://localhost:5174",
+  "http://localhost:3000",
+  "http://127.0.0.1:5173",
+  "http://127.0.0.1:5174",
+  "http://127.0.0.1:3000",
+];
 
-const allowedOrigins = [process.env.CLIENT_URL, "https://dev-flow-zeta-ashy.vercel.app"];
-// Add more origins as needed
+const envOrigins = [process.env.CLIENT_URL, process.env.CORS_ORIGIN]
+  .filter(Boolean)
+  .flatMap((url) => url.split(",").map((s) => s.trim()));
+
+const allowedOrigins = Array.from(new Set([...defaultOrigins, ...envOrigins]));
+
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow requests with no origin (like mobile apps, curl) or whitelisted origins
-    if (!origin || allowedOrigins.includes(origin)) {
+    // Allow requests with no origin (like mobile apps, curl) or whitelisted origins or dev localhost
+    if (!origin || allowedOrigins.includes(origin) || (isDev && origin.includes("localhost"))) {
       callback(null, true);
     } else {
-      callback(new Error("Not allowed by CORS"), false);
+      logger.warn({ origin }, "CORS blocked request from origin");
+      callback(new Error(`Not allowed by CORS: ${origin}`), false);
     }
   },
   credentials: true,

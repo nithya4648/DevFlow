@@ -41,7 +41,7 @@ function LoginPage() {
     try {
       setIsSubmitting(true);
       const res = await login(data);
-      if (res.success) {
+      if (res?.success) {
         addToast("Logged in successfully!", "success");
         const inviteToken = searchParams.get("inviteToken");
         const redirect = searchParams.get("redirect");
@@ -54,7 +54,30 @@ function LoginPage() {
         }
       }
     } catch (err) {
-      const errMsg = err.response?.data?.message || err.message || "Invalid credentials";
+      let errMsg = "Invalid credentials";
+
+      if (err.response?.data) {
+        const resData = err.response.data;
+        if (resData.errors && typeof resData.errors === "object") {
+          const errorValues = Object.values(resData.errors);
+          errMsg = errorValues.length > 0 ? errorValues.join(". ") : resData.message || errMsg;
+        } else if (resData.message) {
+          errMsg = resData.message;
+        }
+      } else if (err.code === "ECONNABORTED" || err.message?.toLowerCase().includes("timeout")) {
+        errMsg = "Server request timed out. The backend server might be waking up from sleep, please try again.";
+      } else if (err.message === "Network Error" || !err.response) {
+        errMsg = "Unable to connect to the server. Please check your network connection or server status.";
+      } else if (err.message) {
+        errMsg = err.message;
+      }
+
+      console.error("[Login Failed]", {
+        message: errMsg,
+        status: err.response?.status,
+        data: err.response?.data,
+      });
+
       addToast(errMsg, "error");
       if (
         err.response?.data?.isVerified === false ||
