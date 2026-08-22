@@ -3,24 +3,18 @@ const mongoose = require("mongoose");
 
 const activitySchema = new mongoose.Schema(
   {
-    team: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Team",
-      default: null,
-      index: true,
-    },
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
+      index: true,
     },
     action: {
       type: String,
       required: true,
-      // e.g. "created a project", "commented on a snippet", "updated a document"
     },
     targetType: {
-      type: String, // e.g. "project", "snippet", "doc", "team"
+      type: String, // e.g. "project", "snippet", "doc"
       required: true,
     },
     targetId: {
@@ -28,15 +22,15 @@ const activitySchema = new mongoose.Schema(
       default: null,
     },
     targetName: {
-      type: String, // Denormalized name (e.g. Project title) so if deleted, activity still makes sense
+      type: String,
       default: "",
-    }
+    },
   },
   {
     timestamps: true,
   }
 );
 
-activitySchema.index({ team: 1, createdAt: -1 });
+activitySchema.index({ user: 1, createdAt: -1 });
 
 module.exports = mongoose.model("Activity", activitySchema);

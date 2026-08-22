@@ -1,50 +1,87 @@
 # DevFlow – Developer Workspace Platform
 
-A real-time collaborative platform for developers. Manage projects, snippets, documentation, secure credentials, and bookmarks—all in one place.
+[![CI](https://github.com/nithya4648/DevFlow/actions/workflows/ci.yml/badge.svg)](https://github.com/nithya4648/DevFlow/actions/workflows/ci.yml)
+[![Node.js](https://img.shields.io/badge/Node.js-20.x-green.svg)](https://nodejs.org)
+[![React](https://img.shields.io/badge/React-18-blue.svg)](https://react.dev)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**[Live Demo](https://dev-flow-zeta-ashy.vercel.app/)** | **[GitHub](https://github.com/nithya4648/DevFlow)**
+A developer workspace platform designed for productivity. Manage projects, code snippets, documentation wikis, encrypted credentials, and bookmarks—all in one place.
 
-## Stack
-- **Frontend**: React (Vite), Tailwind CSS, Socket.io, Framer Motion
-- **Backend**: Node.js, Express, MongoDB, Socket.io
-- **Security**: JWT authentication, AES-256-GCM encryption for vault
+**[Live Demo](https://dev-flow-zeta-ashy.vercel.app/)** | **[GitHub Repository](https://github.com/nithya4648/DevFlow)** | **[API Documentation](docs/API.md)**
 
-## What I Built
-- **Real-time collaboration** – Live activity feeds, presence awareness, instant notifications via WebSocket
-- **Secure Vault** – AES-256-GCM encrypted storage for API keys and environment variables
-- **Full-text search** – Fast retrieval across projects, snippets, docs, bookmarks
-- **Authentication** – JWT (httpOnly cookie) with bcrypt password hashing
-- **Production deployment** – Vercel (frontend) + Render (backend) with MongoDB Atlas
+---
 
-## Key Decisions
-- **Socket.io** for real-time updates instead of polling (lower latency, better UX)
-- **MongoDB** for flexible document model (varied data shapes across features)
-- **Context + Hooks** instead of Redux (less boilerplate, sufficient for this scale)
-- **Vercel + Render** for automatic CI/CD and infrastructure simplicity
+## 🛠 Tech Stack
 
-## Performance
-- Backend response time: ~200ms (p95)
-- WebSocket latency: <50ms
-- Page load: <2.5s on 4G
+- **Frontend**: React (Vite), Tailwind CSS, TanStack Query, Monaco Editor, Framer Motion
+- **Backend**: Node.js, Express, MongoDB (Mongoose), Socket.io, Pino Logger
+- **Security & Cryptography**: AES-256-GCM (random IVs per secret), JWT with HTTP-only cookies, bcrypt password hashing, Zod schema validation, ReDoS-safe regex escaping
+- **Testing & CI/CD**: Jest, Supertest, MongoDB Memory Server, GitHub Actions CI
 
-## Setup
+---
+
+## ✨ Features & Architecture
+
+- **Documentation Wiki**: Full Markdown editor with instant preview, document download (`.md`), and automated historical version tracking.
+- **Kanban & Calendar Projects**: Multi-view project tracking with status lanes, priority tagging, and deep-link navigation.
+- **Code Snippet Library**: Monaco-powered multi-language code storage with tagging, folder structure, and favorite toggles.
+- **Secure Encrypted Vault**: Zero-leakage secret storage using authenticated AES-256-GCM encryption with unique initialization vectors for API keys and environment variables.
+- **Global Search**: Sub-millisecond instant search across all documents, snippets, projects, notes, and bookmarks with ReDoS query protection.
+- **Developer Scratchpad & Bookmarks**: Categorized reference link keeper and rich note taking.
+- **Centralized Error Handling**: Unified error response normalization for Zod validation, Mongoose duplicates, and server exceptions.
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js 18+
+- MongoDB instance (local or Atlas)
+
+### Setup & Local Development
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/nithya4648/DevFlow.git
+   cd DevFlow
+   ```
+
+2. **Backend Setup**
+   ```bash
+   cd backend
+   npm install
+   # Configure backend/.env
+   # MONGO_URI=mongodb://localhost:27017/devflow
+   # JWT_SECRET=your_jwt_secret
+   # ENCRYPTION_KEY=<base64 32-byte key>
+   # CLIENT_URL=http://localhost:5173
+   npm run dev
+   ```
+
+3. **Frontend Setup**
+   ```bash
+   cd frontend
+   npm install
+   npm run dev
+   ```
+
+4. Open `http://localhost:5173` in your browser.
+
+---
+
+## 🧪 Testing & CI
+
+DevFlow includes integration tests covering auth flows, core CRUD operations, pagination, regex sanitization, and cryptographic round-trips:
+
 ```bash
-# Backend
-cd backend && npm install
-# Create .env with MONGO_URI, JWT_SECRET, PORT=5000, CLIENT_URL
-npm run dev
-
-# Frontend
-cd frontend && npm install
-# Create .env.local with VITE_API_URL=http://localhost:5000/api
-npm run dev
+cd backend
+npm test
 ```
 
-Open `http://localhost:5173`
+Automated continuous integration is configured via **GitHub Actions** (`.github/workflows/ci.yml`) on every push and pull request.
 
-## What I Learned
-- Production-grade encryption for sensitive data
-- Real-time architecture with connection resilience
-- MongoDB query optimization (80%+ reduction in response times)
-- Full authentication flow with JWT
-- Containerization and deployment automation
+---
+
+## 📖 API Documentation
+
+Complete REST API specifications including payload schemas and response shapes are available in **[docs/API.md](docs/API.md)**.

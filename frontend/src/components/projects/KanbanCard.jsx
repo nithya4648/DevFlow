@@ -44,11 +44,6 @@ export default function KanbanCard({ project, onEdit, onDelete, canEdit = true, 
           <h3 className="text-xs font-semibold text-gh-heading leading-snug line-clamp-2">
             {project.title}
           </h3>
-          {project.teamId && (
-            <span className="inline-flex items-center mt-0.5 font-mono text-[9px] font-semibold text-sky-400 bg-sky-400/10 px-1.5 py-0.5 rounded border border-sky-400/20">
-              👥 {project.teamId.name || "Team"}
-            </span>
-          )}
         </div>
         {/* Action buttons */}
         <div

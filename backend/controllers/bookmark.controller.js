@@ -1,13 +1,14 @@
 // backend/controllers/bookmark.controller.js
 const Bookmark = require("../models/Bookmark.model");
 const { createBookmarkSchema, updateBookmarkSchema } = require("../validators/bookmark.validators");
+const { escapeRegex } = require("../utils/regex.utils");
 
 // @desc    Get all bookmarks for logged-in user
 // @route   GET /api/bookmarks
 // @access  Private
 const getBookmarks = async (req, res, next) => {
   try {
-    const { category, search } = req.query;
+    const { category, search, page = 1, limit = 50 } = req.query;
     const filter = { owner: req.user._id };
 
     if (category && category !== "all") {
@@ -15,20 +16,40 @@ const getBookmarks = async (req, res, next) => {
     }
 
     if (search) {
+      const searchRegex = { $regex: escapeRegex(search), $options: "i" };
       filter.$or = [
-        { title: { $regex: search, $options: "i" } },
-        { url: { $regex: search, $options: "i" } },
-        { notes: { $regex: search, $options: "i" } },
+        { title: searchRegex },
+        { url: searchRegex },
+        { notes: searchRegex },
       ];
     }
 
-    const bookmarks = await Bookmark.find(filter)
-      .sort({ createdAt: -1 })
-      .lean();
+    const pageNum = Math.max(1, parseInt(page, 10) || 1);
+    const limitNum = Math.min(100, Math.max(1, parseInt(limit, 10) || 50));
+    const skip = (pageNum - 1) * limitNum;
+
+    const [bookmarks, total, categories] = await Promise.all([
+      Bookmark.find(filter)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limitNum)
+        .lean(),
+      Bookmark.countDocuments(filter),
+      Bookmark.distinct("category", { owner: req.user._id }),
+    ]);
 
     res.status(200).json({
       success: true,
       data: bookmarks,
+      pagination: {
+        total,
+        page: pageNum,
+        limit: limitNum,
+        pages: Math.ceil(total / limitNum),
+      },
+      meta: {
+        categories: categories.filter(Boolean).sort(),
+      },
     });
   } catch (error) {
     next(error);

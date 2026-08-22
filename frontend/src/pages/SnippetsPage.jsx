@@ -1,12 +1,10 @@
-import { useContext, useRef, useState, useCallback, useEffect } from "react";
+import { useRef, useState, useCallback, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useSnippets, useCreateSnippet, useUpdateSnippet, useDeleteSnippet } from "../hooks/useSnippets";
 import SnippetSidebar from "../components/snippets/SnippetSidebar";
 import SnippetCard from "../components/snippets/SnippetCard";
 import SnippetModal from "../components/snippets/SnippetModal";
 import { Skeleton } from "../components/ui/Skeleton";
-import { AuthContext } from "../context/AuthContext";
-import { useTeams } from "../hooks/useTeams";
 
 const ALL_FILTER = { type: "all", value: "__all__" };
 
@@ -51,9 +49,6 @@ function SnippetGridSkeleton() {
 }
 
 export default function SnippetsPage() {
-  const { user } = useContext(AuthContext);
-  const { data: teamsData } = useTeams();
-  const teams = teamsData?.data || [];
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [activeFilter, setActiveFilter] = useState(ALL_FILTER);
@@ -62,18 +57,9 @@ export default function SnippetsPage() {
   const [editSnippet, setEditSnippet] = useState(null);
   const searchTimer = useRef(null);
 
-  // Per-snippet permission helper
-  const getPerms = useCallback((snippet) => {
-    const teamId = snippet.teamId?._id || snippet.teamId;
-    if (!teamId) return { canEdit: true, canDelete: true };
-    const team = teams.find((t) => t._id === teamId);
-    const member = team?.members?.find((m) => (m.user?._id || m.user) === user?._id);
-    const role = member?.role || "viewer";
-    return {
-      canEdit: role === "admin" || role === "editor",
-      canDelete: role === "admin",
-    };
-  }, [teams, user]);
+  const getPerms = useCallback(() => {
+    return { canEdit: true, canDelete: true };
+  }, []);
 
   const apiFilters = { ...buildApiFilters(activeFilter), ...(search ? { search } : {}) };
 
@@ -98,7 +84,7 @@ export default function SnippetsPage() {
         setSearchParams(searchParams, { replace: true });
       }
     }
-  }, [searchParams, snippets]);
+  }, [searchParams, snippets, modalOpen, setSearchParams]);
 
   function handleSearch(e) {
     const val = e.target.value;

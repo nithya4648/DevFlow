@@ -1,4 +1,4 @@
-import { useContext, useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useProjects, useCreateProject, useUpdateProject, useDeleteProject } from "../hooks/useProjects";
 import KanbanBoard from "../components/projects/KanbanBoard";
@@ -6,8 +6,6 @@ import CalendarView from "../components/projects/CalendarView";
 import ProjectModal from "../components/projects/ProjectModal";
 import ProjectFilters from "../components/projects/ProjectFilters";
 import { Skeleton } from "../components/ui/Skeleton";
-import { AuthContext } from "../context/AuthContext";
-import { useTeams } from "../hooks/useTeams";
 
 const VIEW_KANBAN = "kanban";
 const VIEW_CALENDAR = "calendar";
@@ -50,9 +48,6 @@ function ProjectsSkeleton() {
 }
 
 export default function ProjectsPage() {
-  const { user } = useContext(AuthContext);
-  const { data: teamsData } = useTeams();
-  const teams = teamsData?.data || [];
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [view, setView] = useState(VIEW_KANBAN);
@@ -61,21 +56,9 @@ export default function ProjectsPage() {
   const [editProject, setEditProject] = useState(null);
   const [defaultStatus, setDefaultStatus] = useState("todo");
 
-  // Helper: given a project return the current user's edit/delete capability
-  const getPerms = useCallback((project) => {
-    const teamId = project.teamId?._id || project.teamId;
-    if (!teamId) return { canEdit: true, canDelete: true }; // private
-    const team = teams.find((t) => t._id === teamId);
-    const isOwner = (team?.owner?._id || team?.owner) === user?._id;
-    const member = team?.members?.find((m) => (m.user?._id || m.user) === user?._id);
-    const role = member?.role || "viewer";
-    return {
-      canEdit: isOwner || role === "admin",
-      canDelete: isOwner || role === "admin",
-    };
-  }, [teams, user]);
-
-
+  const getPerms = useCallback(() => {
+    return { canEdit: true, canDelete: true };
+  }, []);
 
   // Strip empty filter keys before sending to API
   const activeFilters = Object.fromEntries(
@@ -101,7 +84,7 @@ export default function ProjectsPage() {
         setSearchParams(searchParams, { replace: true });
       }
     }
-  }, [searchParams, projects]);
+  }, [searchParams, projects, modalOpen, setSearchParams]);
 
   function openCreateModal(status = "todo") {
     setEditProject(null);

@@ -1,16 +1,15 @@
 // backend/controllers/snippet.controller.js
 const Snippet = require("../models/Snippet.model");
-const { createSnippetSchema, updateSnippetSchema } = require("../validators/snippet.validators");
-
-
 const Activity = require("../models/Activity.model");
-const logActivity = async (teamId, userId, action, targetType, targetId, targetName) => {
-  await Activity.create({ team: teamId || null, user: userId, action, targetType, targetId, targetName });
-};
+const { createSnippetSchema, updateSnippetSchema } = require("../validators/snippet.validators");
+const { escapeRegex } = require("../utils/regex.utils");
 
-// Helper to get teams a user belongs to
-const getUserTeams = async (userId) => {
-  return [];
+const logActivity = async (userId, action, targetType, targetId, targetName) => {
+  try {
+    await Activity.create({ user: userId, action, targetType, targetId, targetName });
+  } catch {
+    // Non-blocking activity logging
+  }
 };
 
 // @desc    Get all snippets for logged-in user
@@ -18,16 +17,9 @@ const getUserTeams = async (userId) => {
 // @access  Private
 const getSnippets = async (req, res, next) => {
   try {
-    const { language, folder, tag, favorite, search, page = 1, limit = 100 } = req.query;
+    const { language, folder, tag, favorite, search, page = 1, limit = 50 } = req.query;
 
-    const teamIds = await getUserTeams(req.user._id);
-
-    const filter = {
-      $or: [
-        { owner: req.user._id },
-        { teamId: { $in: teamIds } },
-      ],
-    };
+    const filter = { owner: req.user._id };
 
     if (language) filter.language = language;
     if (folder !== undefined) filter.folder = folder;
@@ -35,46 +27,38 @@ const getSnippets = async (req, res, next) => {
     if (favorite === "true") filter.isFavorite = true;
 
     if (search) {
+      const searchRegex = { $regex: escapeRegex(search), $options: "i" };
       filter.$or = [
-        { title: { $regex: search, $options: "i" } },
-        { description: { $regex: search, $options: "i" } },
-        { code: { $regex: search, $options: "i" } },
+        { title: searchRegex },
+        { description: searchRegex },
+        { code: searchRegex },
       ];
     }
 
-    const pageNum = Math.max(1, parseInt(page));
-    const limitNum = Math.min(200, Math.max(1, parseInt(limit)));
+    const pageNum = Math.max(1, parseInt(page, 10) || 1);
+    const limitNum = Math.min(200, Math.max(1, parseInt(limit, 10) || 50));
     const skip = (pageNum - 1) * limitNum;
 
-    const [snippets, total] = await Promise.all([
+    const [snippets, total, allFolders, allTags] = await Promise.all([
       Snippet.find(filter)
-        .populate("teamId", "name")
         .sort({ isFavorite: -1, updatedAt: -1 })
         .skip(skip)
         .limit(limitNum)
         .lean(),
       Snippet.countDocuments(filter),
-    ]);
-
-    // Derive folder and tag lists from all accessible user snippets (for sidebar)
-    const [allFolders, allTags] = await Promise.all([
-      Snippet.distinct("folder", {
-        $or: [
-          { owner: req.user._id },
-          { teamId: { $in: teamIds } }
-        ]
-      }),
-      Snippet.distinct("tags", {
-        $or: [
-          { owner: req.user._id },
-          { teamId: { $in: teamIds } }
-        ]
-      }),
+      Snippet.distinct("folder", { owner: req.user._id }),
+      Snippet.distinct("tags", { owner: req.user._id }),
     ]);
 
     res.status(200).json({
       success: true,
       data: snippets,
+      pagination: {
+        total,
+        page: pageNum,
+        limit: limitNum,
+        pages: Math.ceil(total / limitNum),
+      },
       meta: {
         total,
         page: pageNum,
@@ -95,20 +79,13 @@ const getSnippets = async (req, res, next) => {
 const createSnippet = async (req, res, next) => {
   try {
     const validatedData = createSnippetSchema.parse(req.body);
-    const teamId = req.body.teamId || null;
 
     const snippet = await Snippet.create({
       ...validatedData,
-      teamId,
       owner: req.user._id,
     });
 
-    await logActivity(teamId, req.user._id, "created snippet", "snippet", snippet._id, snippet.title);
-    if (teamId) {
-      // Emit socket event
-      const io = req.app.get("io");
-      if (io) io.to(`team_${teamId}`).emit("snippet:created", snippet);
-    }
+    await logActivity(req.user._id, "created snippet", "snippet", snippet._id, snippet.title);
 
     res.status(201).json({ success: true, data: snippet });
   } catch (error) {
@@ -121,19 +98,14 @@ const createSnippet = async (req, res, next) => {
 // @access  Private
 const getSnippetById = async (req, res, next) => {
   try {
-    const snippet = await Snippet.findById(req.params.id)
-      .populate("teamId", "name members")
-      .lean();
+    const snippet = await Snippet.findById(req.params.id).lean();
 
     if (!snippet) {
       return res.status(404).json({ success: false, message: "Snippet not found" });
     }
 
-    // Access check
     const isOwner = snippet.owner.toString() === req.user._id.toString();
-    const hasAccess = isOwner;
-
-    if (!hasAccess) {
+    if (!isOwner) {
       return res.status(403).json({ success: false, message: "Unauthorized to view this snippet" });
     }
 
@@ -155,23 +127,15 @@ const updateSnippet = async (req, res, next) => {
       return res.status(404).json({ success: false, message: "Snippet not found" });
     }
 
-    // Permission check
     const isOwner = snippet.owner.toString() === req.user._id.toString();
-    const isAllowed = isOwner;
-
-    if (!isAllowed) {
+    if (!isOwner) {
       return res.status(403).json({ success: false, message: "Unauthorized to edit this snippet" });
     }
 
     Object.assign(snippet, validatedData);
     await snippet.save();
 
-    await logActivity(snippet.teamId, req.user._id, "updated snippet", "snippet", snippet._id, snippet.title);
-    if (snippet.teamId) {
-      // Emit socket event
-      const io = req.app.get("io");
-      if (io) io.to(`team_${snippet.teamId}`).emit("snippet:updated", snippet);
-    }
+    await logActivity(req.user._id, "updated snippet", "snippet", snippet._id, snippet.title);
 
     res.status(200).json({ success: true, data: snippet });
   } catch (error) {
@@ -189,25 +153,15 @@ const deleteSnippet = async (req, res, next) => {
       return res.status(404).json({ success: false, message: "Snippet not found" });
     }
 
-    // Permission check
     const isOwner = snippet.owner.toString() === req.user._id.toString();
-    const isAllowed = isOwner;
-
-    if (!isAllowed) {
-      return res.status(403).json({ success: false, message: "Unauthorized to delete this snippet (Admin only)" });
+    if (!isOwner) {
+      return res.status(403).json({ success: false, message: "Unauthorized to delete this snippet" });
     }
 
-    const teamId = snippet.teamId;
     const title = snippet.title;
-
     await Snippet.findByIdAndDelete(req.params.id);
 
-    await logActivity(teamId, req.user._id, "deleted snippet", "snippet", null, title);
-    if (teamId) {
-      // Emit socket event
-      const io = req.app.get("io");
-      if (io) io.to(`team_${teamId}`).emit("snippet:deleted", { id: req.params.id });
-    }
+    await logActivity(req.user._id, "deleted snippet", "snippet", null, title);
 
     res.status(200).json({ success: true, message: "Snippet deleted successfully" });
   } catch (error) {
@@ -216,4 +170,3 @@ const deleteSnippet = async (req, res, next) => {
 };
 
 module.exports = { getSnippets, createSnippet, getSnippetById, updateSnippet, deleteSnippet };
-

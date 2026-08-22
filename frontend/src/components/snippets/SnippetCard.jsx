@@ -66,11 +66,6 @@ export default function SnippetCard({ snippet, onEdit, onDelete, onToggleFavorit
           {snippet.description && (
             <p className="text-xs text-gh-muted line-clamp-1 mt-0.5 font-mono">{snippet.description}</p>
           )}
-          {snippet.teamId && (
-            <span className="inline-flex items-center mt-1 text-[9px] font-mono font-bold text-sky-400 bg-sky-400/10 px-1.5 py-0.5 rounded border border-sky-400/20">
-              👥 {snippet.teamId.name || "Team"}
-            </span>
-          )}
         </div>
 
         {/* Favorite star */}

@@ -24,11 +24,6 @@ const commentSchema = new mongoose.Schema(
       required: true,
       index: true,
     },
-    teamId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Team",
-      default: null, // If the target item belongs to a team, useful for broadcasting
-    }
   },
   {
     timestamps: true,

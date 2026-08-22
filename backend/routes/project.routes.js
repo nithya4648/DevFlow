@@ -1,7 +1,7 @@
 // backend/routes/project.routes.js
 const express = require("express");
 const router = express.Router();
-const { protect, requireTeamAdmin } = require("../middleware/auth.middleware");
+const { protect } = require("../middleware/auth.middleware");
 const {
   getProjects,
   createProject,
@@ -14,7 +14,6 @@ const {
 router.use(protect);
 
 router.route("/").get(getProjects).post(createProject);
-router.route("/:id").get(getProjectById).put(requireTeamAdmin, updateProject).delete(requireTeamAdmin, deleteProject);
+router.route("/:id").get(getProjectById).put(updateProject).delete(deleteProject);
 
 module.exports = router;
-

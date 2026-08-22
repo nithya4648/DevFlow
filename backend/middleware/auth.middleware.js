@@ -34,31 +34,11 @@ const protect = async (req, res, next) => {
 
     req.user = user;
     next();
-  } catch (err) {
+  } catch {
     const error = new Error("Not authorized, token invalid or expired");
     error.statusCode = 401;
     return next(error);
   }
 };
 
-const requireTeamAdmin = async (req, res, next) => {
-  try {
-    const Project = require("../models/Project.model");
-    const projectId = req.params.id;
-    const project = await Project.findById(projectId);
-    if (!project) {
-      return res.status(404).json({ success: false, message: "Project not found" });
-    }
-
-    // Since Teams are disabled, only the owner can modify/delete the project
-    if (project.owner.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ success: false, message: "Access denied" });
-    }
-    return next();
-  } catch (error) {
-    next(error);
-  }
-};
-
-module.exports = { protect, requireTeamAdmin };
-
+module.exports = { protect };

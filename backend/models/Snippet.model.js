@@ -44,11 +44,7 @@ const snippetSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
-    },
-    teamId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Team",
-      default: null,
+      index: true,
     },
   },
   {
@@ -57,7 +53,7 @@ const snippetSchema = new mongoose.Schema(
 );
 
 // Efficient queries
-snippetSchema.index({ owner: 1, teamId: 1, language: 1, isFavorite: 1, createdAt: -1 });
+snippetSchema.index({ owner: 1, language: 1, isFavorite: 1, createdAt: -1 });
 // Text search on title and description (set language_override to avoid conflicts with snippet language field)
 snippetSchema.index({ title: "text", description: "text" }, { language_override: "text_language" });
 

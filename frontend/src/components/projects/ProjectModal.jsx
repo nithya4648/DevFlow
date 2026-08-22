@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useTeams } from "../../hooks/useTeams";
 import CommentSection from "../collaboration/CommentSection";
 
 const STATUS_OPTIONS = [
@@ -19,9 +18,6 @@ export default function ProjectModal({ isOpen, onClose, onSubmit, initialData, i
   const [labelInput, setLabelInput] = useState("");
   const overlayRef = useRef(null);
 
-  const { data: teamsRes } = useTeams();
-  const teams = teamsRes?.data || [];
-
   const {
     register,
     handleSubmit,
@@ -38,7 +34,6 @@ export default function ProjectModal({ isOpen, onClose, onSubmit, initialData, i
       labels: [],
       deadline: "",
       category: "",
-      teamId: "",
     },
   });
 
@@ -57,7 +52,6 @@ export default function ProjectModal({ isOpen, onClose, onSubmit, initialData, i
           ? new Date(initialData.deadline).toISOString().split("T")[0]
           : "",
         category: initialData.category || "",
-        teamId: initialData.teamId ? (initialData.teamId._id || initialData.teamId) : "",
       });
     } else {
       reset({
@@ -68,44 +62,47 @@ export default function ProjectModal({ isOpen, onClose, onSubmit, initialData, i
         labels: [],
         deadline: "",
         category: "",
-        teamId: "",
       });
     }
-    setLabelInput("");
-  }, [initialData, isOpen, reset]);
+  }, [initialData, reset, isOpen]);
 
-  // Close on overlay click
+  // Close on Escape
+  useEffect(() => {
+    function onKeyDown(e) {
+      if (e.key === "Escape") onClose();
+    }
+    if (isOpen) window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [isOpen, onClose]);
+
+  // Click outside overlay to close
   function handleOverlayClick(e) {
     if (e.target === overlayRef.current) onClose();
   }
 
-  // Close on Escape
-  useEffect(() => {
-    if (!isOpen) return;
-    const handler = (e) => { if (e.key === "Escape") onClose(); };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-  }, [isOpen, onClose]);
-
   function addLabel(e) {
     e.preventDefault();
     const trimmed = labelInput.trim();
-    if (trimmed && !labels.includes(trimmed) && labels.length < 10) {
+    if (trimmed && !labels.includes(trimmed)) {
       setValue("labels", [...labels, trimmed]);
       setLabelInput("");
     }
   }
 
-  function removeLabel(label) {
-    setValue("labels", labels.filter((l) => l !== label));
+  function removeLabel(tagToRemove) {
+    setValue(
+      "labels",
+      labels.filter((l) => l !== tagToRemove)
+    );
   }
 
   function onFormSubmit(data) {
-    const cleaned = {
+    const payload = {
       ...data,
       deadline: data.deadline ? new Date(data.deadline).toISOString() : null,
+      category: data.category || "",
     };
-    onSubmit(cleaned);
+    onSubmit(payload);
   }
 
   if (!isOpen) return null;
@@ -114,84 +111,90 @@ export default function ProjectModal({ isOpen, onClose, onSubmit, initialData, i
     <div
       ref={overlayRef}
       onClick={handleOverlayClick}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 font-ui"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in"
     >
-      <div className="w-full max-w-lg bg-gh-surface border border-gh-border rounded-md shadow-lg overflow-hidden">
-        {/* Modal header */}
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-gh-border">
-          <h2 className="text-sm font-bold text-gh-heading font-mono">
+      <div className="gh-card w-full max-w-lg max-h-[90vh] flex flex-col shadow-2xl animate-scale-in">
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-4 border-b border-gh-border">
+          <h2 className="text-sm font-bold font-mono text-gh-heading">
             {initialData ? "Edit Project" : "New Project"}
           </h2>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-md hover:bg-gh-subtle text-gh-muted hover:text-gh-heading transition-colors"
+            className="text-gh-muted hover:text-gh-heading text-lg font-mono leading-none transition-colors"
           >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            ✕
           </button>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit(onFormSubmit)} className="px-5 py-4 space-y-4 max-h-[75vh] overflow-y-auto">
+        <form onSubmit={handleSubmit(onFormSubmit)} className="p-5 space-y-4 overflow-y-auto">
           {/* Title */}
           <div>
-            <label className="block text-xs font-mono font-medium text-gh-muted mb-1">Title *</label>
+            <label className="block text-xs font-mono font-medium text-gh-muted mb-1">
+              Title <span className="text-red-400">*</span>
+            </label>
             <input
-              {...register("title", { required: "Title is required", maxLength: { value: 120, message: "Max 120 chars" } })}
-              placeholder="Project title…"
-              className="gh-input text-sm"
+              {...register("title", { required: "Title is required" })}
+              placeholder="e.g. Redesign Landing Page"
+              className="gh-input text-sm w-full"
             />
-            {errors.title && <p className="text-xs text-red-400 font-mono mt-1">{errors.title.message}</p>}
+            {errors.title && (
+              <p className="text-red-400 text-xs font-mono mt-1">{errors.title.message}</p>
+            )}
           </div>
 
           {/* Description */}
           <div>
             <label className="block text-xs font-mono font-medium text-gh-muted mb-1">Description</label>
             <textarea
-              {...register("description", { maxLength: { value: 2000, message: "Max 2000 chars" } })}
+              {...register("description")}
               rows={3}
-              placeholder="Brief description…"
-              className="gh-input text-sm resize-none"
+              placeholder="What is this project about? (Markdown supported)"
+              className="gh-input text-sm w-full resize-none font-mono"
             />
           </div>
 
-          {/* Status + Priority row */}
+          {/* Status + Priority */}
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-mono font-medium text-gh-muted mb-1">Status</label>
               <select {...register("status")} className="gh-input text-sm w-full">
-                {STATUS_OPTIONS.map((o) => (
-                  <option key={o.value} value={o.value} className="bg-gh-surface">{o.label}</option>
+                {STATUS_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value} className="bg-gh-surface">
+                    {opt.label}
+                  </option>
                 ))}
               </select>
             </div>
             <div>
               <label className="block text-xs font-mono font-medium text-gh-muted mb-1">Priority</label>
               <select {...register("priority")} className="gh-input text-sm w-full">
-                {PRIORITY_OPTIONS.map((o) => (
-                  <option key={o.value} value={o.value} className="bg-gh-surface">{o.label}</option>
+                {PRIORITY_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value} className="bg-gh-surface">
+                    {opt.label}
+                  </option>
                 ))}
               </select>
             </div>
           </div>
 
-          {/* Deadline + Category */}
+          {/* Category + Deadline */}
           <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-mono font-medium text-gh-muted mb-1">Category</label>
+              <input
+                {...register("category")}
+                placeholder="e.g. Frontend, API"
+                className="gh-input text-sm w-full"
+              />
+            </div>
             <div>
               <label className="block text-xs font-mono font-medium text-gh-muted mb-1">Deadline</label>
               <input
                 type="date"
                 {...register("deadline")}
-                className="gh-input text-sm font-mono w-full"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-mono font-medium text-gh-muted mb-1">Category / Folder</label>
-              <input
-                {...register("category", { maxLength: { value: 60, message: "Max 60 chars" } })}
-                placeholder="e.g. Work, Personal"
-                className="gh-input text-sm w-full"
+                className="gh-input text-sm w-full font-mono"
               />
             </div>
           </div>
@@ -236,23 +239,11 @@ export default function ProjectModal({ isOpen, onClose, onSubmit, initialData, i
             )}
           </div>
 
-          {/* Team Scope */}
-          <div>
-            <label className="block text-xs font-mono font-medium text-gh-muted mb-1">Workspace Scoping (Team)</label>
-            <select {...register("teamId")} className="gh-input text-sm w-full">
-              <option value="" className="bg-gh-surface">Private (Personal)</option>
-              {teams.map((t) => (
-                <option key={t._id} value={t._id} className="bg-gh-surface">{t.name}</option>
-              ))}
-            </select>
-          </div>
-
           {/* Comments section if project exists */}
           {initialData?._id && (
             <CommentSection
               targetType="project"
               targetId={initialData._id}
-              teamId={initialData.teamId?._id || initialData.teamId}
             />
           )}
 

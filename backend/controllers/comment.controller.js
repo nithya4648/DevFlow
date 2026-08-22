@@ -1,23 +1,17 @@
 // backend/controllers/comment.controller.js
 const Comment = require("../models/Comment.model");
-const Team = require("../models/Team.model");
 const Project = require("../models/Project.model");
 const Snippet = require("../models/Snippet.model");
 const Doc = require("../models/Doc.model");
+const Activity = require("../models/Activity.model");
 const { createCommentSchema } = require("../validators/comment.validators");
 
-const Activity = require("../models/Activity.model");
-const logActivity = async (teamId, userId, action, targetType, targetId, targetName) => {
-  await Activity.create({ team: teamId || null, user: userId, action, targetType, targetId, targetName });
-};
-
-// Helper to find the teamId associated with the target
-const getTargetTeamId = async (targetType, targetId) => {
-  let target;
-  if (targetType === "project") target = await Project.findById(targetId).select("teamId");
-  if (targetType === "snippet") target = await Snippet.findById(targetId).select("teamId");
-  if (targetType === "doc") target = await Doc.findById(targetId).select("teamId");
-  return target?.teamId || null;
+const logActivity = async (userId, action, targetType, targetId, targetName) => {
+  try {
+    await Activity.create({ user: userId, action, targetType, targetId, targetName });
+  } catch {
+    // Non-blocking
+  }
 };
 
 // @desc    Get comments for a target
@@ -57,7 +51,6 @@ const getComments = async (req, res, next) => {
 const createComment = async (req, res, next) => {
   try {
     const { content, targetType, targetId } = createCommentSchema.parse(req.body);
-    const teamId = await getTargetTeamId(targetType, targetId);
 
     // Verify access (owner check)
     let target;
@@ -74,33 +67,12 @@ const createComment = async (req, res, next) => {
       targetType,
       targetId,
       author: req.user._id,
-      teamId,
     });
 
     const populated = await comment.populate("author", "name email avatar");
 
-    // Get target details
-    let targetName = "";
-    if (targetType === "project") {
-      const p = await Project.findById(targetId).select("title");
-      targetName = p?.title;
-    } else if (targetType === "snippet") {
-      const s = await Snippet.findById(targetId).select("title");
-      targetName = s?.title;
-    } else if (targetType === "doc") {
-      const d = await Doc.findById(targetId).select("title");
-      targetName = d?.title;
-    }
-
-    await logActivity(teamId, req.user._id, `commented on ${targetType}`, targetType, targetId, targetName);
-
-    if (teamId) {
-      // Emit to team via socket
-      const io = req.app.get("io");
-      if (io) {
-        io.to(`team_${teamId}`).emit("comment:new", populated);
-      }
-    }
+    const targetName = target?.title || "";
+    await logActivity(req.user._id, `commented on ${targetType}`, targetType, targetId, targetName);
 
     res.status(201).json({ success: true, data: populated });
   } catch (error) {
@@ -124,14 +96,6 @@ const deleteComment = async (req, res, next) => {
     }
 
     await Comment.findByIdAndDelete(req.params.id);
-
-    // Emit to team via socket
-    if (comment.teamId) {
-      const io = req.app.get("io");
-      if (io) {
-        io.to(`team_${comment.teamId}`).emit("comment:deleted", { id: req.params.id });
-      }
-    }
 
     res.status(200).json({ success: true, message: "Comment deleted" });
   } catch (error) {

@@ -1,12 +1,10 @@
 // frontend/src/components/collaboration/CommentSection.jsx
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useComments, useCreateComment, useDeleteComment } from "../../hooks/useComments";
 import useAuth from "../../hooks/useAuth";
-import { useNotifications } from "../../context/NotificationContext";
 
-export default function CommentSection({ targetType, targetId, teamId }) {
+export default function CommentSection({ targetType, targetId }) {
   const { user } = useAuth();
-  const { socket } = useNotifications();
   const [commentText, setCommentText] = useState("");
 
   const { data: commentRes, isLoading } = useComments(targetType, targetId);
@@ -15,52 +13,15 @@ export default function CommentSection({ targetType, targetId, teamId }) {
   const createMutation = useCreateComment();
   const deleteMutation = useDeleteComment();
 
-  // Listen to socket for real-time comments if it's a team target
-  const [localComments, setLocalComments] = useState([]);
-
-  useEffect(() => {
-    if (comments.length > 0) {
-      setLocalComments(comments);
-    } else {
-      setLocalComments([]);
-    }
-  }, [comments]);
-
-  useEffect(() => {
-    if (!socket || !teamId) return;
-
-    const handleNewComment = (newComment) => {
-      if (newComment.targetType === targetType && newComment.targetId === targetId) {
-        setLocalComments((prev) => {
-          // Avoid duplicates
-          if (prev.some((c) => c._id === newComment._id)) return prev;
-          return [...prev, newComment];
-        });
-      }
-    };
-
-    const handleDeleteComment = ({ id }) => {
-      setLocalComments((prev) => prev.filter((c) => c._id !== id));
-    };
-
-    socket.on("comment:new", handleNewComment);
-    socket.on("comment:deleted", handleDeleteComment);
-
-    return () => {
-      socket.off("comment:new", handleNewComment);
-      socket.off("comment:deleted", handleDeleteComment);
-    };
-  }, [socket, teamId, targetType, targetId]);
-
   function handleSubmit(e) {
     e.preventDefault();
     if (!commentText.trim()) return;
 
     createMutation.mutate(
       {
-        content: commentText,
         targetType,
         targetId,
+        content: commentText.trim(),
       },
       {
         onSuccess: () => {
@@ -70,53 +31,51 @@ export default function CommentSection({ targetType, targetId, teamId }) {
     );
   }
 
-  function handleDelete(id) {
-    if (window.confirm("Delete this comment?")) {
-      deleteMutation.mutate({ id, targetType, targetId });
-    }
+  function handleDelete(commentId) {
+    deleteMutation.mutate(commentId);
   }
 
   return (
-    <div className="mt-6 border-t border-gh-border pt-5 font-ui">
-      <h3 className="text-xs font-mono font-semibold text-gh-heading mb-3 flex items-center gap-2">
-        <span>💬</span> Comments ({localComments.length})
-      </h3>
+    <div className="mt-4 pt-4 border-t border-gh-border font-ui">
+      <h4 className="text-xs font-mono font-semibold text-gh-heading mb-3 flex items-center gap-1.5">
+        <svg className="w-3.5 h-3.5 text-gh-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+        </svg>
+        Comments & Notes ({comments.length})
+      </h4>
 
-      {/* List */}
-      <div className="space-y-3 mb-3 max-h-[280px] overflow-y-auto pr-1">
-        {isLoading && localComments.length === 0 ? (
-          <p className="text-xs text-gh-muted font-mono">Loading comments...</p>
-        ) : localComments.length === 0 ? (
-          <p className="text-xs text-gh-muted font-mono italic">No comments yet. Start the conversation!</p>
+      {/* Comment List */}
+      <div className="space-y-3 mb-4 max-h-48 overflow-y-auto pr-1">
+        {isLoading ? (
+          <p className="text-xs font-mono text-gh-muted animate-pulse">Loading comments…</p>
+        ) : comments.length === 0 ? (
+          <p className="text-xs font-mono text-gh-muted italic">No comments yet.</p>
         ) : (
-          localComments.map((c) => {
-            const isAuthor = c.author?._id === user?._id;
+          comments.map((comment) => {
+            const isAuthor = comment.author?._id === user?._id || comment.author === user?._id;
             return (
-              <div key={c._id} className="flex items-start gap-2.5 text-xs bg-gh-subtle border border-gh-border p-2.5 rounded-md">
-                {c.author?.avatar ? (
-                  <img src={c.author.avatar} alt="avatar" className="w-6 h-6 rounded-full shrink-0" />
-                ) : (
-                  <div className="w-6 h-6 rounded-full bg-gh-border flex items-center justify-center font-bold text-gh-heading text-[10px] shrink-0">
-                    {c.author?.name ? c.author.name[0].toUpperCase() : "?"}
-                  </div>
-                )}
+              <div
+                key={comment._id}
+                className="flex items-start justify-between gap-2 p-2.5 rounded-md bg-gh-surface border border-gh-border text-xs"
+              >
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between mb-0.5">
-                    <span className="font-mono font-semibold text-gh-heading">{c.author?.name || "Unknown"}</span>
-                    <span className="text-[10px] text-gh-muted font-mono">{new Date(c.createdAt).toLocaleString()}</span>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="font-mono font-medium text-gh-heading">
+                      {comment.author?.name || "Anonymous"}
+                    </span>
+                    <span className="text-[10px] font-mono text-gh-muted">
+                      {new Date(comment.createdAt).toLocaleString()}
+                    </span>
                   </div>
-                  <p className="text-gh-text leading-relaxed whitespace-pre-wrap">{c.content}</p>
+                  <p className="text-gh-text whitespace-pre-wrap break-words">{comment.content}</p>
                 </div>
-
                 {isAuthor && (
                   <button
-                    onClick={() => handleDelete(c._id)}
-                    className="p-1 rounded text-gh-muted hover:text-red-400 hover:bg-red-500/10 transition shrink-0 self-start"
+                    onClick={() => handleDelete(comment._id)}
+                    className="text-gh-muted hover:text-red-400 text-xs font-mono transition-colors shrink-0 p-0.5"
                     title="Delete comment"
                   >
-                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
+                    ×
                   </button>
                 )}
               </div>
@@ -125,21 +84,21 @@ export default function CommentSection({ targetType, targetId, teamId }) {
         )}
       </div>
 
-      {/* Input */}
+      {/* Add Comment Form */}
       <form onSubmit={handleSubmit} className="flex gap-2">
         <input
           type="text"
           value={commentText}
           onChange={(e) => setCommentText(e.target.value)}
-          placeholder="Write a comment..."
+          placeholder="Add a comment or note…"
           className="gh-input flex-1 text-xs"
         />
         <button
           type="submit"
           disabled={createMutation.isPending || !commentText.trim()}
-          className="btn-primary text-xs px-4 disabled:opacity-50"
+          className="btn-primary text-xs px-3"
         >
-          Send
+          {createMutation.isPending ? "Posting…" : "Post"}
         </button>
       </form>
     </div>

@@ -4,22 +4,9 @@ const Snippet = require("../models/Snippet.model");
 const Doc = require("../models/Doc.model");
 const Note = require("../models/Note.model");
 const Bookmark = require("../models/Bookmark.model");
-const Team = require("../models/Team.model");
+const { escapeRegex } = require("../utils/regex.utils");
 
 const LIMIT_PER_TYPE = 5;
-
-// Build a query that matches user-owned OR team-shared items
-async function ownerOrTeamFilter(userId) {
-  // Find all teams the user belongs to
-  const teams = await Team.find({ "members.user": userId }).select("_id").lean();
-  const teamIds = teams.map((t) => t._id);
-  return {
-    $or: [
-      { owner: userId },
-      ...(teamIds.length ? [{ teamId: { $in: teamIds } }] : []),
-    ],
-  };
-}
 
 // Truncate long text to a short preview
 function excerpt(text, len = 120) {
@@ -39,9 +26,8 @@ const globalSearch = async (req, res, next) => {
       return res.json({ success: true, results: {}, total: 0 });
     }
 
-    const userId = req.user._id;
-    const regex = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
-    const accessFilter = await ownerOrTeamFilter(userId);
+    const accessFilter = { owner: req.user._id };
+    const regex = new RegExp(escapeRegex(q), "i");
 
     const results = {};
     let total = 0;

@@ -1,52 +1,44 @@
 // backend/controllers/project.controller.js
 const Project = require("../models/Project.model");
-const { createProjectSchema, updateProjectSchema } = require("../validators/project.validators");
-
-
 const Activity = require("../models/Activity.model");
-const logActivity = async (teamId, userId, action, targetType, targetId, targetName) => {
-  await Activity.create({ team: teamId || null, user: userId, action, targetType, targetId, targetName });
+const { createProjectSchema, updateProjectSchema } = require("../validators/project.validators");
+const { escapeRegex } = require("../utils/regex.utils");
+
+const logActivity = async (userId, action, targetType, targetId, targetName) => {
+  try {
+    await Activity.create({ user: userId, action, targetType, targetId, targetName });
+  } catch {
+    // Activity logging shouldn't crash the main operation
+  }
 };
 
-// Helper to get teams a user belongs to
-const getUserTeams = async (userId) => {
-  return [];
-};
-
-// @desc    Get all projects for logged-in user (paginated + filtered + team)
+// @desc    Get all projects for logged-in user (paginated + filtered)
 // @route   GET /api/projects
 // @access  Private
 const getProjects = async (req, res, next) => {
   try {
     const { status, priority, label, search, page = 1, limit = 50 } = req.query;
 
-    const teamIds = await getUserTeams(req.user._id);
-
-    const filter = {
-      $or: [
-        { owner: req.user._id },
-        { teamId: { $in: teamIds } },
-      ],
-    };
+    const filter = { owner: req.user._id };
 
     // Apply additional filters
     if (status) filter.status = status;
     if (priority) filter.priority = priority;
     if (label) filter.labels = { $in: [label] };
     if (search) {
+      const searchRegex = { $regex: escapeRegex(search), $options: "i" };
       filter.$or = [
-        { title: { $regex: search, $options: "i" } },
-        { description: { $regex: search, $options: "i" } },
+        { title: searchRegex },
+        { description: searchRegex },
       ];
     }
 
-    const pageNum = Math.max(1, parseInt(page));
-    const limitNum = Math.min(100, Math.max(1, parseInt(limit)));
+    const pageNum = Math.max(1, parseInt(page, 10) || 1);
+    const limitNum = Math.min(100, Math.max(1, parseInt(limit, 10) || 50));
     const skip = (pageNum - 1) * limitNum;
 
     const [projects, total] = await Promise.all([
       Project.find(filter)
-        .populate("teamId", "name")
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limitNum)
@@ -75,20 +67,13 @@ const getProjects = async (req, res, next) => {
 const createProject = async (req, res, next) => {
   try {
     const validatedData = createProjectSchema.parse(req.body);
-    const teamId = req.body.teamId || null;
 
     const project = await Project.create({
       ...validatedData,
-      teamId,
       owner: req.user._id,
     });
 
-    await logActivity(teamId, req.user._id, "created project", "project", project._id, project.title);
-    if (teamId) {
-      // Emit socket event to team
-      const io = req.app.get("io");
-      if (io) io.to(`team_${teamId}`).emit("project:created", project);
-    }
+    await logActivity(req.user._id, "created project", "project", project._id, project.title);
 
     res.status(201).json({ success: true, data: project });
   } catch (error) {
@@ -101,19 +86,14 @@ const createProject = async (req, res, next) => {
 // @access  Private
 const getProjectById = async (req, res, next) => {
   try {
-    const project = await Project.findById(req.params.id)
-      .populate("teamId", "name members")
-      .lean();
+    const project = await Project.findById(req.params.id).lean();
 
     if (!project) {
       return res.status(404).json({ success: false, message: "Project not found" });
     }
 
-    // Auth check
     const isOwner = project.owner.toString() === req.user._id.toString();
-    const hasAccess = isOwner;
-
-    if (!hasAccess) {
+    if (!isOwner) {
       return res.status(403).json({ success: false, message: "Unauthorized to view this project" });
     }
 
@@ -135,24 +115,15 @@ const updateProject = async (req, res, next) => {
       return res.status(404).json({ success: false, message: "Project not found" });
     }
 
-    // Permission check
     const isOwner = project.owner.toString() === req.user._id.toString();
-    const isAllowed = isOwner;
-
-    if (!isAllowed) {
+    if (!isOwner) {
       return res.status(403).json({ success: false, message: "Unauthorized to edit this project" });
     }
 
-    // Perform update
     Object.assign(project, validatedData);
     await project.save();
 
-    await logActivity(project.teamId, req.user._id, "updated project", "project", project._id, project.title);
-    if (project.teamId) {
-      // Emit socket event
-      const io = req.app.get("io");
-      if (io) io.to(`team_${project.teamId}`).emit("project:updated", project);
-    }
+    await logActivity(req.user._id, "updated project", "project", project._id, project.title);
 
     res.status(200).json({ success: true, data: project });
   } catch (error) {
@@ -170,25 +141,15 @@ const deleteProject = async (req, res, next) => {
       return res.status(404).json({ success: false, message: "Project not found" });
     }
 
-    // Permission check
     const isOwner = project.owner.toString() === req.user._id.toString();
-    const isAllowed = isOwner;
-
-    if (!isAllowed) {
-      return res.status(403).json({ success: false, message: "Unauthorized to delete this project (Admin only)" });
+    if (!isOwner) {
+      return res.status(403).json({ success: false, message: "Unauthorized to delete this project" });
     }
 
-    const teamId = project.teamId;
     const title = project.title;
-    
     await Project.findByIdAndDelete(req.params.id);
 
-    await logActivity(teamId, req.user._id, "deleted project", "project", null, title);
-    if (teamId) {
-      // Emit socket event
-      const io = req.app.get("io");
-      if (io) io.to(`team_${teamId}`).emit("project:deleted", { id: req.params.id });
-    }
+    await logActivity(req.user._id, "deleted project", "project", null, title);
 
     res.status(200).json({ success: true, message: "Project deleted successfully" });
   } catch (error) {
@@ -197,4 +158,3 @@ const deleteProject = async (req, res, next) => {
 };
 
 module.exports = { getProjects, createProject, getProjectById, updateProject, deleteProject };
-
