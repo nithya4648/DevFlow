@@ -1,17 +1,14 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { FaCode } from "react-icons/fa";
-import { useTeams, useTeamActivity } from "../../hooks/useTeams";
+import { useQuery } from "@tanstack/react-query";
+import { analyticsService } from "../../services/analytics.service";
 
 export const ActivityFeed = () => {
-  const { data: teamsRes, isLoading: teamsLoading } = useTeams();
-  const teams = teamsRes?.data || [];
-  const selectedTeamId = teams[0]?._id || null;
-
-  const { data: activityRes, isLoading: activityLoading } = useTeamActivity(selectedTeamId);
+  const { data: activityRes, isLoading } = useQuery({
+    queryKey: ["my-activity"],
+    queryFn: analyticsService.getMyActivity,
+  });
   const activities = activityRes?.data || [];
-
-  const isLoading = teamsLoading || activityLoading;
 
   return (
     <div className="gh-card p-4 font-ui">
@@ -29,7 +26,7 @@ export const ActivityFeed = () => {
         </div>
       ) : activities.length === 0 ? (
         <div className="py-6 text-center">
-          <p className="text-xs text-gh-muted font-mono">No team activity logged yet.</p>
+          <p className="text-xs text-gh-muted font-mono">No activity logged yet.</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -42,12 +39,11 @@ export const ActivityFeed = () => {
                 <img src={act.user.avatar} alt="avatar" className="w-6 h-6 rounded-full shrink-0 border border-gh-border" />
               ) : (
                 <span className="w-6 h-6 rounded-full bg-gh-subtle border border-gh-border flex items-center justify-center font-bold text-gh-heading text-[10px] shrink-0 font-mono">
-                  {act.user?.name ? act.user.name[0].toUpperCase() : "?"}
+                  {act.user?.name ? act.user.name[0].toUpperCase() : "•"}
                 </span>
               )}
               <div className="flex-1 space-y-0.5 min-w-0">
                 <p className="text-xs font-medium text-gh-text group-hover:text-gh-heading transition truncate font-mono">
-                  <span className="font-semibold text-gh-heading">{act.user?.name}</span>{" "}
                   {act.action}{" "}
                   {act.targetName && (
                     <span className="text-accent-fg font-mono">

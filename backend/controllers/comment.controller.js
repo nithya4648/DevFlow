@@ -5,7 +5,7 @@ const Project = require("../models/Project.model");
 const Snippet = require("../models/Snippet.model");
 const Doc = require("../models/Doc.model");
 const { createCommentSchema } = require("../validators/comment.validators");
-const { hasTeamPermission } = require("../utils/rbac");
+
 const Activity = require("../models/Activity.model");
 const logActivity = async (teamId, userId, action, targetType, targetId, targetName) => {
   await Activity.create({ team: teamId || null, user: userId, action, targetType, targetId, targetName });
@@ -30,23 +30,14 @@ const getComments = async (req, res, next) => {
       return res.status(400).json({ success: false, message: "targetType and targetId are required" });
     }
 
-    // Verify user has access to target
-    const teamId = await getTargetTeamId(targetType, targetId);
-    if (teamId) {
-      const allowed = await hasTeamPermission(req.user._id, teamId, "viewer");
-      if (!allowed) {
-        return res.status(403).json({ success: false, message: "Unauthorized to view comments" });
-      }
-    } else {
-      // Private target validation (ensure user is owner)
-      let target;
-      if (targetType === "project") target = await Project.findById(targetId).select("owner");
-      if (targetType === "snippet") target = await Snippet.findById(targetId).select("owner");
-      if (targetType === "doc") target = await Doc.findById(targetId).select("owner");
-      
-      if (!target || target.owner.toString() !== req.user._id.toString()) {
-        return res.status(403).json({ success: false, message: "Unauthorized to view comments" });
-      }
+    // Verify user has access to target (owner check)
+    let target;
+    if (targetType === "project") target = await Project.findById(targetId).select("owner");
+    if (targetType === "snippet") target = await Snippet.findById(targetId).select("owner");
+    if (targetType === "doc") target = await Doc.findById(targetId).select("owner");
+
+    if (!target || target.owner.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ success: false, message: "Unauthorized to view comments" });
     }
 
     const comments = await Comment.find({ targetType, targetId })
@@ -68,20 +59,14 @@ const createComment = async (req, res, next) => {
     const { content, targetType, targetId } = createCommentSchema.parse(req.body);
     const teamId = await getTargetTeamId(targetType, targetId);
 
-    // Verify access
-    if (teamId) {
-      const allowed = await hasTeamPermission(req.user._id, teamId, "editor");
-      if (!allowed) return res.status(403).json({ success: false, message: "Unauthorized to comment" });
-    } else {
-      // Private target
-      let target;
-      if (targetType === "project") target = await Project.findById(targetId).select("owner title");
-      if (targetType === "snippet") target = await Snippet.findById(targetId).select("owner title");
-      if (targetType === "doc") target = await Doc.findById(targetId).select("owner title");
+    // Verify access (owner check)
+    let target;
+    if (targetType === "project") target = await Project.findById(targetId).select("owner title");
+    if (targetType === "snippet") target = await Snippet.findById(targetId).select("owner title");
+    if (targetType === "doc") target = await Doc.findById(targetId).select("owner title");
 
-      if (!target || target.owner.toString() !== req.user._id.toString()) {
-        return res.status(403).json({ success: false, message: "Unauthorized to comment" });
-      }
+    if (!target || target.owner.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ success: false, message: "Unauthorized to comment" });
     }
 
     const comment = await Comment.create({
@@ -128,18 +113,13 @@ const createComment = async (req, res, next) => {
 // @access  Private
 const deleteComment = async (req, res, next) => {
   try {
-    const comment = await Comment.findById(comment);
+    const comment = await Comment.findById(req.params.id);
     if (!comment) return res.status(404).json({ success: false, message: "Comment not found" });
 
-    // Allow author to delete, or team admin
+    // Allow author to delete
     const isAuthor = comment.author.toString() === req.user._id.toString();
-    let isAdmin = false;
-    
-    if (comment.teamId) {
-      isAdmin = await hasTeamPermission(req.user._id, comment.teamId, "admin");
-    }
 
-    if (!isAuthor && !isAdmin) {
+    if (!isAuthor) {
       return res.status(403).json({ success: false, message: "Unauthorized to delete this comment" });
     }
 

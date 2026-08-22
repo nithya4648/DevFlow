@@ -15,8 +15,14 @@ const getContributions = async (days = 365) => {
   return response.data;
 };
 
+const getMyActivity = async () => {
+  const response = await api.get("/analytics/my-activity");
+  return response.data;
+};
+
 export const analyticsService = {
   getOverview,
   logToolUsage,
   getContributions,
+  getMyActivity,
 };

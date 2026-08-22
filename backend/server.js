@@ -41,7 +41,7 @@ configureSocket(io);
 // Core middleware
 const helmet = require("helmet");
 const compression = require("compression");
-const rateLimit = require("express-rate-limit");
+const { rateLimit, ipKeyGenerator } = require("express-rate-limit");
 
 app.use(helmet());
 app.use(compression());
@@ -74,7 +74,10 @@ const isDev = process.env.NODE_ENV === "development";
 const isTest = process.env.NODE_ENV === "test";
 const globalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: isTest ? 10000 : isDev ? 1000 : 100,
+  max: isTest ? 10000 : isDev ? 1000 : 500,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req, res) => req.user?._id?.toString() || ipKeyGenerator(req.ip),
   message: "Too many requests from this IP, please try again after 15 minutes",
 });
 if (!isTest) {

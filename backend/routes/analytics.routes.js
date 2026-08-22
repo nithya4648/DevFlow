@@ -6,9 +6,11 @@ const {
   logToolUsage,
   getContributions
 } = require("../controllers/analytics.controller");
+const { getMyActivity } = require("../controllers/activity.controller");
 
 router.get("/overview", protect, getOverview);
 router.post("/tool-usage", protect, logToolUsage);
 router.get("/contributions", protect, getContributions);
+router.get("/my-activity", protect, getMyActivity);
 
 module.exports = router;

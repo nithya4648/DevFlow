@@ -1,7 +1,7 @@
 // backend/controllers/project.controller.js
 const Project = require("../models/Project.model");
 const { createProjectSchema, updateProjectSchema } = require("../validators/project.validators");
-const { hasTeamPermission } = require("../utils/rbac");
+
 
 const Activity = require("../models/Activity.model");
 const logActivity = async (teamId, userId, action, targetType, targetId, targetName) => {
@@ -77,13 +77,6 @@ const createProject = async (req, res, next) => {
     const validatedData = createProjectSchema.parse(req.body);
     const teamId = req.body.teamId || null;
 
-    if (teamId) {
-      const isAllowed = await hasTeamPermission(req.user._id, teamId, "editor");
-      if (!isAllowed) {
-        return res.status(403).json({ success: false, message: "Unauthorized to create project in this team" });
-      }
-    }
-
     const project = await Project.create({
       ...validatedData,
       teamId,
@@ -118,11 +111,7 @@ const getProjectById = async (req, res, next) => {
 
     // Auth check
     const isOwner = project.owner.toString() === req.user._id.toString();
-    let hasAccess = isOwner;
-
-    if (project.teamId) {
-      hasAccess = await hasTeamPermission(req.user._id, project.teamId._id, "viewer");
-    }
+    const hasAccess = isOwner;
 
     if (!hasAccess) {
       return res.status(403).json({ success: false, message: "Unauthorized to view this project" });
@@ -148,11 +137,7 @@ const updateProject = async (req, res, next) => {
 
     // Permission check
     const isOwner = project.owner.toString() === req.user._id.toString();
-    let isAllowed = isOwner;
-
-    if (project.teamId) {
-      isAllowed = await hasTeamPermission(req.user._id, project.teamId, "editor");
-    }
+    const isAllowed = isOwner;
 
     if (!isAllowed) {
       return res.status(403).json({ success: false, message: "Unauthorized to edit this project" });
@@ -187,11 +172,7 @@ const deleteProject = async (req, res, next) => {
 
     // Permission check
     const isOwner = project.owner.toString() === req.user._id.toString();
-    let isAllowed = isOwner;
-
-    if (project.teamId) {
-      isAllowed = await hasTeamPermission(req.user._id, project.teamId, "admin");
-    }
+    const isAllowed = isOwner;
 
     if (!isAllowed) {
       return res.status(403).json({ success: false, message: "Unauthorized to delete this project (Admin only)" });

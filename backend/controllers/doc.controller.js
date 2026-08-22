@@ -2,7 +2,7 @@
 const Doc = require("../models/Doc.model");
 const DocVersion = require("../models/DocVersion.model");
 const { createDocSchema, updateDocSchema } = require("../validators/doc.validators");
-const { hasTeamPermission } = require("../utils/rbac");
+
 
 const Activity = require("../models/Activity.model");
 const logActivity = async (teamId, userId, action, targetType, targetId, targetName) => {
@@ -67,13 +67,6 @@ const createDoc = async (req, res, next) => {
     const validatedData = createDocSchema.parse(req.body);
     const teamId = req.body.teamId || null;
 
-    if (teamId) {
-      const isAllowed = await hasTeamPermission(req.user._id, teamId, "editor");
-      if (!isAllowed) {
-        return res.status(403).json({ success: false, message: "Unauthorized to create doc in this team" });
-      }
-    }
-
     const doc = await Doc.create({
       ...validatedData,
       teamId,
@@ -107,11 +100,7 @@ const getDocById = async (req, res, next) => {
     }
 
     const isOwner = doc.owner.toString() === req.user._id.toString();
-    let hasAccess = isOwner;
-
-    if (doc.teamId) {
-      hasAccess = await hasTeamPermission(req.user._id, doc.teamId._id, "viewer");
-    }
+    const hasAccess = isOwner;
 
     if (!hasAccess) {
       return res.status(403).json({ success: false, message: "Unauthorized to view this document" });
@@ -136,11 +125,7 @@ const updateDoc = async (req, res, next) => {
     }
 
     const isOwner = existing.owner.toString() === req.user._id.toString();
-    let isAllowed = isOwner;
-
-    if (existing.teamId) {
-      isAllowed = await hasTeamPermission(req.user._id, existing.teamId, "editor");
-    }
+    const isAllowed = isOwner;
 
     if (!isAllowed) {
       return res.status(403).json({ success: false, message: "Unauthorized to edit this document" });
@@ -182,11 +167,7 @@ const deleteDoc = async (req, res, next) => {
     }
 
     const isOwner = doc.owner.toString() === req.user._id.toString();
-    let isAllowed = isOwner;
-
-    if (doc.teamId) {
-      isAllowed = await hasTeamPermission(req.user._id, doc.teamId, "admin");
-    }
+    const isAllowed = isOwner;
 
     if (!isAllowed) {
       return res.status(403).json({ success: false, message: "Unauthorized to delete this document (Admin only)" });
@@ -222,11 +203,7 @@ const getDocVersions = async (req, res, next) => {
     }
 
     const isOwner = doc.owner.toString() === req.user._id.toString();
-    let hasAccess = isOwner;
-
-    if (doc.teamId) {
-      hasAccess = await hasTeamPermission(req.user._id, doc.teamId, "viewer");
-    }
+    const hasAccess = isOwner;
 
     if (!hasAccess) {
       return res.status(403).json({ success: false, message: "Unauthorized" });
@@ -254,11 +231,7 @@ const getDocVersionById = async (req, res, next) => {
     }
 
     const isOwner = doc.owner.toString() === req.user._id.toString();
-    let hasAccess = isOwner;
-
-    if (doc.teamId) {
-      hasAccess = await hasTeamPermission(req.user._id, doc.teamId, "viewer");
-    }
+    const hasAccess = isOwner;
 
     if (!hasAccess) {
       return res.status(403).json({ success: false, message: "Unauthorized" });

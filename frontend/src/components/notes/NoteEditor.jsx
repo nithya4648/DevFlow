@@ -8,15 +8,22 @@ export default function NoteEditor({ note, onSave, isSaving }) {
 
   const saveTimer = useRef(null);
   const isFirstRender = useRef(true);
+  const lastNoteId = useRef(null);
 
   // Sync local state when note changes (switching notes)
+  // Tracks note _id so background refetches of the same note don't clobber unsaved edits
   useEffect(() => {
-    if (note) {
+    if (!note) return;
+    const isDifferentNote = note._id !== lastNoteId.current;
+    const isSafeToResync = saveStatus !== "unsaved" && saveStatus !== "saving";
+
+    if (isDifferentNote || isSafeToResync) {
       setLocalTitle(note.title || "");
       setLocalContent(note.content || "");
       setLocalFolder(note.folder || "Unfiled");
       setSaveStatus("saved");
       isFirstRender.current = true;
+      lastNoteId.current = note._id;
     }
   }, [note]);
 

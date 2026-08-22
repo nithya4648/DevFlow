@@ -1,7 +1,7 @@
 // backend/controllers/snippet.controller.js
 const Snippet = require("../models/Snippet.model");
 const { createSnippetSchema, updateSnippetSchema } = require("../validators/snippet.validators");
-const { hasTeamPermission } = require("../utils/rbac");
+
 
 const Activity = require("../models/Activity.model");
 const logActivity = async (teamId, userId, action, targetType, targetId, targetName) => {
@@ -97,13 +97,6 @@ const createSnippet = async (req, res, next) => {
     const validatedData = createSnippetSchema.parse(req.body);
     const teamId = req.body.teamId || null;
 
-    if (teamId) {
-      const isAllowed = await hasTeamPermission(req.user._id, teamId, "editor");
-      if (!isAllowed) {
-        return res.status(403).json({ success: false, message: "Unauthorized to create snippet in this team" });
-      }
-    }
-
     const snippet = await Snippet.create({
       ...validatedData,
       teamId,
@@ -138,11 +131,7 @@ const getSnippetById = async (req, res, next) => {
 
     // Access check
     const isOwner = snippet.owner.toString() === req.user._id.toString();
-    let hasAccess = isOwner;
-
-    if (snippet.teamId) {
-      hasAccess = await hasTeamPermission(req.user._id, snippet.teamId._id, "viewer");
-    }
+    const hasAccess = isOwner;
 
     if (!hasAccess) {
       return res.status(403).json({ success: false, message: "Unauthorized to view this snippet" });
@@ -168,11 +157,7 @@ const updateSnippet = async (req, res, next) => {
 
     // Permission check
     const isOwner = snippet.owner.toString() === req.user._id.toString();
-    let isAllowed = isOwner;
-
-    if (snippet.teamId) {
-      isAllowed = await hasTeamPermission(req.user._id, snippet.teamId, "editor");
-    }
+    const isAllowed = isOwner;
 
     if (!isAllowed) {
       return res.status(403).json({ success: false, message: "Unauthorized to edit this snippet" });
@@ -206,11 +191,7 @@ const deleteSnippet = async (req, res, next) => {
 
     // Permission check
     const isOwner = snippet.owner.toString() === req.user._id.toString();
-    let isAllowed = isOwner;
-
-    if (snippet.teamId) {
-      isAllowed = await hasTeamPermission(req.user._id, snippet.teamId, "admin");
-    }
+    const isAllowed = isOwner;
 
     if (!isAllowed) {
       return res.status(403).json({ success: false, message: "Unauthorized to delete this snippet (Admin only)" });

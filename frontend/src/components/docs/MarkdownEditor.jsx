@@ -14,11 +14,10 @@ function renderMarkdown(md) {
   return DOMPurify.sanitize(rawHtml);
 }
 
-export default function MarkdownEditor({ title, content, category, teamId, onSave, isSaving, readOnly = false }) {
+export default function MarkdownEditor({ title, content, category, onSave, isSaving, readOnly = false }) {
   const [localTitle, setLocalTitle] = useState(title || "");
   const [localContent, setLocalContent] = useState(content || "");
   const [localCategory, setLocalCategory] = useState(category || "General");
-  const [localTeamId, setLocalTeamId] = useState(teamId || "");
   const [preview, setPreview] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
   const autoSaveTimer = useRef(null);
@@ -29,9 +28,8 @@ export default function MarkdownEditor({ title, content, category, teamId, onSav
     setLocalTitle(title || "");
     setLocalContent(content || "");
     setLocalCategory(category || "General");
-    setLocalTeamId(teamId ? (teamId._id || teamId) : "");
     setIsDirty(false);
-  }, [title, content, category, teamId]);
+  }, [title, content, category]);
 
   function markDirty() {
     setIsDirty(true);
@@ -48,9 +46,18 @@ export default function MarkdownEditor({ title, content, category, teamId, onSav
       title: localTitle,
       content: localContent,
       category: localCategory,
-      teamId: localTeamId || null,
     });
     setIsDirty(false);
+  }
+
+  function handleDownload() {
+    const blob = new Blob([localContent], { type: "text/markdown" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${(localTitle || "untitled").replace(/\s+/g, "_")}.md`;
+    a.click();
+    URL.revokeObjectURL(url);
   }
 
   // Cmd/Ctrl+S to save
@@ -129,6 +136,20 @@ export default function MarkdownEditor({ title, content, category, teamId, onSav
                 Saving…
               </>
             ) : isDirty ? "Save  ⌘S" : "Saved ✓"}
+          </button>
+        )}
+
+        {/* Download button */}
+        {!readOnly && (
+          <button
+            onClick={handleDownload}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-mono font-medium transition-colors text-gh-muted border border-gh-border bg-gh-subtle hover:text-gh-heading hover:bg-gh-surface"
+            title="Download as .md"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            Download
           </button>
         )}
       </div>

@@ -23,7 +23,13 @@ const getEnvVars = async (req, res, next) => {
 
     // We MUST map over them to trigger the getter (which decrypts it), 
     // because .lean() bypasses getters. So we avoid .lean() here and use .toJSON().
-    const decryptedVars = envVars.map(v => v.toJSON());
+    const decryptedVars = envVars.map(v => {
+      try {
+        return v.toJSON();
+      } catch (e) {
+        return { ...v.toObject(), value: "Unable to decrypt (corrupted or old format)" };
+      }
+    });
 
     // Also return list of user's projects for the dropdown
     const projects = await Project.find({ owner: req.user._id })
