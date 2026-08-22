@@ -50,6 +50,23 @@ export function useUpdateDoc() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: ({ id, data }) => docService.updateDoc(id, data),
+    onMutate: async (variables) => {
+      await qc.cancelQueries({ queryKey: [DOC_KEY, "detail", variables.id] });
+      const previousDoc = qc.getQueryData([DOC_KEY, "detail", variables.id]);
+      qc.setQueryData([DOC_KEY, "detail", variables.id], (prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          data: { ...prev.data, ...variables.data },
+        };
+      });
+      return { previousDoc };
+    },
+    onError: (err, variables, context) => {
+      if (context?.previousDoc) {
+        qc.setQueryData([DOC_KEY, "detail", variables.id], context.previousDoc);
+      }
+    },
     onSuccess: (_, { id }) => {
       qc.invalidateQueries({ queryKey: [DOC_KEY, "list"] });
       qc.invalidateQueries({ queryKey: [DOC_KEY, "detail", id] });

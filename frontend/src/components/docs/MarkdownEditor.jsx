@@ -75,9 +75,9 @@ export default function MarkdownEditor({ title, content, category, onSave, isSav
   const rendered = renderMarkdown(localContent);
 
   return (
-    <div className="flex flex-col flex-1 min-h-0 font-ui">
+    <div className="flex flex-col flex-1 min-h-0 font-ui p-4 space-y-4">
       {/* Doc header bar */}
-      <div className="flex items-center gap-3 mb-4 flex-wrap">
+      <div className="flex items-center gap-3 mb-0 flex-wrap justify-between">
         <input
           value={localTitle}
           onChange={(e) => { if (!readOnly) { setLocalTitle(e.target.value); markDirty(); } }}
@@ -155,27 +155,27 @@ export default function MarkdownEditor({ title, content, category, onSave, isSav
       </div>
 
       {/* Split pane */}
-      <div className="flex-1 min-h-0 flex gap-4">
+      <div className="flex-1 min-h-0 flex gap-4 overflow-hidden">
         {/* Editor pane — always rendered but hidden in preview mode */}
-        <div className={`flex-1 min-h-0 ${preview ? "hidden" : "flex"} flex-col`}>
+        <div className={`flex-1 min-h-0 ${preview ? "hidden" : "flex"} flex-col bg-gh-bg rounded-md border border-gh-border overflow-hidden`}>
           <textarea
             value={localContent}
             onChange={(e) => { if (!readOnly) { setLocalContent(e.target.value); markDirty(); } }}
             placeholder={`# Your document\n\nStart writing in **Markdown**…\n\n- Supports GFM (tables, task lists)\n- Code blocks with syntax highlighting\n- Inline \`code\``}
             readOnly={readOnly}
-            className={`flex-1 w-full bg-gh-bg border border-gh-border rounded-md px-4 py-3 text-sm text-gh-text font-mono leading-relaxed placeholder-gh-muted resize-none transition ${
+            className={`flex-1 w-full bg-gh-bg px-4 py-3 text-sm text-gh-text font-mono leading-relaxed placeholder-gh-muted resize-none transition ${
               readOnly ? "cursor-default opacity-80" : "focus:outline-none focus:ring-1 focus:ring-accent-border focus:border-accent-border"
             }`}
             spellCheck={false}
           />
-          <p className="text-[10px] text-gh-muted font-mono mt-1.5 text-right">
+          <p className="text-[10px] text-gh-muted font-mono mt-1.5 text-right px-4 pb-2">
             {localContent.length.toLocaleString()} chars · {localContent.split("\n").length} lines
           </p>
         </div>
 
         {/* Preview pane */}
         {preview && (
-          <div className="flex-1 min-h-0 overflow-y-auto bg-gh-bg border border-gh-border rounded-md px-5 py-4">
+          <div className="flex-1 min-h-0 overflow-y-auto bg-gh-surface border border-gh-border rounded-md px-5 py-4">
             {localContent.trim() ? (
               <div
                 className="prose prose-sm max-w-none prose-headings:text-gh-heading prose-p:text-gh-text prose-a:text-accent-fg prose-code:text-accent-fg prose-pre:bg-gh-surface prose-pre:border prose-pre:border-gh-border prose-blockquote:border-gh-border prose-blockquote:text-gh-muted"

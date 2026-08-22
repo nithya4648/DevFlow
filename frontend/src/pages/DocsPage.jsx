@@ -92,7 +92,7 @@ export default function DocsPage() {
         onSearch={setSearch}
       />
 
-      <div className="flex-1 flex flex-col min-w-0 px-3 sm:px-5 pt-1 pb-5 relative overflow-auto">
+      <div className="flex-1 flex flex-col min-w-0 px-0 sm:px-0 pt-0 pb-0 relative overflow-hidden">
         {docsError ? (
           <div className="p-3 rounded-md bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-mono">
             Failed to load documents.
