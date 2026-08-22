@@ -25,7 +25,7 @@ const deleteActivity = async (id) => {
   return response.data;
 };
 
-const clearAllActivity = async () => {
+const deleteAllActivity = async () => {
   const response = await api.delete("/analytics/my-activity");
   return response.data;
 };
@@ -37,4 +37,5 @@ export const analyticsService = {
   getMyActivity,
   deleteActivity,
   clearAllActivity,
+  deleteAllActivity,
 };

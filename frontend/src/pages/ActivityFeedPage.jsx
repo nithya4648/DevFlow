@@ -1,48 +1,46 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { analyticsService } from "../services/analytics.service";
-import { useToast } from "../context/ToastContext";
+import { Trash2 } from "lucide-react";
+import { useState } from "react";
 
 export default function ActivityFeedPage() {
   const queryClient = useQueryClient();
-  const { addToast } = useToast();
+  const [deletingId, setDeletingId] = useState(null);
 
   const { data: activityRes, isLoading } = useQuery({
     queryKey: ["my-activity"],
     queryFn: analyticsService.getMyActivity,
   });
+
+  const deleteActivityMutation = useMutation({
+    mutationFn: (activityId) => analyticsService.deleteActivity(activityId),
+    onSuccess: () => {
+      queryClient.invalidateQueries(["my-activity"]);
+      setDeletingId(null);
+    },
+  });
+
+  const deleteAllMutation = useMutation({
+    mutationFn: () => analyticsService.deleteAllActivity(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(["my-activity"]);
+    },
+  });
+
   const activities = activityRes?.data || [];
 
-  const deleteMutation = useMutation({
-    mutationFn: analyticsService.deleteActivity,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["my-activity"] });
-      addToast("Activity removed", "info");
-    },
-    onError: (err) => {
-      addToast(err.response?.data?.message || "Failed to delete activity", "error");
-    },
-  });
-
-  const clearAllMutation = useMutation({
-    mutationFn: analyticsService.clearAllActivity,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["my-activity"] });
-      addToast("All activity history cleared", "info");
-    },
-    onError: (err) => {
-      addToast(err.response?.data?.message || "Failed to clear activity", "error");
-    },
-  });
-
-  function handleDelete(id) {
-    deleteMutation.mutate(id);
-  }
-
-  function handleClearAll() {
-    if (window.confirm("Are you sure you want to clear your entire activity feed?")) {
-      clearAllMutation.mutate();
+  const handleDelete = (activityId) => {
+    if (confirm("Delete this activity?")) {
+      setDeletingId(activityId);
+      deleteActivityMutation.mutate(activityId);
     }
-  }
+  };
+
+  const handleDeleteAll = () => {
+    if (confirm("Delete all activities? This cannot be undone.")) {
+      deleteAllMutation.mutate();
+    }
+  };
 
   return (
     <div className="flex-1 flex flex-col max-w-4xl mx-auto w-full px-6 py-6 h-full min-h-0 font-ui">
@@ -51,12 +49,11 @@ export default function ActivityFeedPage() {
           <h2 className="text-sm font-bold text-gh-heading font-mono">Your Activity Feed</h2>
           {activities.length > 0 && (
             <button
-              onClick={handleClearAll}
-              disabled={clearAllMutation.isPending}
-              className="text-xs font-mono text-gh-muted hover:text-red-400 border border-gh-border hover:border-red-500/30 px-2.5 py-1 rounded bg-gh-subtle hover:bg-red-500/10 transition"
-              title="Clear all activities"
+              onClick={handleDeleteAll}
+              disabled={deleteAllMutation.isPending}
+              className="text-xs bg-red-900 hover:bg-red-800 text-red-100 px-3 py-1.5 rounded font-mono disabled:opacity-50"
             >
-              {clearAllMutation.isPending ? "Clearing…" : "Clear All"}
+              {deleteAllMutation.isPending ? "Clearing..." : "Clear All"}
             </button>
           )}
         </div>
@@ -68,7 +65,7 @@ export default function ActivityFeedPage() {
         ) : (
           <div className="flex-1 overflow-y-auto space-y-3 pr-1">
             {activities.map((act) => (
-              <div key={act._id} className="flex items-start gap-3 border-b border-gh-border pb-3 text-xs font-mono group">
+              <div key={act._id} className="flex items-start gap-3 border-b border-gh-border pb-3 text-xs font-mono group hover:bg-gh-border/30 p-2 rounded transition">
                 {act.user?.avatar ? (
                   <img src={act.user.avatar} alt="avatar" className="w-6 h-6 rounded-full shrink-0" />
                 ) : (
@@ -91,13 +88,11 @@ export default function ActivityFeedPage() {
                 </div>
                 <button
                   onClick={() => handleDelete(act._id)}
-                  disabled={deleteMutation.isPending}
-                  className="opacity-0 group-hover:opacity-100 p-1.5 rounded text-gh-muted hover:text-red-400 hover:bg-red-500/10 transition"
+                  disabled={deletingId === act._id || deleteActivityMutation.isPending}
+                  className="opacity-0 group-hover:opacity-100 transition p-1 text-gh-muted hover:text-red-500 shrink-0 disabled:opacity-50"
                   title="Delete activity"
                 >
-                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
+                  <Trash2 size={14} />
                 </button>
               </div>
             ))}

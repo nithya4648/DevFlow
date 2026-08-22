@@ -6,17 +6,13 @@ const {
   logToolUsage,
   getContributions
 } = require("../controllers/analytics.controller");
-const {
-  getMyActivity,
-  deleteActivity,
-  clearAllActivity
-} = require("../controllers/activity.controller");
+const { getMyActivity, deleteActivity, deleteAllActivity } = require("../controllers/activity.controller");
 
 router.get("/overview", protect, getOverview);
 router.post("/tool-usage", protect, logToolUsage);
 router.get("/contributions", protect, getContributions);
 router.get("/my-activity", protect, getMyActivity);
-router.delete("/my-activity/:id", protect, deleteActivity);
-router.delete("/my-activity", protect, clearAllActivity);
+router.delete("/my-activity/:activityId", protect, deleteActivity);
+router.delete("/my-activity", protect, deleteAllActivity);
 
 module.exports = router;
