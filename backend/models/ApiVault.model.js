@@ -74,20 +74,12 @@ apiVaultSchema.pre('save', function (next) {
 
 // Decrypt methods (do not expose encrypted values directly)
 apiVaultSchema.methods.decryptKey = function () {
-  try {
-    return decrypt(this.key);
-  } catch {
-    return "••••••••";
-  }
+  return decrypt(this.key);
 };
 
 apiVaultSchema.methods.decryptValue = function () {
   if (!this.value) return '';
-  try {
-    return decrypt(this.value);
-  } catch {
-    return "••••••••";
-  }
+  return decrypt(this.value);
 };
 
 module.exports = mongoose.model('ApiVault', apiVaultSchema);

@@ -19,13 +19,7 @@ const envVariableSchema = new mongoose.Schema(
       type: String,
       required: [true, "Value is required"],
       // The getter decrypts the value automatically when accessed
-      get: (encryptedValue) => {
-        try {
-          return decrypt(encryptedValue);
-        } catch {
-          return encryptedValue;
-        }
-      },
+      get: (encryptedValue) => decrypt(encryptedValue),
       // The setter encrypts the value before saving
       set: (plaintextValue) => encrypt(plaintextValue),
     },

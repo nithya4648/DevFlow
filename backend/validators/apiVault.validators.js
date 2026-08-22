@@ -12,10 +12,10 @@ const createApiVaultSchema = z.object({
   key: z
     .string()
     .min(1, "API key is required")
-    .max(50000, "Key is too long"),
+    .max(5000, "Key is too long"),
   value: z
     .string()
-    .max(100000, "Value is too long")
+    .max(10000, "Value is too long")
     .optional()
     .default(""),
   category: z
@@ -23,7 +23,7 @@ const createApiVaultSchema = z.object({
     .default("other"),
   description: z
     .string()
-    .max(5000, "Description cannot exceed 5000 characters")
+    .max(500, "Description cannot exceed 500 characters")
     .trim()
     .optional()
     .default(""),

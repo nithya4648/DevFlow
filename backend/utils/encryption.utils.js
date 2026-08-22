@@ -12,27 +12,13 @@ function getEncryptionKey() {
   const raw = process.env.ENCRYPTION_KEY;
   if (!raw) {
     throw new Error(
-      'ENCRYPTION_KEY environment variable is required.'
+      'ENCRYPTION_KEY environment variable is required. Generate one with: node -e "console.log(require(\'crypto\').randomBytes(32).toString(\'base64\'))"'
     );
   }
 
-  const trimmed = raw.trim();
-
-  // 1. Support 64-character hex string (32 bytes)
-  if (/^[0-9a-fA-F]{64}$/.test(trimmed)) {
-    _encryptionKey = Buffer.from(trimmed, 'hex');
-  } else {
-    // 2. Try base64
-    const base64Buf = Buffer.from(trimmed, 'base64');
-    if (base64Buf.length === 32) {
-      _encryptionKey = base64Buf;
-    } else if (Buffer.from(trimmed, 'utf8').length === 32) {
-      // 3. 32-byte raw utf-8 string
-      _encryptionKey = Buffer.from(trimmed, 'utf8');
-    } else {
-      // 4. SHA-256 hash fallback to always produce a cryptographically solid 32-byte key
-      _encryptionKey = crypto.createHash('sha256').update(trimmed).digest();
-    }
+  _encryptionKey = Buffer.from(raw, 'base64');
+  if (_encryptionKey.length !== 32) {
+    throw new Error('ENCRYPTION_KEY must be a 256-bit (32 byte) base64-encoded string');
   }
 
   return _encryptionKey;
