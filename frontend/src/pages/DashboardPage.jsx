@@ -23,23 +23,6 @@ export const DashboardPage = () => {
 
   return (
     <div className="space-y-5 font-ui">
-      {/* 1. Welcome Header */}
-      <div className="gh-card flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div>
-          <h1 className="text-xl font-bold text-gh-heading">
-            Welcome back, <span className="text-accent-fg font-mono">{user?.name}</span>
-          </h1>
-          <p className="mt-0.5 text-xs text-gh-muted font-mono">
-            Developer workstation & workspace analytics
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="gh-badge-accent">
-            <span className="h-1.5 w-1.5 rounded-full bg-accent animate-pulse" /> Live Metrics
-          </span>
-        </div>
-      </div>
-
       {/* 2. Quick Launch Shortcuts (Always at top) */}
       <QuickLaunch />
 

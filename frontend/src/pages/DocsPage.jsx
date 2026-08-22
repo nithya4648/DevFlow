@@ -75,7 +75,7 @@ export default function DocsPage() {
   }
 
   return (
-    <div className="flex-1 flex overflow-hidden font-ui">
+    <div className="flex-1 flex overflow-hidden font-ui flex-col lg:flex-row">
       {/* Sidebar listing */}
       <DocSidebar
         docs={docs}
@@ -92,7 +92,7 @@ export default function DocsPage() {
         onSearch={setSearch}
       />
 
-      <div className="flex-1 flex flex-col min-w-0 px-5 pt-1 pb-5 relative">
+      <div className="flex-1 flex flex-col min-w-0 px-3 sm:px-5 pt-1 pb-5 relative overflow-auto">
         {docsError ? (
           <div className="p-3 rounded-md bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-mono">
             Failed to load documents.
@@ -101,8 +101,8 @@ export default function DocsPage() {
           <div className="flex flex-col gap-4">
             <Skeleton className="h-9 w-1/3 rounded-md bg-gh-surface border border-gh-border" />
             <div className="flex gap-4 flex-1">
-              <Skeleton className="h-[60vh] flex-1 rounded-md bg-gh-surface border border-gh-border" />
-              <Skeleton className="h-[60vh] flex-1 rounded-md bg-gh-surface border border-gh-border hidden xl:block" />
+              <Skeleton className="h-[50vh] sm:h-[60vh] flex-1 rounded-md bg-gh-surface border border-gh-border" />
+              <Skeleton className="h-[50vh] sm:h-[60vh] flex-1 rounded-md bg-gh-surface border border-gh-border hidden lg:block" />
             </div>
           </div>
         ) : !selectedDocId ? (

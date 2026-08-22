@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import useAuth from "../hooks/useAuth";
 import authService from "../services/auth.service";
 import { useToast } from "../context/ToastContext";
+import { retryRequest, retryConfig } from "../utils/retryConfig";
 import { FaGoogle, FaEnvelope, FaLock, FaSpinner, FaEye, FaEyeSlash } from "react-icons/fa";
 
 function LoginPage() {
@@ -40,7 +41,7 @@ function LoginPage() {
     setUnverifiedEmail("");
     try {
       setIsSubmitting(true);
-      const res = await login(data);
+      const res = await retryRequest(() => login(data), { ...retryConfig, maxAttempts: 4 });
       if (res?.success) {
         addToast("Logged in successfully!", "success");
         const inviteToken = searchParams.get("inviteToken");

@@ -8,10 +8,12 @@ export default function EnvModal({ isOpen, onClose, onSubmit, initialData, isLoa
     register,
     handleSubmit,
     reset,
+    watch,
     formState: { errors },
   } = useForm({
     defaultValues: { key: "", value: "" },
   });
+  const value = watch("value");
 
   useEffect(() => {
     if (initialData) {
@@ -64,26 +66,39 @@ export default function EnvModal({ isOpen, onClose, onSubmit, initialData, isLoa
         {/* Body */}
         <form onSubmit={handleSubmit(onFormSubmit)} className="p-5 space-y-4">
           <div>
-            <label className="block text-xs font-mono font-medium text-gh-muted mb-1">Key *</label>
+            <label className="block text-xs font-mono font-medium text-gh-muted mb-1">
+              Key * <span className="text-[10px] text-gh-muted">(max 100 chars)</span>
+            </label>
             <input
               {...register("key", {
                 required: "Key is required",
-                pattern: { value: /^[a-zA-Z_][a-zA-Z0-9_]*$/, message: "Invalid characters (alphanumeric and underscore only)" }
+                maxLength: { value: 100, message: "Key max 100 characters" },
+                pattern: { value: /^[a-zA-Z_][a-zA-Z0-9_]*$/, message: "Alphanumeric & underscore only" }
               })}
               placeholder="e.g. DATABASE_URL"
               className="gh-input text-sm font-mono w-full"
+              maxLength={100}
             />
             {errors.key && <p className="text-xs text-red-400 font-mono mt-1">{errors.key.message}</p>}
           </div>
 
           <div>
-            <label className="block text-xs font-mono font-medium text-gh-muted mb-1">Value *</label>
+            <label className="block text-xs font-mono font-medium text-gh-muted mb-1">
+              Value * <span className="text-[10px] text-gh-muted">(max 10000 chars)</span>
+            </label>
             <textarea
-              {...register("value", { required: "Value is required" })}
+              {...register("value", {
+                required: "Value is required",
+                maxLength: { value: 10000, message: "Value max 10000 characters" }
+              })}
               placeholder="e.g. postgres://user:pass@localhost:5432/db"
               rows={4}
               className="gh-input text-sm font-mono resize-none w-full"
+              maxLength={10000}
             />
+            <div className="text-xs text-gh-muted mt-1 font-mono">
+              {(value?.length || 0)} / 10000 chars
+            </div>
             {errors.value && <p className="text-xs text-red-400 font-mono mt-1">{errors.value.message}</p>}
           </div>
 

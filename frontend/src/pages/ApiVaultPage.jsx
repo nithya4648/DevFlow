@@ -455,13 +455,18 @@ export default function ApiVaultPage() {
               <form onSubmit={handleSubmit} className="space-y-3">
                 {/* Name */}
                 <div>
-                  <label className="text-[11px] font-mono text-gh-muted uppercase tracking-wider block mb-1">Name *</label>
+                  <label className="text-[11px] font-mono text-gh-muted uppercase tracking-wider block mb-1">
+                    Name * <span className="text-[10px] text-gh-muted">(max 150 chars)</span>
+                  </label>
                   <input
                     type="text"
                     required
                     placeholder='e.g., "Stripe API Key"'
                     value={form.name}
-                    onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+                    onChange={(e) => {
+                      if (e.target.value.length <= 150) setForm((f) => ({ ...f, name: e.target.value }));
+                    }}
+                    maxLength={150}
                     className="gh-input text-xs font-mono w-full"
                   />
                 </div>
@@ -483,14 +488,17 @@ export default function ApiVaultPage() {
                 {/* Key */}
                 <div>
                   <label className="text-[11px] font-mono text-gh-muted uppercase tracking-wider block mb-1">
-                    API Key *{editId && " (leave blank to keep current)"}
+                    API Key *{editId && " (leave blank to keep current)"} <span className="text-[10px] text-gh-muted">(max 500 chars)</span>
                   </label>
                   <input
                     type="password"
                     required={!editId}
                     placeholder="sk-proj-abc123..."
                     value={form.key}
-                    onChange={(e) => setForm((f) => ({ ...f, key: e.target.value }))}
+                    onChange={(e) => {
+                      if (e.target.value.length <= 500) setForm((f) => ({ ...f, key: e.target.value }));
+                    }}
+                    maxLength={500}
                     className="gh-input text-xs font-mono w-full"
                     autoComplete="off"
                   />
@@ -499,16 +507,22 @@ export default function ApiVaultPage() {
                 {/* Value */}
                 <div>
                   <label className="text-[11px] font-mono text-gh-muted uppercase tracking-wider block mb-1">
-                    Secret Value
+                    Secret Value <span className="text-[10px] text-gh-muted">(max 10000 chars)</span>
                   </label>
                   <textarea
                     placeholder="Your secret value..."
                     value={form.value}
-                    onChange={(e) => setForm((f) => ({ ...f, value: e.target.value }))}
+                    onChange={(e) => {
+                      if (e.target.value.length <= 10000) setForm((f) => ({ ...f, value: e.target.value }));
+                    }}
+                    maxLength={10000}
                     className="gh-input text-xs font-mono w-full resize-none"
-                    rows={2}
+                    rows={3}
                     autoComplete="off"
                   />
+                  <div className="text-[10px] text-gh-muted font-mono mt-0.5">
+                    {(form.value?.length || 0)} / 10000 characters
+                  </div>
                 </div>
 
                 {/* Description */}
