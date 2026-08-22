@@ -37,7 +37,6 @@ const bookmarkSchema = new mongoose.Schema(
 );
 
 bookmarkSchema.index({ owner: 1, category: 1, createdAt: -1 });
-bookmarkSchema.index({ owner: 1, createdAt: -1 });
 bookmarkSchema.index({ title: "text", url: "text", notes: "text" });
 
 module.exports = mongoose.model("Bookmark", bookmarkSchema);

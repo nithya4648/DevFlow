@@ -34,7 +34,6 @@ const docSchema = new mongoose.Schema(
 
 // Indexes for quick filtering
 docSchema.index({ owner: 1, category: 1, updatedAt: -1 });
-docSchema.index({ owner: 1, createdAt: -1 });
-docSchema.index({ title: "text", content: "text" });
+docSchema.index({ title: "text" });
 
 module.exports = mongoose.model("Doc", docSchema);

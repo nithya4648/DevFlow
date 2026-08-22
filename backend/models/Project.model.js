@@ -53,9 +53,6 @@ const projectSchema = new mongoose.Schema(
 
 // Indexes for efficient queries with filters
 projectSchema.index({ owner: 1, status: 1, priority: 1, createdAt: -1 });
-// Individual filter indexes
-projectSchema.index({ status: 1, owner: 1 });
-projectSchema.index({ priority: 1, owner: 1 });
 // Text search
 projectSchema.index({ title: "text", description: "text" });
 

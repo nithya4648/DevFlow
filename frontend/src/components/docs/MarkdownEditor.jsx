@@ -1,5 +1,5 @@
 // frontend/src/components/docs/MarkdownEditor.jsx
-import { useEffect, useRef, useState, memo } from "react";
+import { useEffect, useRef, useState } from "react";
 import { marked } from "marked";
 import DOMPurify from "dompurify";
 
@@ -14,7 +14,7 @@ function renderMarkdown(md) {
   return DOMPurify.sanitize(rawHtml);
 }
 
-export default memo(function MarkdownEditor({ title, content, category, onSave, isSaving, readOnly = false }) {
+export default function MarkdownEditor({ title, content, category, onSave, isSaving, readOnly = false }) {
   const [localTitle, setLocalTitle] = useState(title || "");
   const [localContent, setLocalContent] = useState(content || "");
   const [localCategory, setLocalCategory] = useState(category || "General");
@@ -204,11 +204,4 @@ export default memo(function MarkdownEditor({ title, content, category, onSave, 
       </div>
     </div>
   );
-}, (prev, next) => {
-  return (
-    prev.title === next.title &&
-    prev.content === next.content &&
-    prev.category === next.category &&
-    prev.onSave === next.onSave
-  );
-});
+}
