@@ -31,12 +31,54 @@ const server = http.createServer(app);
 const { configureSocket } = require("./utils/socketService");
 
 // Socket.io setup (real-time notifications/activity feed)
+const jwt = require("jsonwebtoken");
+
 const io = new Server(server, {
   cors: { origin: process.env.CLIENT_URL, credentials: true },
 });
+
+// Socket.io authentication middleware — reject unauthenticated connections
+io.use(async (socket, next) => {
+  const token = socket.handshake.auth.token ||
+                socket.handshake.headers.cookie?.split('devflow_token=')[1];
+
+  if (!token) {
+    logger.warn("Socket connection rejected: no token");
+    return next(new Error("Authentication required"));
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    socket.userId = decoded.id;
+    socket.email = decoded.email;
+    logger.info({ userId: decoded.id }, "Socket authenticated");
+    next();
+  } catch (err) {
+    if (err.name === "TokenExpiredError") {
+      logger.warn("Socket rejected: token expired");
+      return next(new Error("Token expired, reconnect with new token"));
+    }
+    logger.warn("Socket rejected: invalid token");
+    return next(new Error("Invalid authentication token"));
+  }
+});
+
 app.set("io", io);
 global.io = io;
 configureSocket(io);
+
+// Socket lifecycle logging
+io.on("connection", (socket) => {
+  logger.info({ userId: socket.userId }, "Socket connected");
+
+  socket.on("disconnect", () => {
+    logger.info({ userId: socket.userId }, "Socket disconnected");
+  });
+
+  socket.on("error", (err) => {
+    logger.error({ userId: socket.userId, error: err.message }, "Socket error");
+  });
+});
 
 // Core middleware
 const helmet = require("helmet");

@@ -32,6 +32,7 @@ const noteSchema = new mongoose.Schema(
 );
 
 noteSchema.index({ owner: 1, folder: 1, updatedAt: -1 });
+noteSchema.index({ owner: 1, createdAt: -1 });
 noteSchema.index({ title: "text", content: "text" });
 
 module.exports = mongoose.model("Note", noteSchema);

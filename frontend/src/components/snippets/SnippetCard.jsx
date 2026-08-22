@@ -1,4 +1,5 @@
 // frontend/src/components/snippets/SnippetCard.jsx
+import { memo } from "react";
 import useCopyToClipboard from "../../hooks/useCopyToClipboard";
 
 // Map language → file extension for export
@@ -36,7 +37,7 @@ function exportSnippet(snippet) {
   URL.revokeObjectURL(url);
 }
 
-export default function SnippetCard({ snippet, onEdit, onDelete, onToggleFavorite, canEdit = true, canDelete = true }) {
+export default memo(function SnippetCard({ snippet, onEdit, onDelete, onToggleFavorite, canEdit = true, canDelete = true }) {
   const [copied, copy] = useCopyToClipboard();
   const langColor = LANG_COLOR[snippet.language] || "text-gh-muted bg-gh-subtle border-gh-border";
   const codePreview = snippet.code.split("\n").slice(0, 5).join("\n");
@@ -171,4 +172,11 @@ export default function SnippetCard({ snippet, onEdit, onDelete, onToggleFavorit
       </div>
     </div>
   );
-}
+}, (prev, next) => {
+  return (
+    prev.snippet._id === next.snippet._id &&
+    prev.snippet.isFavorite === next.snippet.isFavorite &&
+    prev.snippet.updatedAt === next.snippet.updatedAt &&
+    prev.onEdit === next.onEdit
+  );
+});

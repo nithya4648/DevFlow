@@ -54,6 +54,8 @@ const snippetSchema = new mongoose.Schema(
 
 // Efficient queries
 snippetSchema.index({ owner: 1, language: 1, isFavorite: 1, createdAt: -1 });
+// Tag-based filtering
+snippetSchema.index({ tags: 1, owner: 1 });
 // Text search on title and description (set language_override to avoid conflicts with snippet language field)
 snippetSchema.index({ title: "text", description: "text" }, { language_override: "text_language" });
 

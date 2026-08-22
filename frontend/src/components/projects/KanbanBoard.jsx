@@ -1,5 +1,5 @@
 // frontend/src/components/projects/KanbanBoard.jsx
-import { useState } from "react";
+import { useState, memo } from "react";
 import {
   DndContext,
   DragOverlay,
@@ -15,7 +15,7 @@ import KanbanCard from "./KanbanCard";
 
 const STATUSES = ["todo", "in-progress", "done"];
 
-export default function KanbanBoard({ projects, onStatusChange, onEdit, onDelete, onAddNew, getPerms }) {
+export default memo(function KanbanBoard({ projects, onStatusChange, onEdit, onDelete, onAddNew, getPerms }) {
   const [activeProject, setActiveProject] = useState(null);
 
   const sensors = useSensors(
@@ -94,4 +94,12 @@ export default function KanbanBoard({ projects, onStatusChange, onEdit, onDelete
       </DragOverlay>
     </DndContext>
   );
-}
+}, (prevProps, nextProps) => {
+  return (
+    JSON.stringify(prevProps.projects) === JSON.stringify(nextProps.projects) &&
+    prevProps.onStatusChange === nextProps.onStatusChange &&
+    prevProps.onEdit === nextProps.onEdit &&
+    prevProps.onDelete === nextProps.onDelete &&
+    prevProps.onAddNew === nextProps.onAddNew
+  );
+});
