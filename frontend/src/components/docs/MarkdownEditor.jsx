@@ -20,8 +20,27 @@ export default function MarkdownEditor({ title, content, category, onSave, isSav
   const [localCategory, setLocalCategory] = useState(category || "General");
   const [preview, setPreview] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
+  const [editorWidth, setEditorWidth] = useState(null);
   const autoSaveTimer = useRef(null);
 
+  const handleMouseDown = (e) => {
+    e.preventDefault();
+    const startX = e.clientX;
+    const startWidth = e.target.parentElement.getBoundingClientRect().width;
+    
+    const onMouseMove = (moveEvent) => {
+      const newWidth = Math.max(200, startWidth + (moveEvent.clientX - startX));
+      setEditorWidth(newWidth);
+    };
+    
+    const onMouseUp = () => {
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+    };
+    
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+  };
 
   // Sync props when doc changes
   useEffect(() => {
@@ -83,7 +102,7 @@ export default function MarkdownEditor({ title, content, category, onSave, isSav
   const rendered = renderMarkdown(localContent);
 
   return (
-    <div className="flex flex-col flex-1 min-h-0 font-ui p-4 space-y-4">
+    <div className="flex flex-col flex-1 min-h-[80vh] font-ui p-2 space-y-2">
       {/* Doc header bar */}
       <div className="flex items-center gap-3 mb-0 flex-wrap justify-between">
         <input
@@ -163,9 +182,19 @@ export default function MarkdownEditor({ title, content, category, onSave, isSav
       </div>
 
       {/* Split pane */}
-      <div className="flex-1 min-h-0 flex gap-4 overflow-hidden">
+      <div className="flex-1 min-h-0 flex overflow-hidden">
         {/* Editor pane — always rendered but hidden in preview mode */}
-        <div className={`flex-1 min-h-0 ${preview ? "hidden" : "flex"} flex-col bg-gh-bg rounded-md border border-gh-border overflow-hidden`}>
+        <div 
+          className={`min-h-0 ${preview ? "hidden" : "flex"} flex-col bg-gh-bg rounded-md border border-gh-border overflow-hidden relative`}
+          style={editorWidth ? { width: editorWidth, flex: 'none' } : { flex: 1 }}
+        >
+          {/* Resize Handle */}
+          {!preview && (
+            <div 
+              onMouseDown={handleMouseDown}
+              className="absolute right-0 top-0 bottom-0 w-2 cursor-col-resize hover:bg-accent-border/50 z-10"
+            />
+          )}
           <textarea
             value={localContent}
             onChange={(e) => { if (!readOnly) { setLocalContent(e.target.value); markDirty(); } }}
@@ -183,7 +212,7 @@ export default function MarkdownEditor({ title, content, category, onSave, isSav
 
         {/* Preview pane */}
         {preview && (
-          <div className="flex-1 min-h-0 overflow-y-auto bg-gh-surface border border-gh-border rounded-md px-5 py-4">
+          <div className="flex-1 min-h-0 overflow-y-auto bg-gh-surface border border-gh-border rounded-md px-5 py-4 ml-4">
             {localContent.trim() ? (
               <div
                 className="prose prose-sm max-w-none prose-headings:text-gh-heading prose-p:text-gh-text prose-a:text-accent-fg prose-code:text-accent-fg prose-pre:bg-gh-surface prose-pre:border prose-pre:border-gh-border prose-blockquote:border-gh-border prose-blockquote:text-gh-muted"
@@ -197,7 +226,7 @@ export default function MarkdownEditor({ title, content, category, onSave, isSav
 
         {/* Side-by-side in wide layout when not toggled */}
         {!preview && (
-          <div className="hidden xl:flex flex-1 min-h-0 overflow-y-auto bg-gh-bg border border-gh-border rounded-md px-5 py-4 flex-col">
+          <div className="hidden xl:flex flex-1 min-h-0 overflow-y-auto bg-gh-bg border border-gh-border rounded-md px-5 py-4 flex-col ml-4">
             <p className="text-[10px] uppercase font-mono font-semibold text-gh-muted tracking-wider mb-3">Preview</p>
             {localContent.trim() ? (
               <div

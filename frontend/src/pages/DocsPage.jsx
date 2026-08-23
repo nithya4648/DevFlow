@@ -1,16 +1,13 @@
-// frontend/src/pages/DocsPage.jsx
 import { useState, useEffect } from "react";
 import { useDocs, useDoc, useCreateDoc, useUpdateDoc, useDeleteDoc } from "../hooks/useDocs";
 import DocSidebar from "../components/docs/DocSidebar";
 import MarkdownEditor from "../components/docs/MarkdownEditor";
-import DocVersionHistory from "../components/docs/DocVersionHistory";
 import CommentSection from "../components/collaboration/CommentSection";
 import { Skeleton } from "../components/ui/Skeleton";
 
 export default function DocsPage() {
   const [search, setSearch] = useState("");
   const [selectedDocId, setSelectedDocId] = useState(null);
-  const [showHistory, setShowHistory] = useState(false);
 
   // Fetch list of docs
   const { data: docsData, isLoading: loadingDocs, isError: docsError } = useDocs({ search });
@@ -29,9 +26,20 @@ export default function DocsPage() {
   useEffect(() => {
     if (selectedDocId && !loadingDocs && !docs.find((d) => d._id === selectedDocId)) {
       setSelectedDocId(null);
-      setShowHistory(false);
     }
   }, [docs, selectedDocId, loadingDocs]);
+  
+  // Navigation block
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (window.__isDocSaving) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, []);
 
   function handleNewDoc() {
     createMutation.mutate(
@@ -63,18 +71,6 @@ export default function DocsPage() {
     });
   }
 
-  function handleRestoreVersion(version) {
-    if (!selectedDocId) return;
-    updateMutation.mutate({
-      id: selectedDocId,
-      data: {
-        title: version.title,
-        content: version.content,
-      },
-    });
-    setShowHistory(false);
-  }
-
   return (
     <div className="flex-1 flex overflow-hidden font-ui flex-col lg:flex-row">
       {/* Sidebar listing */}
@@ -84,7 +80,6 @@ export default function DocsPage() {
         selectedDocId={selectedDocId}
         onSelectDoc={(id) => {
           setSelectedDocId(id);
-          setShowHistory(false);
         }}
         onNewDoc={handleNewDoc}
         onDeleteDoc={handleDeleteDoc}
@@ -133,17 +128,6 @@ export default function DocsPage() {
           </div>
         ) : selectedDoc ? (
           <div className="flex-1 flex flex-col min-h-0 relative">
-            <div className="absolute right-0 top-0 z-10 flex items-center gap-2">
-              <button
-                onClick={() => setShowHistory(true)}
-                className="btn-secondary text-xs py-1 px-2.5"
-              >
-                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                History
-              </button>
-            </div>
 
             <MarkdownEditor
               title={selectedDoc.title}
@@ -162,14 +146,6 @@ export default function DocsPage() {
           </div>
         ) : null}
 
-        {/* History overlay */}
-        {showHistory && selectedDocId && (
-          <DocVersionHistory
-            docId={selectedDocId}
-            onClose={() => setShowHistory(false)}
-            onRestore={handleRestoreVersion}
-          />
-        )}
       </div>
     </div>
   );

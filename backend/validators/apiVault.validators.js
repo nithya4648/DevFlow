@@ -11,8 +11,8 @@ const createApiVaultSchema = z.object({
     .trim(),
   key: z
     .string()
-    .min(10, "API key is too short")
-    .max(2048, "Key is too long"),
+    .min(1, "API key must be between 1 and 2048 characters")
+    .max(2048, "API key must be between 1 and 2048 characters"),
   value: z
     .string()
     .max(10000, "Value is too long")

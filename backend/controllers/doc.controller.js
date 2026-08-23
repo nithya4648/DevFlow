@@ -65,15 +65,26 @@ const createDoc = async (req, res, next) => {
   try {
     const validatedData = createDocSchema.parse(req.body);
 
-    const doc = await Doc.create({
+    const doc = new Doc({
       ...validatedData,
       owner: req.user._id,
     });
+    
+    await doc.save();
 
     await logActivity(req.user._id, "created document", "doc", doc._id, doc.title);
 
-    res.status(201).json({ success: true, data: doc });
+    res.status(201).json({ 
+      success: true, 
+      data: {
+        _id: doc._id,
+        title: doc.title,
+        content: doc.content,
+        userId: doc.owner
+      } 
+    });
   } catch (error) {
+    console.error(error);
     next(error);
   }
 };

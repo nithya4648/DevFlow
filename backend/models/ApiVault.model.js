@@ -16,7 +16,7 @@ const apiVaultSchema = new mongoose.Schema(
     key: {
       type: String,
       required: true,
-      maxlength: [10000, "Encrypted key too large"],
+      maxlength: [3000, "Encrypted key too large"],
       trim: false
     },
     value: {
@@ -58,20 +58,24 @@ function maskSecret(str) {
 
 // Encrypt key and value before saving
 apiVaultSchema.pre('save', function (next) {
-  if (this.isModified('key')) {
-    this.maskedKey = maskSecret(this.key);
-    this.key = encrypt(this.key);
-  }
-  if (this.isModified('value')) {
-    if (this.value) {
-      this.maskedValue = maskSecret(this.value);
-      this.value = encrypt(this.value);
-    } else {
-      this.maskedValue = undefined;
-      this.value = undefined;
+  try {
+    if (this.isModified('key')) {
+      this.maskedKey = maskSecret(this.key);
+      this.key = encrypt(this.key);
     }
+    if (this.isModified('value')) {
+      if (this.value) {
+        this.maskedValue = maskSecret(this.value);
+        this.value = encrypt(this.value);
+      } else {
+        this.maskedValue = undefined;
+        this.value = undefined;
+      }
+    }
+    next();
+  } catch (err) {
+    next(new Error(`Failed to encrypt API key: ${err.message}`));
   }
-  next();
 });
 
 // Decrypt methods (do not expose encrypted values directly)

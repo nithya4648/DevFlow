@@ -224,11 +224,24 @@ const revealVault = async (req, res, next) => {
     auditLog(req.user._id, "reveal", vault._id, vault.name);
     logger.info({ userId: req.user._id, vaultId: vault._id }, "API Vault entry revealed");
 
+    let decryptedKey, decryptedValue;
+    try {
+      decryptedKey = vault.decryptKey();
+    } catch (err) {
+      throw new Error(`Failed to decrypt API key. Possible cause: corrupted data`);
+    }
+
+    try {
+      decryptedValue = vault.decryptValue();
+    } catch (err) {
+      decryptedValue = ""; // Fallback for optional values
+    }
+
     res.status(200).json({
       success: true,
       data: {
-        key: vault.decryptKey(),
-        value: vault.decryptValue(),
+        key: decryptedKey,
+        value: decryptedValue,
       },
     });
   } catch (error) {

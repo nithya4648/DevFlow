@@ -21,23 +21,6 @@ export function useDoc(id) {
   });
 }
 
-export function useDocVersions(docId) {
-  return useQuery({
-    queryKey: [DOC_KEY, "versions", docId],
-    queryFn: () => docService.getVersions(docId),
-    enabled: !!docId,
-    staleTime: 0, // always fresh
-  });
-}
-
-export function useDocVersion(docId, versionId) {
-  return useQuery({
-    queryKey: [DOC_KEY, "version", docId, versionId],
-    queryFn: () => docService.getVersionById(docId, versionId),
-    enabled: !!docId && !!versionId,
-  });
-}
-
 export function useCreateDoc() {
   const qc = useQueryClient();
   return useMutation({
@@ -49,8 +32,12 @@ export function useCreateDoc() {
 export function useUpdateDoc() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, data }) => docService.updateDoc(id, data),
+    mutationFn: ({ id, data }) => {
+      window.__isDocSaving = true;
+      return docService.updateDoc(id, data);
+    },
     onMutate: async ({ id, data }) => {
+      window.__isDocSaving = true;
       // Cancel outgoing queries to prevent race condition
       await qc.cancelQueries({ queryKey: [DOC_KEY, "detail", id] });
       
@@ -66,17 +53,22 @@ export function useUpdateDoc() {
       return { previousDoc, id };
     },
     onSuccess: (responseData, { id }) => {
+      window.__isDocSaving = false;
       // Update with server response (source of truth)
       qc.setQueryData([DOC_KEY, "detail", id], responseData);
       // Invalidate list to reflect updated timestamp
       qc.invalidateQueries({ queryKey: [DOC_KEY, "list"] });
-      qc.invalidateQueries({ queryKey: [DOC_KEY, "versions", id] });
     },
     onError: (error, { id }, context) => {
+      window.__isDocSaving = false;
+      console.error("Save failed", error);
       // Rollback on error
       if (context?.previousDoc) {
         qc.setQueryData([DOC_KEY, "detail", id], context.previousDoc);
       }
+    },
+    onSettled: () => {
+      window.__isDocSaving = false;
     }
   });
 }

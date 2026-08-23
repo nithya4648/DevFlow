@@ -14,11 +14,11 @@ const createEnvSchema = z.object({
   key: z
     .string()
     .min(3, "Key must be at least 3 characters")
-    .max(128, "Key cannot exceed 128 characters")
+    .max(256, "Key cannot exceed 256 characters")
     .regex(/^[a-zA-Z_][a-zA-Z0-9_]*$/, "Key must be a valid environment variable name (alphanumeric and underscores only)"),
   value: z
     .string()
-    .min(1, "Value is required")
+    .min(3, "Value must be at least 3 characters")
     .max(3000, "Value cannot exceed 3000 characters"),
 });
 
@@ -26,12 +26,12 @@ const updateEnvSchema = z.object({
   key: z
     .string()
     .min(3, "Key must be at least 3 characters")
-    .max(128, "Key cannot exceed 128 characters")
+    .max(256, "Key cannot exceed 256 characters")
     .regex(/^[a-zA-Z_][a-zA-Z0-9_]*$/)
     .optional(),
   value: z
     .string()
-    .min(1, "Value is required")
+    .min(3, "Value must be at least 3 characters")
     .max(3000, "Value cannot exceed 3000 characters")
     .optional(),
 });
