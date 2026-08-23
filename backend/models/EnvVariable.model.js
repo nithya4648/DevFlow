@@ -18,7 +18,7 @@ const envVariableSchema = new mongoose.Schema(
     value: {
       type: String,
       required: [true, "Value is required"],
-      maxlength: [3500, "Encrypted value too large"],
+      maxlength: [14000, "Encrypted value too large"],
       // The getter decrypts the value automatically when accessed
       get: (encryptedValue) => decrypt(encryptedValue),
       // The setter encrypts the value before saving

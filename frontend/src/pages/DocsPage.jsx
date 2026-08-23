@@ -4,6 +4,7 @@ import DocSidebar from "../components/docs/DocSidebar";
 import MarkdownEditor from "../components/docs/MarkdownEditor";
 import CommentSection from "../components/collaboration/CommentSection";
 import { Skeleton } from "../components/ui/Skeleton";
+import { useToast } from "../context/ToastContext";
 
 export default function DocsPage() {
   const [search, setSearch] = useState("");
@@ -18,6 +19,7 @@ export default function DocsPage() {
   const { data: docDetailData, isLoading: loadingDetail } = useDoc(selectedDocId);
   const selectedDoc = docDetailData?.data;
 
+  const { addToast } = useToast();
   const createMutation = useCreateDoc();
   const updateMutation = useUpdateDoc();
   const deleteMutation = useDeleteDoc();
@@ -54,11 +56,15 @@ export default function DocsPage() {
 
   function handleSaveDoc({ title, content, category }) {
     if (!selectedDocId) return;
-    console.log('Saving doc:', { id: selectedDocId, title, content: content.substring(0, 50) + '...' });
-    updateMutation.mutate({
-      id: selectedDocId,
-      data: { title, content, category },
-    });
+    updateMutation.mutate(
+      { id: selectedDocId, data: { title, content, category } },
+      {
+        onError: (err) => {
+          const msg = err?.response?.data?.message || err?.message || "Failed to save document";
+          addToast(`Save failed: ${msg}`, "error");
+        },
+      }
+    );
   }
 
   function handleDeleteDoc(docId) {
@@ -130,6 +136,7 @@ export default function DocsPage() {
           <div className="flex-1 flex flex-col min-h-0 relative">
 
             <MarkdownEditor
+              docId={selectedDoc._id}
               title={selectedDoc.title}
               content={selectedDoc.content}
               category={selectedDoc.category}

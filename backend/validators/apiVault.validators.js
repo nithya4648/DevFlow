@@ -7,7 +7,7 @@ const createApiVaultSchema = z.object({
   name: z
     .string()
     .min(1, "Name is required")
-    .max(120, "Name cannot exceed 120 characters")
+    .max(150, "Name cannot exceed 150 characters")
     .trim(),
   key: z
     .string()

@@ -19,7 +19,7 @@ const createEnvSchema = z.object({
   value: z
     .string()
     .min(3, "Value must be at least 3 characters")
-    .max(3000, "Value cannot exceed 3000 characters"),
+    .max(10000, "Value cannot exceed 10000 characters"),
 });
 
 const updateEnvSchema = z.object({
@@ -32,7 +32,7 @@ const updateEnvSchema = z.object({
   value: z
     .string()
     .min(3, "Value must be at least 3 characters")
-    .max(3000, "Value cannot exceed 3000 characters")
+    .max(10000, "Value cannot exceed 10000 characters")
     .optional(),
 });
 

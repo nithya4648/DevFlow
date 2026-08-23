@@ -14,7 +14,7 @@ function renderMarkdown(md) {
   return DOMPurify.sanitize(rawHtml);
 }
 
-export default function MarkdownEditor({ title, content, category, onSave, isSaving, readOnly = false }) {
+export default function MarkdownEditor({ docId, title, content, category, onSave, isSaving, readOnly = false }) {
   const [localTitle, setLocalTitle] = useState(title || "");
   const [localContent, setLocalContent] = useState(content || "");
   const [localCategory, setLocalCategory] = useState(category || "General");
@@ -22,6 +22,13 @@ export default function MarkdownEditor({ title, content, category, onSave, isSav
   const [isDirty, setIsDirty] = useState(false);
   const [editorWidth, setEditorWidth] = useState(null);
   const autoSaveTimer = useRef(null);
+  // Refs that always hold the latest values — used in the unmount-save effect
+  // so stale closures can't fire a save with old data.
+  const latestTitle = useRef(localTitle);
+  const latestContent = useRef(localContent);
+  const latestCategory = useRef(localCategory);
+  const latestIsDirty = useRef(isDirty);
+  const latestOnSave = useRef(onSave);
 
   const handleMouseDown = (e) => {
     e.preventDefault();
@@ -42,13 +49,22 @@ export default function MarkdownEditor({ title, content, category, onSave, isSav
     document.addEventListener('mouseup', onMouseUp);
   };
 
-  // Sync props when doc changes
+  // Keep refs in sync so the unmount effect always has fresh values
+  useEffect(() => { latestTitle.current = localTitle; });
+  useEffect(() => { latestContent.current = localContent; });
+  useEffect(() => { latestCategory.current = localCategory; });
+  useEffect(() => { latestIsDirty.current = isDirty; });
+  useEffect(() => { latestOnSave.current = onSave; });
+
+  // Sync props → local state ONLY when the selected document changes.
+  // Keying on [docId] (not [title, content, category]) prevents react-query
+  // background refetches from silently overwriting in-progress edits.
   useEffect(() => {
     setLocalTitle(title || "");
     setLocalContent(content || "");
     setLocalCategory(category || "General");
     setIsDirty(false);
-  }, [title, content, category]);
+  }, [docId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function markDirty() {
     setIsDirty(true);
@@ -91,13 +107,20 @@ export default function MarkdownEditor({ title, content, category, onSave, isSav
     return () => window.removeEventListener("keydown", handler);
   });
 
+  // On unmount: flush any pending auto-save using the latest ref values.
+  // Empty deps array is intentional — we read state via refs, not the closure.
   useEffect(() => {
     return () => {
-      // When component unmounts, fire save if dirty
       if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current);
-      if (isDirty) handleSave();
+      if (latestIsDirty.current) {
+        latestOnSave.current({
+          title: latestTitle.current,
+          content: latestContent.current,
+          category: latestCategory.current,
+        });
+      }
     };
-  }, [isDirty]);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const rendered = renderMarkdown(localContent);
 

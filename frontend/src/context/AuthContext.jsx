@@ -1,5 +1,6 @@
 import { createContext, useState, useEffect, useCallback } from "react";
 import authService from "../services/auth.service";
+import { retryRequest, retryConfig } from "../utils/retryConfig";
 
 export const AuthContext = createContext(null);
 
@@ -10,7 +11,12 @@ export const AuthProvider = ({ children }) => {
   const checkAuth = useCallback(async () => {
     try {
       setLoading(true);
-      const data = await authService.getMe();
+      // Use the same retry helper as LoginPage so a Render cold-start doesn't
+      // leave the app stuck on the loading screen with a user who is logged in.
+      const data = await retryRequest(() => authService.getMe(), {
+        ...retryConfig,
+        maxAttempts: 3,
+      });
       if (data.success && data.user) {
         setUser(data.user);
       } else {
