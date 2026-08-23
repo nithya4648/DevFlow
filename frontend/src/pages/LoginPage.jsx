@@ -17,6 +17,7 @@ function LoginPage() {
   const [unverifiedEmail, setUnverifiedEmail] = useState("");
   const [isResending, setIsResending] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [loadingTime, setLoadingTime] = useState(0);
 
   useEffect(() => {
     const error = searchParams.get("error");
@@ -39,8 +40,14 @@ function LoginPage() {
 
   const onSubmit = async (data) => {
     setUnverifiedEmail("");
+    setLoadingTime(0);
+    let timeInterval;
     try {
       setIsSubmitting(true);
+      const startTime = Date.now();
+      timeInterval = setInterval(() => {
+        setLoadingTime(Date.now() - startTime);
+      }, 500);
       const res = await retryRequest(() => login(data), { ...retryConfig, maxAttempts: 4 });
       if (res?.success) {
         addToast("Logged in successfully!", "success");
@@ -88,6 +95,8 @@ function LoginPage() {
         setUnverifiedEmail(data.email);
       }
     } finally {
+      clearInterval(timeInterval);
+      setLoadingTime(0);
       setIsSubmitting(false);
     }
   };
@@ -222,6 +231,15 @@ function LoginPage() {
             >
               {isSubmitting ? <FaSpinner className="animate-spin" /> : "Sign In"}
             </button>
+
+            {/* Cold-start status feedback */}
+            {isSubmitting && (
+              <p className="text-center text-xs font-mono mt-2 text-gh-muted animate-pulse">
+                {loadingTime < 3000 && "Connecting to server..."}
+                {loadingTime >= 3000 && loadingTime < 20000 && "Server is waking up… please wait (30–60 sec)"}
+                {loadingTime >= 20000 && "Still connecting… retrying automatically"}
+              </p>
+            )}
           </form>
 
           {/* Divider */}
