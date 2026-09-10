@@ -60,7 +60,12 @@ export default function DocsPage() {
       { id: selectedDocId, data: { title, content, category } },
       {
         onError: (err) => {
-          const msg = err?.response?.data?.message || err?.message || "Failed to save document";
+          const data = err?.response?.data;
+          let msg = data?.message || err?.message || "Failed to save document";
+          if (data?.errors) {
+            const fieldMsgs = Object.entries(data.errors).map(([k, v]) => `${k}: ${v}`).join("; ");
+            msg = `${msg} (${fieldMsgs})`;
+          }
           addToast(`Save failed: ${msg}`, "error");
         },
       }
