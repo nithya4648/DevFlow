@@ -1,7 +1,7 @@
 {
   "name": "devflow-backend",
   "version": "1.0.0",
-  "description": "DevFlow - The Operating System for Developers (Backend)",
+  "description": "Developer Center - The Operating System for Developers (Backend)",
   "main": "server.js",
   "type": "commonjs",
   "scripts": {

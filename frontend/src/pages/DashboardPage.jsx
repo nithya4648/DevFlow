@@ -24,7 +24,7 @@ export const DashboardPage = () => {
   return (
     <div className="space-y-5 font-ui">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gh-heading font-mono mb-1">DevFlow</h1>
+        <h1 className="text-3xl font-bold text-gh-heading font-mono mb-1">Developer Center</h1>
         <p className="text-sm text-gh-muted font-mono">The Operating System for Developers</p>
       </div>
 

@@ -36,7 +36,7 @@ export const DashboardLayout = () => {
   const navigate = useNavigate();
 
   const [collapsed, setCollapsed] = useState(() => {
-    return localStorage.getItem("devflow_sidebar_collapsed") === "true";
+    return (localStorage.getItem("developer_center_sidebar_collapsed") || localStorage.getItem("devflow_sidebar_collapsed")) === "true";
   });
   const [mobileOpen, setMobileOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
@@ -46,7 +46,7 @@ export const DashboardLayout = () => {
   const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
 
   useEffect(() => {
-    localStorage.setItem("devflow_sidebar_collapsed", collapsed);
+    localStorage.setItem("developer_center_sidebar_collapsed", collapsed);
   }, [collapsed]);
 
   // Close mobile sidebar on route change
@@ -216,7 +216,7 @@ export const DashboardLayout = () => {
                       onClick={() => setNotifDropdownOpen(false)}
                       className="fixed inset-0 z-40"
                     />
-                    <div className="absolute right-0 mt-2 w-80 rounded-md border border-gh-border bg-gh-surface z-50 flex flex-col max-h-[400px] shadow-lg">
+                    <div className="absolute right-0 mt-2 w-[min(320px,calc(100vw-2rem))] rounded-md border border-gh-border bg-gh-surface z-50 flex flex-col max-h-[400px] shadow-lg">
                       {/* Header */}
                       <div className="flex items-center justify-between px-3 py-2 border-b border-gh-border">
                         <h2 className="text-xs font-mono font-bold text-gh-heading">Notifications</h2>

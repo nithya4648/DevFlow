@@ -18,7 +18,7 @@ const {
 router.get("/", (req, res) => {
   res.status(200).json({
     success: true,
-    message: "DevFlow Auth API is operational",
+    message: "Developer Center Auth API is operational",
     endpoints: {
       register: "POST /api/auth/register",
       login: "POST /api/auth/login",

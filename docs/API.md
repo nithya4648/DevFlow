@@ -1,6 +1,6 @@
-# DevFlow REST API Specification
+# Developer Center REST API Specification
 
-DevFlow provides a unified REST API for developer productivity, notes, documentation wikis, code snippets, project tracking, and encrypted secret management.
+Developer Center provides a unified REST API for developer productivity, notes, documentation wikis, code snippets, project tracking, and encrypted secret management.
 
 ---
 

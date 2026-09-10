@@ -15,7 +15,7 @@ const DEFAULT_SHORTCUTS = [
 export const QuickLaunch = () => {
   const [shortcuts, setShortcuts] = useState(() => {
     try {
-      const saved = localStorage.getItem("devflow_quick_launch");
+      const saved = localStorage.getItem("developer_center_quick_launch") || localStorage.getItem("devflow_quick_launch");
       return saved ? JSON.parse(saved) : DEFAULT_SHORTCUTS;
     } catch (e) {
       return DEFAULT_SHORTCUTS;
@@ -28,7 +28,7 @@ export const QuickLaunch = () => {
 
   useEffect(() => {
     try {
-      localStorage.setItem("devflow_quick_launch", JSON.stringify(shortcuts));
+      localStorage.setItem("developer_center_quick_launch", JSON.stringify(shortcuts));
     } catch (e) {
       // ignore
     }

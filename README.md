@@ -1,4 +1,4 @@
-# DevFlow – Developer Workspace Platform
+# Developer Center – Developer Workspace Platform
 
 [![CI](https://github.com/nithya4648/DevFlow/actions/workflows/ci.yml/badge.svg)](https://github.com/nithya4648/DevFlow/actions/workflows/ci.yml)
 [![Node.js](https://img.shields.io/badge/Node.js-20.x-green.svg)](https://nodejs.org)
@@ -71,7 +71,7 @@ A developer workspace platform designed for productivity. Manage projects, code 
 
 ## 🧪 Testing & CI
 
-DevFlow includes integration tests covering auth flows, core CRUD operations, pagination, regex sanitization, and cryptographic round-trips:
+Developer Center includes integration tests covering auth flows, core CRUD operations, pagination, regex sanitization, and cryptographic round-trips:
 
 ```bash
 cd backend

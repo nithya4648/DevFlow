@@ -12,7 +12,7 @@ const DEFAULT_HEADER = `{
 
 const DEFAULT_PAYLOAD = `{
   "sub": "user_123",
-  "name": "DevFlow User",
+  "name": "Developer Center User",
   "iat": ${Math.floor(Date.now() / 1000)},
   "exp": ${Math.floor(Date.now() / 1000) + 3600}
 }`;

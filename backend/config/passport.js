@@ -60,7 +60,7 @@ passport.use(
           const welcomeNote = await Notification.create({
             recipient: newUser._id,
             type: "success",
-            message: `Welcome to DevFlow, ${newUser.name}! 🚀 Explore your new developer dashboard.`,
+            message: `Welcome to Developer Center, ${newUser.name}! Explore your new developer dashboard.`,
           });
           
           // emit is best effort since they haven't connected yet, but good to have

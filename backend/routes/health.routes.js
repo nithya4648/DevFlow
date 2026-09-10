@@ -4,7 +4,7 @@ const router = express.Router();
 router.get("/", (req, res) => {
   res.status(200).json({
     success: true,
-    message: "DevFlow API is running",
+    message: "Developer Center API is running",
     timestamp: new Date().toISOString(),
   });
 });

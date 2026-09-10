@@ -14,7 +14,7 @@ const ALGOS = [
 ];
 
 export default function HashGeneratorTool() {
-  const [input, setInput] = useState("Hello, DevFlow!");
+  const [input, setInput] = useState("Hello, Developer Center!");
   const [uppercase, setUppercase] = useState(false);
   const [hashes, setHashes] = useState({});
   const debounced = useDebounce(input, 300);

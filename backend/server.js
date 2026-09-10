@@ -160,7 +160,7 @@ app.use("/api/api-vault", apiVaultRoutes);
 
 // Root health-check — must exist so Render's health pings and browsers don't get a 404
 app.get("/", (req, res) => {
-  res.status(200).json({ success: true, message: "DevFlow API is running" });
+  res.status(200).json({ success: true, message: "Developer Center API is running" });
 });
 
 // Error handling (always last)
@@ -171,7 +171,7 @@ const PORT = process.env.PORT || 5000;
 
 if (require.main === module) {
   server.listen(PORT, () => {
-    logger.info({ port: PORT }, "DevFlow API running");
+    logger.info({ port: PORT }, "Developer Center API running");
   });
 
   connectDB();

@@ -85,7 +85,7 @@ const ApiKeysTab = () => {
           API Keys
         </h2>
         <p className="mt-0.5 text-xs text-gh-muted font-mono">
-          Manage API keys to access DevFlow programmatically.
+          Manage API keys to access Developer Center programmatically.
         </p>
       </div>
 

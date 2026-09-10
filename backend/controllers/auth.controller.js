@@ -63,7 +63,7 @@ const register = async (req, res, next) => {
       const welcomeNote = await Notification.create({
         recipient: user._id,
         type: "success",
-        message: `Welcome to DevFlow, ${user.name}! 🚀 Explore your new developer dashboard.`,
+        message: `Welcome to Developer Center, ${user.name}! Explore your new developer dashboard.`,
       });
       
       emitNotificationToUser(req, user._id, welcomeNote);

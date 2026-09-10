@@ -5,7 +5,7 @@ import CopyButton from "./CopyButton";
 
 export default function UrlEncoderTool() {
   const [mode, setMode] = useState("encode");
-  const [input, setInput] = useState("https://devflow.app/search?q=hello world&lang=en&page=1");
+  const [input, setInput] = useState("https://developer-center.app/search?q=hello world&lang=en&page=1");
   const [output, setOutput] = useState("");
   const [error, setError] = useState("");
   const [encodeType, setEncodeType] = useState("component"); // "component" | "full"

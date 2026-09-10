@@ -34,7 +34,7 @@ function EmptyState({ onAdd }) {
 
 function ProjectsSkeleton() {
   return (
-    <div className="flex gap-4 overflow-x-hidden">
+    <div className="flex gap-4 overflow-x-auto scroll-smooth">
       {[1, 2, 3].map((col) => (
         <div key={col} className="flex flex-col gap-3 w-72 shrink-0">
           <Skeleton className="h-8 w-32 rounded-md bg-gh-surface border border-gh-border" />

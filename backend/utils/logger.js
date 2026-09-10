@@ -5,13 +5,13 @@ const isProduction = process.env.NODE_ENV === "production";
 const logger = isProduction
   ? pino({
       level: process.env.LOG_LEVEL || "info",
-      base: { service: "devflow-backend" },
+      base: { service: "developer-center-backend" },
       timestamp: pino.stdTimeFunctions.isoTime,
     })
   : pino(
       {
         level: process.env.LOG_LEVEL || "info",
-        base: { service: "devflow-backend" },
+        base: { service: "developer-center-backend" },
         transport: {
           target: "pino-pretty",
           options: {

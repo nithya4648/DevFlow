@@ -11,7 +11,7 @@ export const useDarkMode = () => {
   const user = authContext?.user;
 
   const [theme, setTheme] = useState(() => {
-    const stored = localStorage.getItem("devflow_theme");
+    const stored = localStorage.getItem("developer_center_theme") || localStorage.getItem("devflow_theme");
     if (stored) return stored;
     if (user?.preferences?.theme) return user.preferences.theme;
     return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
@@ -19,7 +19,7 @@ export const useDarkMode = () => {
 
   // Sync initial theme from user preferences if no local storage preference is set yet
   useEffect(() => {
-    const stored = localStorage.getItem("devflow_theme");
+    const stored = localStorage.getItem("developer_center_theme") || localStorage.getItem("devflow_theme");
     if (!stored && user?.preferences?.theme) {
       setTheme(user.preferences.theme);
     }
@@ -38,7 +38,7 @@ export const useDarkMode = () => {
       root.classList.remove("dark");
     }
 
-    localStorage.setItem("devflow_theme", theme);
+    localStorage.setItem("developer_center_theme", theme);
   }, [theme]);
 
   const toggleTheme = () => {

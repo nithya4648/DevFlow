@@ -39,7 +39,7 @@ const AppearanceTab = () => {
       <div>
         <h2 className="text-base font-bold text-gh-heading font-mono">Appearance</h2>
         <p className="mt-0.5 text-xs text-gh-muted font-mono">
-          Customize how DevFlow looks and feels on your device.
+          Customize how Developer Center looks and feels on your device.
         </p>
       </div>
 

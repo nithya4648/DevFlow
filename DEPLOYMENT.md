@@ -1,6 +1,6 @@
 # Deployment Guide
 
-This document outlines the steps to deploy DevFlow to a production environment using MongoDB Atlas, Render (Backend), and Vercel (Frontend).
+This document outlines the steps to deploy Developer Center to a production environment using MongoDB Atlas, Render (Backend), and Vercel (Frontend).
 
 ## 1. Database: MongoDB Atlas
 
@@ -13,7 +13,7 @@ This document outlines the steps to deploy DevFlow to a production environment u
 
 1. **Create an Account**: Sign up at [Render](https://render.com/).
 2. **New Web Service**: Click "New" > "Web Service".
-3. **Connect Repository**: Connect your GitHub repository containing the DevFlow code.
+3. **Connect Repository**: Connect your GitHub repository containing the Developer Center code.
 4. **Configuration**:
    - **Root Directory**: `backend`
    - **Environment**: `Node`
@@ -30,7 +30,7 @@ This document outlines the steps to deploy DevFlow to a production environment u
 
 1. **Create an Account**: Sign up at [Vercel](https://vercel.com/).
 2. **New Project**: Click "Add New..." > "Project".
-3. **Connect Repository**: Connect your GitHub repository containing the DevFlow code.
+3. **Connect Repository**: Connect your GitHub repository containing the Developer Center code.
 4. **Configuration**:
    - **Root Directory**: Edit and select `frontend`
    - **Framework Preset**: Vite (Vercel should auto-detect this)

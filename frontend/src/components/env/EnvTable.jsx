@@ -48,7 +48,7 @@ export default function EnvTable({ envVars, onEdit, onDelete }) {
   }
 
   return (
-    <div className="gh-card overflow-hidden font-ui">
+    <div className="gh-card overflow-x-auto font-ui">
       <table className="w-full text-left border-collapse">
         <thead>
           <tr className="border-b border-gh-border bg-gh-subtle text-[11px] text-gh-muted font-mono font-semibold uppercase tracking-wider">
