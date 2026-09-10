@@ -31,9 +31,6 @@ const getEnvVars = async (req, res, next) => {
         return result;
       } catch (e) {
         console.error('Decryption failed for:', v.key, e);
-        if (v.key === 'JWT_SECRET' || v.key === 'DATABASE_URL') {
-          throw new Error(`Failed to decrypt env var "${v.key}": ${e.message}`);
-        }
         return { ...v.toObject(), value: "Unable to decrypt (corrupted or old format)" };
       }
     });

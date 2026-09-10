@@ -228,12 +228,13 @@ const revealVault = async (req, res, next) => {
     try {
       decryptedKey = vault.decryptKey();
     } catch (err) {
-      throw new Error(`Failed to decrypt API key. Possible cause: corrupted data`);
+      throw new Error(`Failed to decrypt API key: ${err.message}`);
     }
 
     try {
       decryptedValue = vault.decryptValue();
     } catch (err) {
+      if (err.message.includes('ENCRYPTION_KEY')) throw err;
       decryptedValue = ""; // Fallback for optional values
     }
 
