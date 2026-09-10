@@ -34,6 +34,12 @@ const errorHandler = (err, req, res, next) => {
     }, {});
   }
 
+  // Format Mongoose CastError (invalid ObjectId, etc.)
+  if (err.name === "CastError") {
+    statusCode = 400;
+    message = `Invalid ${err.path}: ${err.value}`;
+  }
+
   res.status(statusCode).json({
     success: false,
     message,

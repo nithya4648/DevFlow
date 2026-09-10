@@ -8,15 +8,11 @@ const authService = {
 
   login: async (credentials) => {
     const response = await api.post("/auth/login", credentials);
-    if (response.data.token) {
-      localStorage.setItem("developer_center_token", response.data.token);
-    }
     return response.data;
   },
 
   logout: async () => {
     const response = await api.post("/auth/logout");
-    localStorage.removeItem("developer_center_token");
     return response.data;
   },
 

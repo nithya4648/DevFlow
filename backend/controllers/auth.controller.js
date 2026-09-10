@@ -347,7 +347,11 @@ const verifyEmail = async (req, res, next) => {
 // @route   GET /api/auth/google/callback
 // @access  Public
 const googleCallback = async (req, res, next) => {
-  const clientUrl = process.env.CLIENT_URL || "https://dev-flow-zeta-ashy.vercel.app";
+  const clientUrl = process.env.CLIENT_URL;
+  if (!clientUrl) {
+    logger.error("CLIENT_URL is not set; cannot redirect after Google OAuth callback");
+    return res.status(500).json({ success: false, message: "Server misconfiguration" });
+  }
   try {
     const user = req.user;
     if (!user) {
