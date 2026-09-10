@@ -7,27 +7,43 @@
     --font-ui:   'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Consolas, monospace;
 
-    /* ─── LIGHT THEME: GitHub-style flat, clean whites / cool grays ─── */
-    --gh-bg:           #f6f8fa;   /* GitHub light page background */
+    /* ─── LIGHT THEME: clean off-white, black-and-white primary UI ─── */
+    --gh-bg:           #f5f5f5;   /* Off-white page background */
     --gh-surface:      #ffffff;   /* Card surface */
-    --gh-subtle:       #eaeef2;   /* Subtle hover / input fill */
-    --gh-border:       #d0d7de;   /* Standard border */
-    --gh-border-muted: #eaeef2;   /* Muted divider */
-    --gh-muted:        #656d76;   /* Secondary text / labels */
-    --gh-text:         #24292f;   /* Primary body text */
-    --gh-heading:      #1f2328;   /* Headings */
+    --gh-subtle:       #ebebeb;   /* Subtle hover / input fill */
+    --gh-border:       #d4d4d4;   /* Standard border */
+    --gh-border-muted: #e5e5e5;   /* Muted divider */
+    --gh-muted:        #737373;   /* Secondary text / labels */
+    --gh-text:         #262626;   /* Primary body text */
+    --gh-heading:      #0a0a0a;   /* Headings */
+
+    /* Glass card tokens (light mode: no glass effect, clean flat) */
+    --glass-bg:        rgba(255, 255, 255, 0.9);
+    --glass-border:    rgba(0, 0, 0, 0.06);
+    --glass-highlight: rgba(255, 255, 255, 0);
+
+    /* Logo filter: in light mode, make currentColor-based SVG dark */
+    --logo-filter: brightness(0);
   }
 
-  /* ─── DARK THEME: classic GitHub dark ─── */
+  /* ─── DARK THEME: near-black, glassmorphism-friendly ─── */
   .dark {
-    --gh-bg:           #0d1117;
-    --gh-surface:      #161b22;
-    --gh-subtle:       #21262d;
-    --gh-border:       #30363d;
-    --gh-border-muted: #21262d;
-    --gh-muted:        #8b949e;
-    --gh-text:         #c9d1d9;
-    --gh-heading:      #f0f6fc;
+    --gh-bg:           #0a0a0a;
+    --gh-surface:      #111111;
+    --gh-subtle:       #1a1a1a;
+    --gh-border:       #262626;
+    --gh-border-muted: #1a1a1a;
+    --gh-muted:        #737373;
+    --gh-text:         #a3a3a3;
+    --gh-heading:      #fafafa;
+
+    /* Glass card tokens (dark mode: subtle translucency + inner glow) */
+    --glass-bg:        rgba(255, 255, 255, 0.03);
+    --glass-border:    rgba(255, 255, 255, 0.08);
+    --glass-highlight: rgba(255, 255, 255, 0.04);
+
+    /* Logo filter: in dark mode, make SVG white */
+    --logo-filter: brightness(0) invert(1);
   }
 
   html, body, #root {
@@ -54,24 +70,34 @@
 }
 
 @layer components {
-  /* Flat GitHub-style card surface */
+  /* Flat card surface with subtle glass effect in dark mode */
   .gh-card {
-    @apply bg-gh-surface border border-gh-border rounded-md p-4 transition-colors;
+    @apply rounded-md p-4 transition-colors;
+    background: var(--glass-bg, var(--gh-surface));
+    border: 1px solid var(--glass-border, var(--gh-border));
+    box-shadow: inset 0 1px 0 0 var(--glass-highlight);
   }
 
-  /* Primary Action Button (Solid GitHub Action Green) */
+  /* In light mode, cards are opaque and clean */
+  :root .gh-card {
+    background: var(--gh-surface);
+    border-color: var(--gh-border);
+    box-shadow: none;
+  }
+
+  /* Primary Action Button (accent color, slightly rounded) */
   .btn-primary {
     @apply inline-flex items-center justify-center gap-2 px-3 py-1.5 rounded-md bg-accent hover:bg-accent-hover text-white text-sm font-medium border border-white/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
-  /* Secondary Action Button */
+  /* Secondary Action Button (glass-style in dark, flat in light) */
   .btn-secondary {
     @apply inline-flex items-center justify-center gap-2 px-3 py-1.5 rounded-md bg-gh-subtle hover:bg-gh-border text-gh-text hover:text-gh-heading text-sm font-medium border border-gh-border transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
   /* Danger Button */
   .btn-danger {
-    @apply inline-flex items-center justify-center gap-2 px-3 py-1.5 rounded-md bg-[#da3633] hover:bg-[#b62324] text-white text-sm font-medium border border-white/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply inline-flex items-center justify-center gap-2 px-3 py-1.5 rounded-md bg-[#dc2626] hover:bg-[#b91c1c] text-white text-sm font-medium border border-white/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
   /* Ghost Button */

@@ -130,12 +130,12 @@ function LoginPage() {
           <div className="text-center">
             <img
               src="/favicon.svg"
-              alt="DevFlow"
+              alt="Developer Center"
               className="h-9 w-9 mb-3 mx-auto"
-              style={{ filter: 'brightness(0) saturate(100%) invert(1) sepia(1) saturate(2) hue-rotate(120deg)' }}
+              style={{ filter: 'var(--logo-filter, none)' }}
             />
             <h2 className="text-xl font-bold text-gh-heading">
-              Sign in to DevFlow
+              Sign in to Developer Center
             </h2>
             <p className="mt-1 text-xs text-gh-muted font-mono">
               Access your developer workstation
@@ -260,7 +260,7 @@ function LoginPage() {
           </button>
 
           <p className="mt-5 text-center text-xs text-gh-muted">
-            New to DevFlow?{" "}
+            New to Developer Center?{" "}
             <Link to="/register" className="font-medium text-accent-blue hover:underline">
               Create an account
             </Link>

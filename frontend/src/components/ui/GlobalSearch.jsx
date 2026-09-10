@@ -184,7 +184,7 @@ export const GlobalSearch = () => {
                 <div ref={listRef} className="flex-1 overflow-y-auto overflow-x-hidden p-2 min-h-[100px]">
                   {!query ? (
                     <div className="flex h-32 flex-col items-center justify-center text-xs font-mono text-gh-muted">
-                      <p>Start typing to search across DevFlow.</p>
+                      <p>Start typing to search across Developer Center.</p>
                       <p className="mt-1 text-[11px] text-gh-muted">
                         Try searching for a project or snippet title.
                       </p>
@@ -279,7 +279,7 @@ export const GlobalSearch = () => {
                     </span>
                   </div>
                   <div className="text-[10px] font-mono font-medium text-gh-muted">
-                    DevFlow Command
+                    Developer Center Command
                   </div>
                 </div>
               </motion.div>

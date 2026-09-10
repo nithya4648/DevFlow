@@ -10,8 +10,7 @@ export default {
         mono: ["var(--font-mono)", "ui-monospace", "SFMono-Regular", "monospace"],
       },
       colors: {
-        // gh-* tokens now reference CSS custom properties, so they respond to .dark
-        // Light values defined on :root, dark values overridden under .dark in index.css
+        // gh-* tokens reference CSS custom properties, responding to .dark
         gh: {
           bg:           "var(--gh-bg)",
           surface:      "var(--gh-surface)",
@@ -22,15 +21,15 @@ export default {
           text:         "var(--gh-text)",
           heading:      "var(--gh-heading)",
         },
-        // Dedicated, restrained accent palette (unchanged)
+        // Restrained neutral accent palette
         accent: {
           DEFAULT:       "#238636",
           hover:         "#2ea043",
           fg:            "#3fb950",
           light:         "rgba(35, 134, 54, 0.15)",
           border:        "rgba(46, 160, 67, 0.4)",
-          blue:          "#58a6ff",
-          "blue-hover":  "#79c0ff",
+          blue:          "#3b82f6",
+          "blue-hover":  "#60a5fa",
         },
       },
       borderRadius: {

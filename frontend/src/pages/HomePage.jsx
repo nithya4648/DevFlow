@@ -18,7 +18,7 @@ function HomePage() {
         <div className="mx-auto flex max-w-6xl items-center justify-between">
           <div className="flex items-center gap-3">
             <span className="text-xl font-bold font-mono tracking-tight text-gh-heading">
-              DevFlow
+              Developer Center
             </span>
             <span className="gh-badge-accent">v1.0</span>
           </div>
@@ -54,7 +54,7 @@ function HomePage() {
         <div className="w-full gh-card max-w-lg space-y-6">
           <div>
             <h1 className="text-2xl font-bold text-gh-heading">
-              Welcome to DevFlow
+              Welcome to Developer Center
             </h1>
             <p className="mt-1 text-sm text-gh-muted font-mono">
               Developer Workstation & Operations OS
