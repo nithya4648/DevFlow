@@ -14,7 +14,6 @@ const docVersionSchema = new mongoose.Schema(
     },
     content: {
       type: String,
-      required: true,
       default: "",
     },
     editedAt: {

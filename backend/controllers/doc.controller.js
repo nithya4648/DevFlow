@@ -132,7 +132,7 @@ const updateDoc = async (req, res, next) => {
     await DocVersion.create({
       docId: existing._id,
       title: existing.title,
-      content: existing.content,
+      content: existing.content || "",
       editedAt: existing.updatedAt,
     });
 
