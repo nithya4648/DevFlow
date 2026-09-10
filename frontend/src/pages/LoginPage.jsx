@@ -132,7 +132,6 @@ function LoginPage() {
               src="/favicon.svg"
               alt="Developer Center"
               className="h-9 w-9 mb-3 mx-auto"
-              style={{ filter: 'var(--logo-filter, none)' }}
             />
             <h2 className="text-xl font-bold text-gh-heading">
               Sign in to Developer Center

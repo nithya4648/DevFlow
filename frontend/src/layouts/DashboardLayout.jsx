@@ -102,7 +102,7 @@ export const DashboardLayout = () => {
         {/* Brand Header */}
         <div className="flex h-14 items-center justify-between px-4 border-b border-gh-border shrink-0">
           <Link to="/" className="flex items-center gap-2.5">
-            <img src="/favicon.svg" className="h-7 w-7 text-gh-heading" alt="Developer Center" style={{ filter: 'var(--logo-filter, none)' }} />
+            <img src="/favicon.svg" className="h-7 w-7 text-gh-heading" alt="Developer Center" />
             {!collapsed && (
               <span className="font-mono text-base font-bold tracking-tight text-gh-heading">
                 Developer Center
